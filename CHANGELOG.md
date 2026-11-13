@@ -15,7 +15,9 @@ Categorieën: **Toegevoegd**, **Gewijzigd**, **Opgelost**, **Verwijderd**, **Bev
 - Design-tokens met Utopia (type en space) en OKLCH `light-dark()`, light/dark-toggle, `DESIGN.md`.
 - SEO: meta, OG, JSON-LD, sitemap, `robots.txt`, `llms.txt` (site staat op `noindex` tot livegang).
 - Intake-mail met open punten (`docs/mail-intake.md`).
-- Testset `stack-test` met een echte opname (mp4 in `public/media/`) om de player met echt materiaal te testen. Tijdelijk, tot Bunny Stream.
+- `npm run set:add`: set toevoegen vanuit STACK (map READY) via Bunny Stream, zonder CMS. Bunny haalt de video zelf op; het script maakt het Markdown-bestand aan.
+- Bunny-thumbnail als still van een set (cover, kaart, player) als er geen eigen poster is.
+- Testset `stack-test` met een korte echte opname, nu via Bunny Stream (de mp4 is uit de repo).
 
 ### Gewijzigd
 - Video van de uitgelichte set speelt in het hero-podium op de home en zweeft rechtsonder als je wegscrollt.

@@ -72,13 +72,29 @@ DESIGN.md       Ontwerpsysteem
 
 ## Content en CMS
 
-- **Sets:** titel, omschrijving (body), datum, dj's, genres, avond (optioneel, leeg = losse set), video (`src` + `duration`), still (`poster`), tracklist (artiest, titel, label, optioneel tijd).
+- **Sets:** titel, omschrijving (body), datum, dj's, genres, avond (optioneel, leeg = losse set), video (`src`, `duration`, `bunny`, `stack`, `thumbnail`), eigen still (`poster`, anders de Bunny-thumbnail), tracklist (artiest, titel, label, optioneel tijd).
 - **DJs:** naam, plaats, resident, foto, links, bio (body).
 - **Genres:** titel, omschrijving.
 - **Events:** titel, start/eind, locatie, poster, RA-link, line-up, tekst (body).
 - **Pages:** about.
 - Schema: `src/content.config.ts`. De Markdown-content is **dummy** (fictieve dj's), behalve de avond van 30-07-2026 en de about-tekst.
 - Overstap naar Sanity volgens `~/Code/_standards/SANITY-MIGRATIE.md`; alle pagina's lezen via `src/lib/content.ts`.
+
+### Set toevoegen (tot Sanity er is)
+
+Sander zet de afgemonteerde opname in STACK, map **READY**, en stuurt de gegevens (titel, dj's, genres, tracklist). Dan:
+
+```bash
+npm run set:add            # kies een video uit STACK/READY en beantwoord de vragen
+npm run set:add -- --list  # alleen kijken wat er staat (✓ = al op de site)
+```
+
+Het script (`scripts/set-add.mjs`) laat Bunny Stream de video zelf uit STACK ophalen (server naar server), maakt `src/content/sets/<slug>.md` aan (plus nieuwe dj's/genres) en wacht tot Bunny klaar is met coderen. Daarna: tracklist en beschrijving aanvullen, checken met `npm run dev`, branch → PR naar `staging`.
+
+- Nodig in `.env`: `STACK_SHARE_URL`, `BUNNY_STREAM_LIBRARY_ID`, `BUNNY_STREAM_CDN_HOSTNAME`, `BUNNY_STREAM_API_KEY`.
+- Bij STACK doet het script alleen lees-verzoeken.
+- Opties: `--folder Recordings` (andere map), `--draft` (alleen zichtbaar in dev), `--no-wait`.
+- Bunny staat op **Block direct url file access**: zonder Referer geen toegang. Stills laden daarom direct in de browser (geen Astro-beeldoptimalisatie) en zijn geen OG-beeld. Vul bij livegang **Allowed domains** in: het echte domein, `spacedome.netlify.app`, `staging--spacedome.netlify.app` en `localhost`.
 
 ## Privacy, toegankelijkheid en SEO
 

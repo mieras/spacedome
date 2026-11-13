@@ -7,7 +7,7 @@ import QueueButton from '../components/QueueButton.astro';
 import SetGrid from '../components/SetGrid.astro';
 import { t } from '../i18n/ui';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { djHref, eventHref, genreHref, getLibrary, isUpcoming, setHref, setsByDj, setsByEvent, toPlayerItem } from '../lib/content';
+import { djHref, eventHref, genreHref, getLibrary, isUpcoming, setHref, setsByDj, setsByEvent, setStill, toPlayerItem } from '../lib/content';
 import { formatDate, formatDateLong, formatDuration, joinNames } from '../lib/format';
 import { settings } from '../settings';
 
@@ -32,7 +32,7 @@ const djs = lib.djs.filter((d) => setsByDj(lib, d.id).length > 0);
         <article class="hero__feature" aria-labelledby="featured-title">
           <div class="hero__stage" data-player-stage={featured.id}>
             <a href={setHref(featured.id)} tabindex="-1" aria-hidden="true">
-              <CoverArt seed={featured.id} image={featured.data.poster} ratio="16/9" eager sizes="(min-width: 60rem) 55vw, 100vw" />
+              <CoverArt seed={featured.id} image={setStill(featured)} ratio="16/9" eager sizes="(min-width: 60rem) 55vw, 100vw" />
             </a>
             <PlayButton item={featuredItem} size="lg" class="hero__play" />
           </div>
