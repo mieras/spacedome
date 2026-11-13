@@ -46,14 +46,14 @@ const description = `${set.data.title} by ${joinNames(djs.map((d) => d.data.name
 
       <div class="set__info">
         <header class="set__head">
-          <p class="meta">
+          <p class="meta" data-reveal="up">
             <time datetime={set.data.date.toISOString().slice(0, 10)}>{formatDate(set.data.date)}</time>
             {duration && <> · {duration}</>}
             {' · '}
             {event ? <a href={eventHref(event.id)}>{t('set.recordedAt')} {event.data.title} @ {event.data.venue.name}</a> : t('set.standalone')}
           </p>
-          <h1 class="set__title">{set.data.title}</h1>
-          <ul class="set__djs" role="list">
+          <h1 class="set__title" data-reveal="words">{set.data.title}</h1>
+          <ul class="set__djs" role="list" data-reveal="up">
             {
               djs.map((dj) => (
                 <li>
@@ -65,14 +65,14 @@ const description = `${set.data.title} by ${joinNames(djs.map((d) => d.data.name
               ))
             }
           </ul>
-          <div class="set__actions">
+          <div class="set__actions" data-reveal="up">
             <PlayButton item={item} label={t('set.play')} size="sm" useUrlTime />
             <QueueButton item={item} />
             <ShareButton url={setHref(set.id)} title={set.data.title} />
           </div>
           {
             genres.length > 0 && (
-              <ul class="chips" role="list" aria-label={t('nav.genres')}>
+              <ul class="chips" role="list" aria-label={t('nav.genres')} data-reveal="up">
                 {genres.map((g) => (
                   <li>
                     <a class="chip" href={genreHref(g.id)}>
@@ -88,7 +88,7 @@ const description = `${set.data.title} by ${joinNames(djs.map((d) => d.data.name
         {
           /* Beschrijving en tracklist. Met JS (sd-tabs) als tabs; zonder JS gewoon onder elkaar met koppen. */
           (hasText || hasTracks) && (
-            <sd-tabs class="set__tabs">
+            <sd-tabs class="set__tabs" data-reveal="up">
               {hasText && hasTracks && (
                 <div class="tabs__list" role="tablist" aria-label={set.data.title} data-tabs-list hidden>
                   <button type="button" role="tab" class="tabs__tab" id="tab-about" aria-controls="panel-about" aria-selected="true">

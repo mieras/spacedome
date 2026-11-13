@@ -90,7 +90,7 @@ Beide self-hosted via Fontsource (geen verzoeken naar Google, AVG). Voorlopige k
 
 - **Paginatransities:** `<ClientRouter />`. De oude pagina fadet weg, de nieuwe fadet in en schuift 0,75rem omhoog. Header en player hebben een eigen `view-transition-name` en blijven dus staan.
 - **Player:** de video schuift met een FLIP-animatie tussen gedockt (op de setpagina) en mini (onderin, rechts of links). Tussen pagina's "morpht" hij via de view transition.
-- **Reveal bij laden** (`data-reveal`, GSAP SplitText): `chars` (datum, per teken uit een masker), `words` (titels, per woord), `up` (blokken: 18px omhoog + fade, stagger 0,07s), `media` (flyer: clip-path van onder naar boven + zoom 1,04 → 1). Easing `expo.out` voor tekst en beeld, `power3.out` voor blokken, ±1s. Gebruikt op home (titel, intro, knoppen) en de avondpagina.
+- **Reveal bij laden** (`data-reveal`, GSAP SplitText): `chars` (datum, per teken uit een masker), `words` (titels, per woord), `up` (blokken: 18px omhoog + fade, stagger 0,07s), `media` (flyer: clip-path van onder naar boven + zoom 1,04 → 1). Easing `expo.out` voor tekst en beeld, `power3.out` voor blokken, ±1s. Gebruikt op home (titel, intro, knoppen), de avondpagina en de setpagina (niet op het podium: de gedockte video moet er exact op blijven liggen).
 - **Reduced motion:** alle duurtokens worden 0,01 ms en de view-transition-animaties staan uit.
 
 ## 8. De player
