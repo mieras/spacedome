@@ -11,21 +11,17 @@
  * laatste stop is transparant, dus de toppen lossen op. Hoogte valt vanuit het midden af met
  * 1 - t^1.24 (vlakker dan een cosinus, meer piramide).
  *
- * Bloei: gekoppeld aan het scrollen via een scroll-driven animation (view timeline). Komt de footer
- * in beeld, dan staat hij rustig (laag, smaller, doffer, minder verzadigd: de calm-waarden). Naar
- * beneden scrollen laat hem openbloeien; helemaal onderaan staat de volle eindstand. Terugscrollen
- * maakt hem weer rustig. Alleen transform, opacity en filter: goedkoop per frame.
- * Ease-in (p²): het meeste gebeurt als je onderaan aankomt, dat maakt het een bloei.
- * Geen JS. Browsers zonder scroll-driven animations (Firefox nu nog) en prefers-reduced-motion:
- * hij staat er gewoon.
+ * Bloei: src/scripts/peak.ts mengt tijdens het scrollen elke waarde van `start` naar de eindstand
+ * (de vorm zelf wordt heftiger: falloff, valley, blur, overlap). De build rendert de eindstand,
+ * dus zonder JS of met prefers-reduced-motion staat hij er gewoon vol.
  */
-import { PEAK_FOOTER, PEAK_H, PEAK_W, peakCalmStyle, peakSvg, type PeakOptions } from '../lib/peak';
+import { PEAK_FOOTER, PEAK_H, PEAK_W, peakSvg, type PeakOptions } from '../lib/peak';
 
 interface Props extends Partial<PeakOptions> {
   /** Uniek per instantie op een pagina (gradient- en filter-id's). */
   id?: string;
   class?: string;
-  /** Niet aan het scrollen koppelen (preview op /brand). */
+  /** Niet aan het scrollen koppelen (preview op /brand, die stuurt hij zelf aan). */
   still?: boolean;
 }
 
@@ -33,9 +29,13 @@ const { id = 'peak', class: className, still = false, ...overrides } = Astro.pro
 const options = { ...PEAK_FOOTER, ...overrides };
 ---
 
-<div class:list={['peak', className]} aria-hidden="true" data-still={still || undefined} style={peakCalmStyle(options)}>
+<div class:list={['peak', className]} aria-hidden="true" data-peak={still ? undefined : JSON.stringify(options)}>
   <svg viewBox={`0 0 ${PEAK_W} ${PEAK_H}`} preserveAspectRatio="none" focusable="false" data-peak-svg={id} set:html={peakSvg(id, options)} />
 </div>
+
+<script>
+  import '../scripts/peak';
+</script>
 
 <style>
   .peak {
@@ -47,29 +47,5 @@ const options = { ...PEAK_FOOTER, ...overrides };
     display: block;
     inline-size: 100%;
     block-size: 100%;
-    transform-origin: 50% 100%;
-  }
-  /* Scroll-gekoppeld: de timeline hangt aan de container (niet aan de svg, die schaalt zelf). */
-  @supports (animation-timeline: view()) {
-    @media (prefers-reduced-motion: no-preference) {
-      /* inset 0: anders telt de scroll-padding (playerbalk) mee en haalt hij onderaan de 100% niet. */
-      .peak { view-timeline: --peak block; view-timeline-inset: 0; }
-      .peak svg {
-        animation: peak-rise linear both;
-        animation-timeline: --peak;
-        animation-range: entry 0% entry 100%;
-      }
-    }
-  }
-  .peak[data-still] svg { animation: none; }
-  /* Ease-in in de keyframe zelf (≈ p², zie peakBloomEase): scrollen is lineair. */
-  @keyframes peak-rise {
-    from {
-      transform: scale(var(--peak-calm-w), var(--peak-calm-h));
-      opacity: var(--peak-calm-o);
-      filter: saturate(var(--peak-calm-s));
-      animation-timing-function: cubic-bezier(0.11, 0, 0.5, 0);
-    }
-    to { transform: none; opacity: 1; filter: none; }
   }
 </style>

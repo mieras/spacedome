@@ -22,6 +22,9 @@ Categorieën: **Toegevoegd**, **Gewijzigd**, **Opgelost**, **Verwijderd**, **Bev
 - De eerste twee Space Dome-avonden in Melkweg (14-07-2023 en 23-12-2023) met line-up; nieuwe dj-pagina's voor Mono/Poly, Kutmah, Cintasoul, Cheyanne Hudson, Odaira en Sunny Saimuns.
 
 ### Gewijzigd
+- Footer-peak: geen schalen meer. Tijdens het scrollen mengt de vorm zelf van een startstand (vlakke band: falloff 0, lage valley, iets gezakt, dof) naar de eindstand (falloff 2,17, valley 0,45, blur 35), per frame herberekend in `src/scripts/peak.ts` (alleen in beeld, rAF). Zonder JS of bij reduced motion: de eindstand. Werkt nu ook in Firefox.
+- Peak-configurator op /brand: Start en End als tabs (preview springt naar de gekozen stand), scrubber en een play-knop van Start naar End.
+- Tab-stijlen (`.tabs__*`) zijn globaal (components.scss); `sd-tabs` stuurt `tabs:change`.
 - Footer-peak bloeit nu open: rustig (laag, smal, dof) als de footer in beeld komt, volle bloei helemaal onderaan (ease-in), weer rustig bij terugscrollen. Eindstand: magenta, 10 kolommen, blur 35, piek 0,84, dal 0,45, afval 2,17, overlap 2. View timeline negeert nu de scroll-padding, zodat onderaan echt 100% gehaald wordt.
 - Peak-configurator: groep "Calm" (hoogte, breedte, dekking, verzadiging) en een scroll-preview van rustig naar bloei.
 - Peak gradient in de footer: roze/paars palet (indigo vloer, violet, magenta, zachtroze kern) in plaats van de regenboog, en gekoppeld aan het scrollen (CSS scroll-driven animation, geen JS): rijst op terwijl de footer in beeld schuift, zakt weer weg als je terugscrollt. Zonder ondersteuning (Firefox) of bij reduced motion staat hij er gewoon.
