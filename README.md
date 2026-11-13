@@ -86,7 +86,9 @@ DESIGN.md       Ontwerpsysteem
 
 ## Deploy
 
-- Nog niet gekoppeld aan Netlify. Daarna: `main` → productie, `staging` → branch deploy, PR's → deploy preview (zie `~/Code/_standards/DEPLOY.md`).
+- Netlify-site `spacedome` op het MIERAS-team: https://spacedome.netlify.app (admin: app.netlify.com/projects/spacedome). Later over naar Space Dome.
+- De eerste deploys zijn handmatig gedaan vanaf `staging` (`netlify deploy --prod --dir dist`). De GitHub-repo moet nog gekoppeld worden in Netlify.
+- Na het koppelen: `main` → productie, `staging` → branch deploy (staging--spacedome.netlify.app), PR's → deploy preview (zie `~/Code/_standards/DEPLOY.md`).
 
 ## Bekende issues en afspraken
 
