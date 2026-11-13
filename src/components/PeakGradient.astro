@@ -13,6 +13,8 @@
  * komt. Zonder JS of met prefers-reduced-motion staat hij er gewoon.
  */
 interface Props {
+  /** Uniek per instantie op een pagina (gradient- en filter-id's). */
+  id?: string;
   class?: string;
 }
 
@@ -43,23 +45,23 @@ const stops = [
   [1, 'oklch(62% 0.25 352 / 0)'],
 ] as const;
 
-const { class: className } = Astro.props;
+const { id = 'peak', class: className } = Astro.props;
 ---
 
 <div class:list={['peak', className]} data-peak aria-hidden="true">
   <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" focusable="false">
     <defs>
-      <linearGradient id="peak-fill" x1="0" y1="1" x2="0" y2="0">
+      <linearGradient id={`${id}-fill`} x1="0" y1="1" x2="0" y2="0">
         {stops.map(([offset, color]) => <stop offset={offset} style={`stop-color: ${color}`} />)}
       </linearGradient>
-      <filter id="peak-blur" x="-50%" y="-50%" width="200%" height="200%">
+      <filter id={`${id}-blur`} x="-50%" y="-50%" width="200%" height="200%">
         <feGaussianBlur stdDeviation={BLUR} />
       </filter>
     </defs>
     {
       bars.map((b) => (
-        <g filter="url(#peak-blur)">
-          <rect x={b.x.toFixed(1)} y={b.y.toFixed(1)} width={width.toFixed(1)} height={(b.h + BLUR * 3).toFixed(1)} fill="url(#peak-fill)" />
+        <g filter={`url(#${id}-blur)`}>
+          <rect x={b.x.toFixed(1)} y={b.y.toFixed(1)} width={width.toFixed(1)} height={(b.h + BLUR * 3).toFixed(1)} fill={`url(#${id}-fill)`} />
         </g>
       ))
     }

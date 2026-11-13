@@ -100,22 +100,8 @@ const topGenres = lib.genres
     <p class="site-footer__small meta wrapper">© {new Date().getFullYear()} {settings.siteName}</p>
   </div>
 
-  <!-- Filter voor het smear-effect op de links (src/scripts/smear.ts). -->
-  <svg class="site-footer__defs" aria-hidden="true" focusable="false" width="0" height="0">
-    <filter id="sd-smear" x="-5%" y="-30%" width="130%" height="160%" color-interpolation-filters="sRGB">
-      <feGaussianBlur in="SourceGraphic" stdDeviation="0 0" result="blur" />
-      <feOffset in="blur" dx="0" dy="0" result="streak" />
-      <feMerge>
-        <feMergeNode in="streak" />
-        <feMergeNode in="SourceGraphic" />
-      </feMerge>
-    </filter>
-  </svg>
 </footer>
 
-<script>
-  import '../scripts/smear';
-</script>
 
 <style>
   .site-footer {
@@ -153,22 +139,8 @@ const topGenres = lib.genres
     letter-spacing: 0.04em;
     text-decoration: none;
   }
-  .site-footer__nav a[data-smearing] { filter: url(#sd-smear); }
-  .site-footer__nav a:hover { text-decoration: underline; }
   .site-footer__nav :global(.icon) { inline-size: 1em; block-size: 1em; flex: none; }
   .site-footer__more { color: var(--color-muted); }
-  .badge {
-    min-inline-size: 1.6em;
-    padding: 0.1em 0.5em;
-    border-radius: var(--radius-round);
-    background: color-mix(in oklch, currentColor 10%, transparent);
-    color: var(--color-muted);
-    font-size: var(--step--2);
-    font-variant-numeric: tabular-nums;
-    line-height: 1.4;
-    text-align: center;
-  }
-  .site-footer__nav a:hover .badge { text-decoration: none; }
   .site-footer__nav .muted { text-transform: none; }
 
   /* Peak: de vloer is in beide thema's donker, dus het copyright is daar altijd licht. */
@@ -186,5 +158,5 @@ const topGenres = lib.genres
     padding-block: var(--space-s);
     color: oklch(96% 0.02 300);
   }
-  .site-footer__defs { position: absolute; inline-size: 0; block-size: 0; overflow: hidden; }
+
 </style>

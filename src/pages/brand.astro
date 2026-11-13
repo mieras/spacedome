@@ -1,0 +1,401 @@
+---
+/*
+ * /brand: interne stijlgids. Tokens, UI-componenten en effecten op één pagina, met echte content.
+ * Niet in de navigatie of sitemap, altijd noindex. Kleuren komen rechtstreeks uit tokens.scss
+ * (die is leidend), dus deze pagina loopt nooit achter.
+ */
+import tokens from '../styles/tokens.scss?raw';
+import CoverArt from '../components/CoverArt.astro';
+import DjAvatar from '../components/DjAvatar.astro';
+import EventCard from '../components/EventCard.astro';
+import Icon from '../components/Icon.astro';
+import Logo from '../components/Logo.astro';
+import PageHeader from '../components/PageHeader.astro';
+import PeakGradient from '../components/PeakGradient.astro';
+import PlayButton from '../components/PlayButton.astro';
+import QueueButton from '../components/QueueButton.astro';
+import SetCarousel from '../components/SetCarousel.astro';
+import SetGrid from '../components/SetGrid.astro';
+import ShareButton from '../components/ShareButton.astro';
+import Tracklist from '../components/Tracklist.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getLibrary, setHref, setsByEvent, toPlayerItem } from '../lib/content';
+
+const lib = await getLibrary();
+const featured = lib.sets.find((s) => s.data.featured) ?? lib.sets[0];
+const item = await toPlayerItem(featured, lib);
+const withTracks = lib.sets.find((s) => s.data.tracklist.length > 0);
+const event = lib.events[0];
+
+// Kleuren: elke --color-* uit tokens.scss, met de licht- en donkerwaarde uit light-dark().
+const colors = [...tokens.matchAll(/--color-([\w-]+):\s*(.+?);/g)].map(([, name, value]) => {
+  const pair = value.match(/^light-dark\((oklch\([^)]*\)),\s*(oklch\([^)]*\))\)$/);
+  return { name, light: pair?.[1] ?? value, dark: pair?.[2] ?? value };
+});
+
+const steps = [8, 7, 6, 5, 4, 3, 2, 1, 0, -1, -2];
+const spaces = ['3xs', '2xs', 'xs', 's', 'm', 'l', 'xl', '2xl', '3xl'];
+const radii = ['s', 'm', 'l', 'round'];
+const icons = ['play', 'pause', 'plus', 'check', 'share', 'queue', 'back', 'forward', 'volume', 'mute', 'headphones', 'video', 'swap', 'expand', 'arrow', 'external', 'close', 'sun', 'moon', 'auto'] as const;
+
+const toc = [
+  ['logo', 'Logo'],
+  ['colour', 'Colour'],
+  ['type', 'Type'],
+  ['space', 'Space & shape'],
+  ['icons', 'Icons'],
+  ['controls', 'Controls'],
+  ['cards', 'Cards'],
+  ['effects', 'Effects'],
+];
+---
+
+<BaseLayout title="Brand" description="Space Dome design tokens, UI components and effects." noindex>
+  <PageHeader eyebrow="Style guide" title="Brand" lead="Tokens, components and effects of the Space Dome site, rendered live from the code." />
+
+  <div class="wrapper brand">
+    <nav class="brand__toc" aria-label="Sections">
+      <ul role="list" class="chips">
+        {toc.map(([id, label]) => <li><a class="chip" href={`#${id}`}>{label}</a></li>)}
+      </ul>
+    </nav>
+
+    <!-- Logo -->
+    <section class="brand__section" aria-labelledby="logo">
+      <h2 id="logo" class="brand__title">Logo</h2>
+      <div class="brand__row">
+        <div class="brand__tile" style="--logo-size: 9rem"><Logo id="brand-logo" /></div>
+        <div class="brand__tile brand__tile--accent" style="--logo-size: 9rem"><Logo id="brand-logo-accent" /></div>
+        <div class="brand__tile" style="--logo-size: 4rem"><Logo id="brand-logo-sm" /></div>
+      </div>
+      <p class="brand__note">SVG with a grain filter; each instance needs its own <code>id</code>. Minimum size about 2.5rem (header).</p>
+    </section>
+
+    <!-- Kleur -->
+    <section class="brand__section" aria-labelledby="colour">
+      <h2 id="colour" class="brand__title">Colour</h2>
+      <p class="brand__note">OKLCH with <code>light-dark()</code>. Night: deep indigo. Day: lilac flyer paper. Accent: the poster magenta. Swatches follow the current theme.</p>
+      <ul role="list" class="swatches">
+        {
+          colors.map((c) => (
+            <li class="swatch">
+              <span class="swatch__chip" style={`background: var(--color-${c.name})`} />
+              <code class="swatch__name">--color-{c.name}</code>
+              <span class="swatch__value">
+                <span>Light {c.light}</span>
+                <span>Dark {c.dark}</span>
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <!-- Type -->
+    <section class="brand__section" aria-labelledby="type">
+      <h2 id="type" class="brand__title">Type</h2>
+      <div class="faces">
+        <div class="face">
+          <p class="meta">Display · Unbounded Variable</p>
+          <p class="face__sample face__sample--display">Space Dome</p>
+        </div>
+        <div class="face">
+          <p class="meta">Text · Hanken Grotesk Variable</p>
+          <p class="face__sample">Beats, trip-hop, deep grooves</p>
+        </div>
+      </div>
+      <p class="brand__note">Fluid Utopia scale, 18→20px base, ratio 1.2→1.25 (360→1920px). Only use <code>--step-*</code>.</p>
+      <ul role="list" class="scale">
+        {
+          steps.map((n) => (
+            <li class="scale__row">
+              <code>--step-{n}</code>
+              <span class="scale__sample" style={`font-size: var(--step-${n})`}>
+                Recorded live
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="brand__row brand__row--text">
+        <p class="meta">Meta · 01.03.2026 · 25m</p>
+        <p class="lead">Lead text for intros, a little larger and tighter.</p>
+        <a class="more-link" href="/sets">More link →</a>
+      </div>
+    </section>
+
+    <!-- Ruimte en vorm -->
+    <section class="brand__section" aria-labelledby="space">
+      <h2 id="space" class="brand__title">Space & shape</h2>
+      <ul role="list" class="spaces">
+        {
+          spaces.map((s) => (
+            <li class="spaces__row">
+              <code>--space-{s}</code>
+              <span class="spaces__bar" style={`inline-size: var(--space-${s})`} />
+            </li>
+          ))
+        }
+      </ul>
+      <ul role="list" class="brand__row">
+        {
+          radii.map((r) => (
+            <li class="radius" style={`border-radius: var(--radius-${r})`}>
+              <code>--radius-{r}</code>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="brand__note">Motion: <code>--ease-out</code> for almost everything, <code>--dur-fast</code> 150ms, <code>--dur</code> 300ms, <code>--dur-slow</code> 600ms. All collapse to near zero under reduced motion.</p>
+    </section>
+
+    <!-- Iconen -->
+    <section class="brand__section" aria-labelledby="icons">
+      <h2 id="icons" class="brand__title">Icons</h2>
+      <ul role="list" class="icons">
+        {
+          icons.map((name) => (
+            <li>
+              <Icon name={name} />
+              <code>{name}</code>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="brand__note">24×24, stroke 1.75, round caps. Always <code>aria-hidden</code>; the button carries the label.</p>
+    </section>
+
+    <!-- Controls -->
+    <section class="brand__section" aria-labelledby="controls">
+      <h2 id="controls" class="brand__title">Controls</h2>
+      <h3 class="brand__sub">Buttons</h3>
+      <div class="brand__row">
+        <a class="button button--primary" href="/sets">Primary</a>
+        <a class="button" href="/about">Secondary</a>
+        <button class="button" type="button" aria-pressed="true">Pressed</button>
+        <button class="icon-button" type="button" aria-label="Share"><Icon name="share" /></button>
+      </div>
+      <h3 class="brand__sub">Player buttons</h3>
+      <p class="brand__note">These are live: they play <a href={setHref(featured.id)}>{featured.data.title}</a> in the player.</p>
+      <div class="brand__row">
+        <PlayButton item={item} size="sm" />
+        <PlayButton item={item} />
+        <PlayButton item={item} size="lg" />
+        <PlayButton item={item} label="Play" size="sm" />
+        <QueueButton item={item} />
+        <QueueButton item={item} variant="icon" />
+        <ShareButton url={setHref(featured.id)} title={featured.data.title} />
+      </div>
+      <h3 class="brand__sub">Chips and badges</h3>
+      <div class="brand__row">
+        <ul role="list" class="chips">
+          {lib.genres.slice(0, 4).map((g, i) => <li><a class="chip" href={`/genres/${g.id}`} aria-current={i === 0 ? 'page' : undefined}>{g.data.title}</a></li>)}
+        </ul>
+        <span class="badge">7</span>
+        <span class="badge">12</span>
+      </div>
+      <h3 class="brand__sub">Avatars</h3>
+      <div class="brand__row">
+        {lib.djs.slice(0, 5).map((dj) => <DjAvatar dj={dj} size="4rem" />)}
+      </div>
+    </section>
+
+    <!-- Kaarten -->
+    <section class="brand__section" aria-labelledby="cards">
+      <h2 id="cards" class="brand__title">Cards</h2>
+      <h3 class="brand__sub">Set grid</h3>
+      <SetGrid sets={lib.sets.slice(0, 4)} lib={lib} />
+      <h3 class="brand__sub">Event</h3>
+      {event && <EventCard event={event} setCount={setsByEvent(lib, event.id).length} />}
+      <h3 class="brand__sub">Cover art</h3>
+      <div class="covers">
+        <CoverArt seed="brand-a" alt="" ratio="1/1" />
+        <CoverArt seed="brand-b" alt="" ratio="1/1" />
+        <CoverArt seed="brand-c" alt="" ratio="1/1" />
+        <CoverArt seed="brand-d" alt="" ratio="1/1" />
+      </div>
+      <p class="brand__note">Generated art per seed when there is no still or poster.</p>
+      <SetCarousel sets={lib.sets.slice(0, 10)} lib={lib} title="Carousel" id="brand-carousel" />
+      {
+        withTracks && (
+          <>
+            <h3 class="brand__sub">Tracklist</h3>
+            <Tracklist tracks={withTracks.data.tracklist.slice(0, 6)} />
+          </>
+        )
+      }
+    </section>
+
+    <!-- Effecten -->
+    <section class="brand__section" aria-labelledby="effects">
+      <h2 id="effects" class="brand__title">Effects</h2>
+
+      <div class="effect">
+        <div class="effect__head">
+          <h3 class="brand__sub">Reveal</h3>
+          <button class="button" type="button" data-brand-replay><Icon name="back" /> Replay</button>
+        </div>
+        <p class="brand__note">GSAP + SplitText on page load. <code>data-reveal</code> = <code>chars</code> | <code>words</code> | <code>up</code> | <code>media</code>. Expo.out for text, power3.out for blocks. Off under reduced motion.</p>
+        <div class="effect__stage" data-brand-reveal>
+          <p class="effect__date" data-reveal="chars">30.07</p>
+          <p class="effect__headline" data-reveal="words">Recorded live in the dome</p>
+          <p class="lead" data-reveal="up">Content blocks fade in and rise 18px.</p>
+        </div>
+      </div>
+
+      <div class="effect">
+        <div class="effect__head">
+          <h3 class="brand__sub">Smear</h3>
+          <button class="button" type="button" data-smear-play><Icon name="play" /> Smear</button>
+        </div>
+        <p class="brand__note">Hover or focus: text smears sideways like wet ink and dries back. Replaces underlines on titles and footer links. <code>data-smear</code> on the text, <code>data-smear-scope</code> on a card. Tune it below; values are for 16px text and scale with the font size.</p>
+        <div class="smear-lab">
+          <div class="effect__stage">
+            <a class="effect__headline effect__link" href={setHref(featured.id)} data-smear data-smear-demo>{featured.data.title}</a>
+            <a class="effect__mono" href="/sets" data-smear data-smear-demo>Sets <span class="badge">{lib.sets.length}</span></a>
+          </div>
+          <form class="smear-lab__controls" data-smear-lab>
+            <label>Amount <output data-for="amount"></output><input type="range" name="amount" min="0" max="60" step="1" value="14" /></label>
+            <label>Shift <output data-for="shift"></output><input type="range" name="shift" min="0" max="40" step="1" value="10" /></label>
+            <label>Spread <output data-for="spread"></output><input type="range" name="spread" min="0" max="8" step="0.1" value="0.6" /></label>
+            <label>Duration <output data-for="duration"></output><input type="range" name="duration" min="0.2" max="2.5" step="0.05" value="0.7" /></label>
+            <label>Direction
+              <select name="dir"><option value="right">Right</option><option value="left">Left</option></select>
+            </label>
+            <label>Ease
+              <select name="ease">
+                <option>expo.out</option>
+                <option>power3.out</option>
+                <option>power2.inOut</option>
+                <option>back.out(2)</option>
+                <option>elastic.out(1, 0.4)</option>
+                <option>steps(6)</option>
+              </select>
+            </label>
+            <button class="button" type="reset">Reset</button>
+          </form>
+          <pre class="smear-lab__code"><code data-smear-code>data-smear</code></pre>
+        </div>
+      </div>
+
+      <div class="effect">
+        <h3 class="brand__sub">Peak gradient</h3>
+        <p class="brand__note">Nine blurred columns with one vertical gradient, rising from the floor when in view. Bottom of the footer.</p>
+        <div class="effect__peak">
+          <PeakGradient id="brand-peak" />
+        </div>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<script>
+  import { smear, SMEAR_DEFAULTS } from '../scripts/smear';
+
+  // Smear-speeltuin: schuifjes zetten de data-smear-* attributen op de voorbeelden en tonen de
+  // markup die je kunt overnemen (alleen wat afwijkt van de standaard).
+  document.addEventListener('astro:page-load', () => {
+    const form = document.querySelector<HTMLFormElement>('[data-smear-lab]');
+    if (!form || form.dataset.bound) return;
+    form.dataset.bound = '';
+    const demos = [...document.querySelectorAll<HTMLElement>('[data-smear-demo]')];
+    const code = document.querySelector('[data-smear-code]')!;
+    const play = document.querySelector<HTMLButtonElement>('[data-smear-play]');
+    const keys = ['amount', 'shift', 'spread', 'duration', 'dir', 'ease'] as const;
+
+    const update = () => {
+      const data = new FormData(form);
+      const attrs: string[] = ['data-smear'];
+      for (const key of keys) {
+        const value = String(data.get(key));
+        const attr = `smear${key[0].toUpperCase()}${key.slice(1)}`;
+        demos.forEach((el) => (el.dataset[attr] = value));
+        const out = form.querySelector(`output[data-for="${key}"]`);
+        if (out) out.textContent = value;
+        if (value !== String(SMEAR_DEFAULTS[key])) attrs.push(`data-smear-${key}="${value}"`);
+      }
+      code.textContent = attrs.join(' ');
+    };
+    form.addEventListener('input', update);
+    form.addEventListener('change', () => smear(demos[0]));
+    form.addEventListener('reset', () => requestAnimationFrame(update));
+    play?.addEventListener('click', () => smear(demos[0]));
+    update();
+  });
+
+  // Reveal opnieuw afspelen: markering weghalen en reveal.ts opnieuw laten lopen.
+  document.addEventListener('astro:page-load', () => {
+    const btn = document.querySelector<HTMLButtonElement>('[data-brand-replay]');
+    if (!btn || btn.dataset.bound) return;
+    btn.dataset.bound = '';
+    btn.addEventListener('click', () => {
+      document.querySelectorAll<HTMLElement>('[data-brand-reveal] [data-reveal]').forEach((el) => delete el.dataset.revealed);
+      document.dispatchEvent(new Event('astro:page-load'));
+    });
+  });
+</script>
+
+<style>
+  .brand { display: grid; gap: var(--space-2xl); padding-block-end: var(--space-xl); }
+  .brand__toc { position: sticky; inset-block-start: calc(var(--header-h) + var(--space-2xs)); z-index: 5; }
+  .brand__toc .chips { padding: var(--space-2xs); margin-inline: calc(var(--space-2xs) * -1); border-radius: var(--radius-l); background: color-mix(in oklch, var(--color-bg) 85%, transparent); backdrop-filter: blur(12px); }
+  .brand__section { display: grid; gap: var(--space-m); scroll-margin-block-start: calc(var(--header-h) + 5rem); }
+  .brand__title { font-size: var(--step-4); text-transform: uppercase; padding-block-end: var(--space-xs); border-block-end: var(--border-width) solid var(--color-line); }
+  .brand__sub { font-size: var(--step-1); font-family: var(--font-sans); letter-spacing: 0; margin-block-start: var(--space-s); }
+  .brand__note { max-inline-size: var(--measure); color: var(--color-muted); font-size: var(--step--1); }
+  .brand code { font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; font-size: 0.9em; }
+  .brand__row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-s); }
+  .brand__row--text { display: grid; gap: var(--space-xs); justify-items: start; }
+
+  .brand__tile { display: grid; place-items: center; padding: var(--space-m); border-radius: var(--radius-l); background: var(--color-surface); }
+  .brand__tile--accent { background: var(--color-accent); color: var(--color-on-accent); }
+
+  .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); gap: var(--space-s); }
+  .swatch { display: grid; gap: var(--space-3xs); }
+  .swatch__chip { block-size: 5rem; border-radius: var(--radius-m); box-shadow: inset 0 0 0 var(--border-width) var(--color-line); }
+  .swatch__name { font-weight: 600; }
+  .swatch__value { display: grid; color: var(--color-muted); font-size: var(--step--2); font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; }
+
+  .faces { display: grid; gap: var(--space-m); }
+  @media (min-width: 48rem) { .faces { grid-template-columns: 1fr 1fr; } }
+  .face { display: grid; gap: var(--space-2xs); padding: var(--space-m); border-radius: var(--radius-l); background: var(--color-surface); }
+  .face__sample { font-size: var(--step-3); line-height: var(--leading-tight); }
+  .face__sample--display { font-family: var(--font-display); font-weight: 800; text-transform: uppercase; letter-spacing: var(--tracking-display); }
+
+  .scale { display: grid; gap: var(--space-2xs); }
+  .scale__row { display: grid; grid-template-columns: 7rem minmax(0, 1fr); align-items: baseline; gap: var(--space-s); }
+  .scale__row code { color: var(--color-muted); font-size: var(--step--2); }
+  .scale__sample { font-family: var(--font-display); font-weight: 700; line-height: 1.1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  .spaces { display: grid; gap: var(--space-2xs); }
+  .spaces__row { display: grid; grid-template-columns: 7rem minmax(0, 1fr); align-items: center; gap: var(--space-s); }
+  .spaces__row code { color: var(--color-muted); font-size: var(--step--2); }
+  .spaces__bar { block-size: 0.75rem; border-radius: var(--radius-s); background: var(--color-accent); }
+  .radius { display: grid; place-items: center; inline-size: 7rem; aspect-ratio: 1; background: var(--color-surface); box-shadow: inset 0 0 0 var(--border-width) var(--color-line); font-size: var(--step--2); }
+
+  .icons { display: grid; grid-template-columns: repeat(auto-fill, minmax(6rem, 1fr)); gap: var(--space-xs); }
+  .icons li { display: grid; justify-items: center; gap: var(--space-3xs); padding: var(--space-s) var(--space-2xs); border-radius: var(--radius-m); background: var(--color-surface); }
+  .icons :global(.icon) { inline-size: 1.5rem; block-size: 1.5rem; }
+  .icons code { color: var(--color-muted); font-size: var(--step--2); }
+
+  .covers { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-s); max-inline-size: 36rem; }
+
+  .effect { display: grid; gap: var(--space-xs); }
+  .effect__head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: var(--space-s); }
+  .effect__stage { display: grid; gap: var(--space-s); justify-items: start; padding: var(--space-l); border-radius: var(--radius-l); background: var(--color-surface); }
+  .effect__date { font-family: var(--font-display); font-weight: 800; font-size: var(--step-5); line-height: 1; font-variant-numeric: tabular-nums; }
+  .effect__headline { font-family: var(--font-display); font-weight: 800; font-size: var(--step-4); line-height: var(--leading-tight); text-transform: uppercase; letter-spacing: var(--tracking-display); }
+  .effect__link { text-decoration: none; }
+  .effect__mono { display: inline-flex; align-items: center; gap: 0.75ch; font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; text-transform: uppercase; letter-spacing: 0.04em; text-decoration: none; }
+  .smear-lab { display: grid; gap: var(--space-s); }
+  @media (min-width: 64rem) { .smear-lab { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); } }
+  .smear-lab__controls { display: grid; gap: var(--space-xs); align-content: start; padding: var(--space-m); border-radius: var(--radius-l); background: var(--color-surface); }
+  .smear-lab__controls label { display: grid; grid-template-columns: 1fr auto; gap: var(--space-3xs) var(--space-xs); font-size: var(--step--1); font-weight: 600; }
+  .smear-lab__controls input, .smear-lab__controls select { grid-column: 1 / -1; inline-size: 100%; accent-color: var(--color-accent); }
+  .smear-lab__controls select { min-block-size: 2.5rem; padding-inline: var(--space-2xs); border: var(--border-width) solid var(--color-line); border-radius: var(--radius-s); background: var(--color-bg); color: inherit; font: inherit; }
+  .smear-lab__controls output { color: var(--color-muted); font-variant-numeric: tabular-nums; }
+  .smear-lab__controls .button { justify-self: start; }
+  .smear-lab__code { grid-column: 1 / -1; overflow-x: auto; padding: var(--space-s); border-radius: var(--radius-m); background: var(--color-raised); font-size: var(--step--1); }
+  .effect__peak { display: grid; block-size: clamp(10rem, 30vw, 20rem); overflow: hidden; border-radius: var(--radius-l); background: var(--color-surface); }
+  .effect__peak :global(.peak) { block-size: 100%; }
+</style>
