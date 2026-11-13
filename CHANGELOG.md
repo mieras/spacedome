@@ -39,6 +39,7 @@ Categorieën: **Toegevoegd**, **Gewijzigd**, **Opgelost**, **Verwijderd**, **Bev
 - Play-knop met tekst: gewoon "Play"/"Pause", even breed (geen verspringen).
 
 ### Opgelost
+- /brand: kier tussen header en de sticky sectiebalk weg (balk sluit direct aan, zelfde glasachtergrond over de volle breedte). Op mobiel één horizontaal scrollende rij in plaats van drie regels. Ankers springen nu naar net onder die balk (scroll-margin op de titels), en de secties hebben meer ruimte (`--space-3xl`).
 - /brand#peak: de sticky preview schoof over het codeblok (en de play-knop over de code). Preview en schuifjes zitten nu in een eigen blok, het codeblok eronder.
 - Bunny-still die nog niet klaar is (of geweigerd wordt) gaf een kapot-plaatje-icoon; nu blijft de gegenereerde art staan.
 - Op mobiel kon je na "alleen audio" niet meer terug naar video: de knop in de balk blijft nu staan (als camera-icoon).
