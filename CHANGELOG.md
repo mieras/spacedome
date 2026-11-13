@@ -8,6 +8,7 @@ Categorieën: **Toegevoegd**, **Gewijzigd**, **Opgelost**, **Verwijderd**, **Bev
 ## [Unreleased]
 
 ### Toegevoegd
+- Flyers bij de drie avonden (Melkweg 14-07-2023 en 23-12-2023, De Nachtzuster 30-07-2026): op de avondpagina in eigen verhouding, in de lijst als thumbnail en als OG-beeld. Bronnen in `src/assets/events/`.
 - Reveal-animatie bij het laden (GSAP 3.15 + SplitText): datum per teken, titel per woord, content-blokken en flyer schuiven zacht in. Op home, de avondpagina en de setpagina (titel, meta, dj's, knoppen, genres, tabs; de video zelf niet vanwege de docking). Niet bij `prefers-reduced-motion`; zonder JS gewoon zichtbaar.
 - Home: knoppen "Browse all sets" (primary) en "About".
 - Mini-video versleepbaar: loslaten zet hem links of rechts onderin (onthouden). Ook via een wisselknop, zonder slepen.

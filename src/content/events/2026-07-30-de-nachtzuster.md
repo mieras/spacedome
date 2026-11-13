@@ -2,6 +2,8 @@
 title: Space Dome
 start: 2026-07-30T18:30:00+02:00
 end: 2026-07-30T23:30:00+02:00
+poster: ../../assets/events/2026-07-30-de-nachtzuster.png
+posterAlt: "Flyer: Space Dome, 30.07.2026, De Nachtzuster. Palm trees against a pink and purple sky."
 venue:
   name: De Nachtzuster
   city: Tilburg
