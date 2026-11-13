@@ -39,7 +39,7 @@ const topGenres = lib.genres
         {
           explore.map((l) => (
             <li>
-              <a href={l.href} data-smear>
+              <a href={l.href}>
                 {l.label}
                 {l.count !== undefined && <span class="badge">{l.count}</span>}
               </a>
@@ -56,7 +56,7 @@ const topGenres = lib.genres
           <ul role="list">
             {topGenres.map(({ genre, count }) => (
               <li>
-                <a href={genreHref(genre.id)} data-smear>
+                <a href={genreHref(genre.id)}>
                   {genre.data.title}
                   <span class="badge">
                     {count}
@@ -66,7 +66,7 @@ const topGenres = lib.genres
               </li>
             ))}
             <li>
-              <a href="/genres" class="site-footer__more" data-smear>
+              <a href="/genres" class="site-footer__more">
                 {t('footer.allGenres')} <Icon name="arrow" />
               </a>
             </li>
@@ -81,7 +81,7 @@ const topGenres = lib.genres
         {
           settings.socials.map((s) => (
             <li>
-              <a href={s.url} rel="me noopener" target="_blank" data-smear>
+              <a href={s.url} rel="me noopener" target="_blank">
                 {s.label} <span class="muted">{s.handle}</span>
                 <Icon name="external" />
                 <span class="visually-hidden">(opens in a new tab)</span>
@@ -127,7 +127,7 @@ const topGenres = lib.genres
   .site-footer__brand .lead { max-inline-size: 28ch; font-size: var(--step-0); color: var(--color-muted); }
   .site-footer__nav { display: grid; gap: var(--space-2xs); min-inline-size: 0; }
   .site-footer__nav ul { display: grid; gap: var(--space-3xs); }
-  /* Links in mono-kapitalen (systeemfont, geen extra download), met het smear-effect. */
+  /* Links in mono-kapitalen (systeemfont, geen extra download). */
   .site-footer__nav a {
     display: inline-flex;
     align-items: center;
@@ -139,6 +139,7 @@ const topGenres = lib.genres
     letter-spacing: 0.04em;
     text-decoration: none;
   }
+  .site-footer__nav a:hover { color: var(--color-accent); }
   .site-footer__nav :global(.icon) { inline-size: 1em; block-size: 1em; flex: none; }
   .site-footer__more { color: var(--color-muted); }
   .site-footer__nav .muted { text-transform: none; }

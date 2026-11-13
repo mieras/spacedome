@@ -47,15 +47,17 @@ Contrast: tekst, muted en accent halen in beide thema's minstens 4,5:1 op `--col
 
 | Rol | Font | Gebruik |
 |---|---|---|
-| Display | **Unbounded** (variabel, 200–900) | Koppen, titels van sets, het woordmerk. Rond en breed, zoals de letters in het logo. |
-| Tekst | **Hanken Grotesk** (variabel) | Lopende tekst, interface, metadata. |
+| Display | **Stack Sans Notch** (variabel, 200–700) | De grote titels: hero, paginakop, set, dj, avond (`--font-display`). |
+| Koppen | **Stack Sans Headline** (variabel, 200–700) | Sectiekoppen, kaarttitels, h2–h4 (`--font-heading`). |
+| Tekst | **Stack Sans Text** (variabel, 200–700) | Lopende tekst, interface, metadata. |
+| Logo | **Unbounded** | Alleen het tijdelijke woordmerk (`--font-logo`). |
 
-Beide self-hosted via Fontsource (geen verzoeken naar Google, AVG). Voorlopige keuze: als het logo-font bekend is, kijken we of Unbounded blijft.
+Beide self-hosted via Fontsource (geen verzoeken naar Google, AVG). Gekozen door Maarten op 13-11-2026 (eerst lokaal getest).
 
 **Schaal:** Utopia, fluid tussen 360 en 1920 px. Basis 18 → 20 px, ratio 1.2 → 1.25. Tokens `--step--2` t/m `--step-8`.
 
 - `h1` `--step-5`, `h2` `--step-3`, `h3` `--step-1`.
-- Grote display-titels (hero, set, dj, paginakop): `--step-5` op mobiel, `--step-6` vanaf 48–60rem. Unbounded in kapitalen is breed; een lang woord past anders niet op 320px.
+- Grote display-titels (hero, set, dj, paginakop): `--step-5` op mobiel, `--step-6` vanaf 48–60rem. Bewust groot met veel contrast tegenover de tekst: hero `min(step-7, 13vw)` → `min(step-8, 7,5vw)`, paginakop/dj `min(step-7, 14vw)` → `step-8`, settitel `min(step-7, 14cqi)`, regelafstand 0,92.
 - Grote datums (avondpagina, eventkaart) schalen mee met hun kolom: `min(--step-x, 11–14cqi)` (avondpagina step-4) met `container-type: inline-size` op de ouder.
 - Koppen hebben `overflow-wrap: anywhere` + `hyphens: auto` als vangnet. Grids met één kolom altijd `minmax(0, 1fr)`, nooit `auto`/`1fr` (anders rekt lange tekst de pagina op).
 - Metadata (`.meta`): `--step--1`, hoofdletters, `letter-spacing: .08em`, tabular nums. Datums zoals op de poster: `30.07.2026`.
@@ -69,7 +71,7 @@ Beide self-hosted via Fontsource (geen verzoeken naar Google, AVG). Voorlopige k
 - **Wrapper** (`.wrapper`): breed raster voor header, footer en kaartrasters, max 96rem.
 - Kaartrasters: `.grid` met `--grid-min` (standaard 16rem).
 - Carousel (`SetCarousel`): horizontale rij met `scroll-snap-type: x mandatory`. Telefoon 78% per kaart (stukje van de volgende zichtbaar), tablet 2,5, desktop 4. Pijlknoppen rechts in de sectiekop, uitgeschakeld aan begin/eind, verborgen als alles past.
-- Footer: merk (1,6fr) + Explore, Genres, Follow; tablet drie kolommen onder het merk, telefoon twee. Aantallen als `.badge` (pil, `--step--2`, tabular-nums). Links in systeem-mono, kapitalen, `--step--1`, met smear bij hover/focus. Onderaan een peak gradient (magenta, 10 kolommen; zie `PEAK_FOOTER` in `src/lib/peak.ts`) die tijdens het scrollen van vorm verandert: elke waarde mengt van `start` (vlakke band, gezakt, dof) naar de eindstand helemaal onderaan, met ease-in-out. Geen scale/transform, zodat de randen altijd tot de zijkant lopen; het copyright staat op de donkere vloer en is daarom altijd licht.
+- Footer: merk (1,6fr) + Explore, Genres, Follow; tablet drie kolommen onder het merk, telefoon twee. Aantallen als `.badge` (pil, `--step--2`, tabular-nums). Links in systeem-mono, kapitalen, `--step--1`, accentkleur bij hover. Onderaan een peak gradient (magenta, 10 kolommen; zie `PEAK_FOOTER` in `src/lib/peak.ts`) die tijdens het scrollen van vorm verandert: elke waarde mengt van `start` (vlakke band, gezakt, dof) naar de eindstand helemaal onderaan, met ease-in-out. Geen scale/transform, zodat de randen altijd tot de zijkant lopen; het copyright staat op de donkere vloer en is daarom altijd licht.
 - Setpagina: hero met video en info naast elkaar vanaf 64rem (`1.8fr / 1fr`). Het podium is daar sticky (onder de header) tot het einde van de hero; daarna mini-video. Titel `min(var(--step-6), 12cqi)` op de infokolom. Beschrijving en tracklist als tabs (`<sd-tabs>`, `src/scripts/tabs.ts`): onderstreepte tabs in meta-stijl, actieve tab met accentlijn, aantal tracks als pil.
 - Play-knop met tekst: `min-inline-size: 7.25rem`, zodat Play en Pause even breed zijn.
 
@@ -125,17 +127,19 @@ De kern van de site. Eén `<sd-player>` in de layout met `transition:persist`: h
 ## 10. Open punten
 
 - [ ] Logo als vector (SVG/AI/PDF) en het font van het logo
-- [ ] Definitieve fontkeuze (Unbounded is een voorstel)
+- [x] Fontkeuze: Stack Sans Notch / Headline / Text
 - [ ] Fotografie van avonden en dj's
 - [ ] Stills uit de video (thumbnail-picker via Bunny Stream)
 - [ ] Nederlandse vertaling (interface staat klaar in `src/i18n/ui.ts`)
 - [ ] OG-afbeelding per set (nu: cover of standaardbeeld)
 
-## Smear
-- Hover/focus-effect op titellinks en footerlinks, in plaats van een underline. Tekst plus een horizontaal geblurde, verschoven kopie (SVG-filter `#sd-smear` in `BaseLayout`), die GSAP terugbrengt naar 0.
-- Standaard: amount 14, shift 10, spread 0,6, 0,7s, rechts, `expo.out`; waarden voor 16px tekst, schalen mee met de lettergrootte (max 4×). Per element aan te passen met `data-smear-*`; uitproberen op `/brand#effects`.
-- `data-smear-scope` op een kaart: hover op de hele kaart laat de titel smeren. Bij een link met een klikbare `::after` smeer je een span erin (een filter maakt een containing block).
-- Uit bij `prefers-reduced-motion`.
+## Knoppen
+- `.button`: pil met rand. Hover met een muis: een cirkel (170% van de knop) vult de knop vanaf het punt waar de pointer binnenkomt, volgt hem (0,4s, power2) en rolt eruit waar hij weggaat (0,3s). Naar "Position Aware Button Hover w/ GSAP" (CodePen OJYywaJ), in `src/scripts/button-flair.ts` met event delegation. Kleur van de vulling: `--_bg-hover`, tekst: `--_fg-hover`.
+- Touch, toetsenbord, geen JS en `prefers-reduced-motion`: gewoon omkleuren.
+
+## Cover-art
+- Zonder still of flyer: gegenereerde art per seed (`src/lib/art.ts`). Die leeft: de twee lichtbollen drijven rond, de tint schuift ±12° en de ring zweeft en ademt (`art-drift`, `art-ring` in `components.scss`, via `@property`). Duur 14–24s en startpunt uit de seed, zodat covers niet gelijk lopen. Hover op een kaart: ring schaalt naar 1,14.
+- Niet bij `prefers-reduced-motion` en niet zodra er een echte afbeelding is.
 
 ## Stijlgids
-- `/brand` toont tokens, componenten en effecten live uit de code. Smear en peak gradient hebben er een speeltuin; de peak-instelling van de footer staat in `PEAK_FOOTER` (`src/lib/peak.ts`). Nieuw component of token: zet het daar ook bij.
+- `/brand` toont tokens, componenten en effecten live uit de code. De peak gradient heeft er een speeltuin; de peak-instelling van de footer staat in `PEAK_FOOTER` (`src/lib/peak.ts`). Nieuw component of token: zet het daar ook bij.

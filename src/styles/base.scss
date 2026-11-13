@@ -30,8 +30,9 @@ body::after {
   mix-blend-mode: overlay;
 }
 
+/* Grote titels in Notch, de rest in Headline. Bewust veel contrast met de tekst (step-0). */
 h1, h2, h3, h4 {
-  font-family: var(--font-display);
+  font-family: var(--font-heading);
   line-height: var(--leading-tight);
   letter-spacing: var(--tracking-display);
   font-weight: 700;
@@ -39,8 +40,8 @@ h1, h2, h3, h4 {
   overflow-wrap: anywhere; /* anywhere telt mee in de min-breedte (break-word niet) */
   hyphens: auto;
 }
-h1 { font-size: var(--step-5); }
-h2 { font-size: var(--step-3); }
+h1 { font-family: var(--font-display); font-size: var(--step-6); line-height: 0.95; }
+h2 { font-size: var(--step-4); }
 h3 { font-size: var(--step-1); font-weight: 600; }
 h4 { font-size: var(--step-0); font-weight: 600; }
 
@@ -87,10 +88,16 @@ hr { border: 0; border-block-start: var(--border-width) solid var(--color-line);
   text-align: center;
 }
 
-/* Knoppen */
+/* Knoppen. Hover: een cirkel vult de knop vanaf het punt waar de muis binnenkomt
+   (src/scripts/button-flair.ts). Zonder JS, op touch en bij reduced motion: gewoon omkleuren. */
 .button {
   --_bg: transparent;
   --_fg: var(--color-fg);
+  --_bg-hover: var(--color-fg);
+  --_fg-hover: var(--color-bg);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -105,13 +112,35 @@ hr { border: 0; border-block-start: var(--border-width) solid var(--color-line);
   font-size: var(--step--1);
   letter-spacing: 0.02em;
   text-decoration: none;
-  transition: background var(--dur) var(--ease-out), color var(--dur) var(--ease-out), border-color var(--dur) var(--ease-out);
+  transition: background var(--dur) var(--ease-out), color var(--dur-fast) var(--ease-out), border-color var(--dur) var(--ease-out);
 }
-.button:hover { --_bg: var(--color-fg); --_fg: var(--color-bg); border-color: var(--color-fg); }
+.button:hover { color: var(--_fg-hover); border-color: var(--_bg-hover); }
+.button:not([data-flair]):hover { background: var(--_bg-hover); }
 .button--primary { --_bg: var(--color-accent); --_fg: var(--color-on-accent); border-color: var(--color-accent); }
-.button--primary:hover { --_bg: var(--color-fg); --_fg: var(--color-bg); }
 .button svg { inline-size: 1.15em; block-size: 1.15em; flex: none; }
 .button[aria-pressed='true'] { --_bg: var(--color-surface); }
+/* De vulling: een vlak zo groot als de knop, met een cirkel (170%) om zijn linkerbovenhoek.
+   GSAP schuift het vlak (xPercent/yPercent) zodat het middelpunt onder de muis ligt, en schaalt
+   vanaf die hoek. Onder de tekst dankzij isolation + z-index -1. */
+.button__flair {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  transform: scale(0);
+  transform-origin: 0 0;
+}
+.button__flair::before {
+  content: '';
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  inline-size: 170%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--_bg-hover);
+  translate: -50% -50%;
+}
 
 .icon-button {
   display: inline-grid;

@@ -46,7 +46,7 @@ const djs = lib.djs.filter((d) => setsByDj(lib, d.id).length > 0);
               {featured.data.video.duration && <> · {formatDuration(featured.data.video.duration)}</>}
             </p>
             <h2 id="featured-title" class="hero__set-title">
-              <a href={setHref(featured.id)} data-smear>{featured.data.title}</a>
+              <a href={setHref(featured.id)}>{featured.data.title}</a>
             </h2>
             <p class="muted">{joinNames(lib.djsOf(featured).map((d) => d.data.name))}</p>
             <div class="hero__actions">
@@ -158,14 +158,16 @@ const djs = lib.djs.filter((d) => setsByDj(lib, d.id).length > 0);
   }
   @media (min-width: 60rem) {
     .hero { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); }
+    /* Intro blijft staan terwijl de featured set langsschuift, tot de hero ophoudt. */
+    .hero__intro { position: sticky; inset-block-start: calc(var(--header-h) + var(--space-m)); }
   }
   .hero__intro { display: grid; gap: var(--space-s); align-content: start; }
   .hero__cta { display: flex; flex-wrap: wrap; gap: var(--space-2xs); margin-block-start: var(--space-2xs); }
+  /* Zo groot als het past: nooit breder dan ~12 tekens per regel op een telefoon. */
   .hero__title {
-    font-size: var(--step-5);
+    font-size: min(var(--step-7), 13vw);
     text-transform: uppercase;
-    letter-spacing: -0.035em;
-    line-height: 0.98;
+    line-height: 0.92;
   }
   @media (prefers-reduced-motion: no-preference) {
     .hero__feature { animation: rise var(--dur-slow) 220ms var(--ease-out) both; }
@@ -178,7 +180,7 @@ const djs = lib.djs.filter((d) => setsByDj(lib, d.id).length > 0);
   .hero__stage[data-player-docked] > :global(*) { visibility: hidden; }
   .hero__stage :global(.hero__play) { position: absolute; inset: 50% auto auto 50%; translate: -50% -50%; z-index: 3; }
   .hero__meta { display: grid; gap: var(--space-3xs); }
-  .hero__set-title { font-size: var(--step-3); }
+  .hero__set-title { font-family: var(--font-display); font-size: var(--step-5); line-height: 0.95; }
   .hero__set-title a { text-decoration: none; }
   .hero__actions { display: flex; flex-wrap: wrap; gap: var(--space-2xs); margin-block-start: var(--space-2xs); }
 
@@ -214,6 +216,6 @@ const djs = lib.djs.filter((d) => setsByDj(lib, d.id).length > 0);
   .dj-row__item:hover :global(.avatar) { scale: 1.06; }
   /* Grote titel pas als er ruimte is (op mobiel past een lang woord anders niet). */
   @media (min-width: 60rem) {
-    .hero__title { font-size: var(--step-6); }
+    .hero__title { font-size: min(var(--step-8), 7.5vw); }
   }
 </style>

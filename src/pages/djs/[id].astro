@@ -84,11 +84,11 @@ const genres = [...counts.values()].sort((a, b) => b.n - a.n).map((x) => x.genre
     .dj-head { grid-template-columns: auto minmax(0, 1fr); }
   }
   .dj-head__text { display: grid; gap: var(--space-s); }
-  .dj-head h1 { font-size: var(--step-5); text-transform: uppercase; letter-spacing: -0.035em; line-height: 0.98; }
+  .dj-head h1 { font-size: min(var(--step-7), 14vw); text-transform: uppercase; line-height: 0.92; }
   .dj-links { display: flex; flex-wrap: wrap; gap: var(--space-2xs); }
   .dj-genres { display: grid; gap: var(--space-2xs); }
   /* Grote titel pas als er ruimte is (op mobiel past een lang woord anders niet). */
   @media (min-width: 48rem) {
-    .dj-head h1 { font-size: var(--step-6); }
+    .dj-head h1 { font-size: var(--step-8); }
   }
 </style>
