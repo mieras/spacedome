@@ -9,6 +9,7 @@ Categorieën: **Toegevoegd**, **Gewijzigd**, **Opgelost**, **Verwijderd**, **Bev
 
 ### Onderhoud
 - Netlify gekoppeld aan GitHub: `main` is productie, `staging` een branch deploy. README bijgewerkt.
+- Branch protection op `staging` en `main` (PR verplicht, geen force-push of verwijderen).
 
 ## [2026-11-13]
 

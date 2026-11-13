@@ -107,6 +107,7 @@ Het script (`scripts/set-add.mjs`) laat Bunny Stream de video zelf uit STACK oph
 
 - Netlify-site `spacedome` op het MIERAS-team: https://spacedome.netlify.app (admin: app.netlify.com/projects/spacedome). Later over naar Space Dome.
 - Gekoppeld aan GitHub: `main` → productie (spacedome.netlify.app), `staging` → branch deploy (staging--spacedome.netlify.app), PR's → deploy preview. Werkwijze volgens `~/Code/_standards/DEPLOY.md`.
+- Branch protection op `staging` en `main`: alleen via PR (0 reviews nodig), geen force-push, niet verwijderen. De repo is publiek: nooit geheimen committen.
 
 ## Bekende issues en afspraken
 
