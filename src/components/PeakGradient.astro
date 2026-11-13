@@ -1,0 +1,112 @@
+---
+/*
+ * Peak gradient: een zachte regenboog van geblurde kolommen die uit de vloer oprijst, het hoogst
+ * in het midden. Naar het idee van design.how/vault#peak-gradient (MIT), in Space Dome-kleuren.
+ *
+ * Hoe het werkt: BARS rechthoeken naast elkaar in één SVG, elk 1.23× zo breed als de stap zodat ze
+ * overlappen. Allemaal dezelfde verticale gradient (objectBoundingBox: elke kolom draagt de hele
+ * regenboog over zijn eigen hoogte) en een gaussian blur, zodat ze samensmelten tot één vlak. De
+ * laatste stop is transparant, dus de toppen lossen op. Hoogte valt vanuit het midden af met
+ * 1 - t^1.24 (vlakker dan een cosinus, meer piramide).
+ *
+ * Oprijzen: alleen een transform (scaleY 0 → 1 vanaf de onderkant), gestart als de footer in beeld
+ * komt. Zonder JS of met prefers-reduced-motion staat hij er gewoon.
+ */
+interface Props {
+  class?: string;
+}
+
+const W = 1271;
+const H = 599;
+const BARS = 9;
+const BLUR = 15;
+const PEAK = 0.98;
+const VALLEY = 0.55;
+
+const pitch = W / BARS;
+const width = pitch * 1.23;
+const mid = (BARS - 1) / 2;
+const bars = Array.from({ length: BARS }, (_, i) => {
+  const t = Math.abs(i - mid) / mid;
+  const h = PEAK * H * (VALLEY + (1 - VALLEY) * (1 - t ** 1.24));
+  return { x: i * pitch - (width - pitch) / 2, y: H - h, h };
+});
+
+// Onder naar boven: nachtblauw vloer, blauw, bijna-wit, geel, oranjerood, poster-magenta, weg.
+const stops = [
+  [0, 'oklch(22% 0.09 290)'],
+  [0.14, 'oklch(52% 0.2 268)'],
+  [0.3, 'oklch(93% 0.035 285)'],
+  [0.44, 'oklch(90% 0.16 95)'],
+  [0.58, 'oklch(68% 0.22 38)'],
+  [0.76, 'oklch(62% 0.25 352)'],
+  [1, 'oklch(62% 0.25 352 / 0)'],
+] as const;
+
+const { class: className } = Astro.props;
+---
+
+<div class:list={['peak', className]} data-peak aria-hidden="true">
+  <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" focusable="false">
+    <defs>
+      <linearGradient id="peak-fill" x1="0" y1="1" x2="0" y2="0">
+        {stops.map(([offset, color]) => <stop offset={offset} style={`stop-color: ${color}`} />)}
+      </linearGradient>
+      <filter id="peak-blur" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation={BLUR} />
+      </filter>
+    </defs>
+    {
+      bars.map((b) => (
+        <g filter="url(#peak-blur)">
+          <rect x={b.x.toFixed(1)} y={b.y.toFixed(1)} width={width.toFixed(1)} height={(b.h + BLUR * 3).toFixed(1)} fill="url(#peak-fill)" />
+        </g>
+      ))
+    }
+  </svg>
+</div>
+
+<script>
+  // Laat de vlakte oprijzen zodra hij in beeld komt. Opnieuw koppelen na elke ClientRouter-swap.
+  function bind() {
+    const peaks = document.querySelectorAll<HTMLElement>('[data-peak]:not([data-risen])');
+    if (!peaks.length) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (!e.isIntersecting) continue;
+          const el = e.target as HTMLElement;
+          // Twee frames wachten zodat de ingeklapte stand eerst getekend is (anders geen transitie).
+          requestAnimationFrame(() => requestAnimationFrame(() => (el.dataset.risen = '')));
+          io.unobserve(el);
+        }
+      },
+      { threshold: 0.15 },
+    );
+    peaks.forEach((p) => {
+      p.dataset.armed = '';
+      io.observe(p);
+    });
+  }
+  document.addEventListener('astro:page-load', bind);
+</script>
+
+<style>
+  .peak {
+    position: relative;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .peak svg {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+    transform-origin: 50% 100%;
+  }
+  /* Alleen inklappen als het script hem bewaakt (data-armed) en beweging mag. */
+  @media (prefers-reduced-motion: no-preference) {
+    .peak[data-armed]:not([data-risen]) svg { transform: scaleY(0); }
+    /* Transitie pas bij het oprijzen, anders zie je hem bij het inklappen al wegzakken. */
+    .peak[data-risen] svg { transition: transform 1.1s cubic-bezier(0.16, 1, 0.3, 1); }
+  }
+</style>

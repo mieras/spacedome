@@ -8,6 +8,7 @@ import { genreHref, getLibrary, setsByGenre } from '../lib/content';
 import { settings } from '../settings';
 import Icon from './Icon.astro';
 import Logo from './Logo.astro';
+import PeakGradient from './PeakGradient.astro';
 
 const lib = await getLibrary();
 const explore = [
@@ -38,7 +39,7 @@ const topGenres = lib.genres
         {
           explore.map((l) => (
             <li>
-              <a href={l.href}>
+              <a href={l.href} data-smear>
                 {l.label}
                 {l.count !== undefined && <span class="badge">{l.count}</span>}
               </a>
@@ -55,7 +56,7 @@ const topGenres = lib.genres
           <ul role="list">
             {topGenres.map(({ genre, count }) => (
               <li>
-                <a href={genreHref(genre.id)}>
+                <a href={genreHref(genre.id)} data-smear>
                   {genre.data.title}
                   <span class="badge">
                     {count}
@@ -65,7 +66,7 @@ const topGenres = lib.genres
               </li>
             ))}
             <li>
-              <a href="/genres" class="site-footer__more">
+              <a href="/genres" class="site-footer__more" data-smear>
                 {t('footer.allGenres')} <Icon name="arrow" />
               </a>
             </li>
@@ -80,7 +81,7 @@ const topGenres = lib.genres
         {
           settings.socials.map((s) => (
             <li>
-              <a href={s.url} rel="me noopener" target="_blank">
+              <a href={s.url} rel="me noopener" target="_blank" data-smear>
                 {s.label} <span class="muted">{s.handle}</span>
                 <Icon name="external" />
                 <span class="visually-hidden">(opens in a new tab)</span>
@@ -91,16 +92,36 @@ const topGenres = lib.genres
       </ul>
     </nav>
 
-    <p class="site-footer__small meta">© {new Date().getFullYear()} {settings.siteName}</p>
   </div>
+
+  <!-- Peak gradient onderaan, met het copyright op de donkere vloer. -->
+  <div class="site-footer__peak">
+    <PeakGradient class="site-footer__glow" />
+    <p class="site-footer__small meta wrapper">© {new Date().getFullYear()} {settings.siteName}</p>
+  </div>
+
+  <!-- Filter voor het smear-effect op de links (src/scripts/smear.ts). -->
+  <svg class="site-footer__defs" aria-hidden="true" focusable="false" width="0" height="0">
+    <filter id="sd-smear" x="-5%" y="-30%" width="130%" height="160%" color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="0 0" result="blur" />
+      <feOffset in="blur" dx="0" dy="0" result="streak" />
+      <feMerge>
+        <feMergeNode in="streak" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </svg>
 </footer>
+
+<script>
+  import '../scripts/smear';
+</script>
 
 <style>
   .site-footer {
     margin-block-start: var(--space-2xl);
-    padding-block: var(--space-xl) var(--space-l);
+    padding-block-start: var(--space-xl);
     border-block-start: var(--border-width) solid var(--color-line);
-    background: radial-gradient(60% 120% at 10% 100%, var(--color-glow), transparent 70%);
   }
   .site-footer__inner {
     display: grid;
@@ -108,8 +129,7 @@ const topGenres = lib.genres
     gap: var(--space-l) var(--space-m);
     align-items: start;
   }
-  .site-footer__brand,
-  .site-footer__small { grid-column: 1 / -1; }
+  .site-footer__brand { grid-column: 1 / -1; }
   @media (min-width: 40rem) {
     .site-footer__inner { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   }
@@ -121,7 +141,19 @@ const topGenres = lib.genres
   .site-footer__brand .lead { max-inline-size: 28ch; font-size: var(--step-0); color: var(--color-muted); }
   .site-footer__nav { display: grid; gap: var(--space-2xs); min-inline-size: 0; }
   .site-footer__nav ul { display: grid; gap: var(--space-3xs); }
-  .site-footer__nav a { display: inline-flex; align-items: center; gap: 0.5ch; min-block-size: 2rem; text-decoration: none; }
+  /* Links in mono-kapitalen (systeemfont, geen extra download), met het smear-effect. */
+  .site-footer__nav a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75ch;
+    min-block-size: 2rem;
+    font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+    font-size: var(--step--1);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+  }
+  .site-footer__nav a[data-smearing] { filter: url(#sd-smear); }
   .site-footer__nav a:hover { text-decoration: underline; }
   .site-footer__nav :global(.icon) { inline-size: 1em; block-size: 1em; flex: none; }
   .site-footer__more { color: var(--color-muted); }
@@ -137,4 +169,22 @@ const topGenres = lib.genres
     text-align: center;
   }
   .site-footer__nav a:hover .badge { text-decoration: none; }
+  .site-footer__nav .muted { text-transform: none; }
+
+  /* Peak: de vloer is in beide thema's donker, dus het copyright is daar altijd licht. */
+  .site-footer__peak {
+    position: relative;
+    display: grid;
+    align-items: end;
+    block-size: clamp(11rem, 34vw, 26rem);
+    margin-block-start: var(--space-xl);
+  }
+  .site-footer__peak > :global(*) { grid-area: 1 / 1; }
+  :global(.site-footer__glow) { block-size: 100%; }
+  .site-footer__small {
+    position: relative;
+    padding-block: var(--space-s);
+    color: oklch(96% 0.02 300);
+  }
+  .site-footer__defs { position: absolute; inline-size: 0; block-size: 0; overflow: hidden; }
 </style>
