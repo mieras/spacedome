@@ -20,6 +20,7 @@ const en = {
   'set.queued': 'In queue',
   'set.share': 'Share',
   'set.copied': 'Link copied',
+  'set.about': 'About this set',
   'set.tracklist': 'Tracklist',
   'set.recordedAt': 'Recorded at',
   'set.standalone': 'Standalone set',

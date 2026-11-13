@@ -7,6 +7,9 @@ Categorieën: **Toegevoegd**, **Gewijzigd**, **Opgelost**, **Verwijderd**, **Bev
 
 ## [Unreleased]
 
+### Gewijzigd
+- Setpagina: op desktop video en info naast elkaar in de hero (video ~2/3, info ~1/3); op mobiel onder elkaar. Beschrijving en tracklist als tabs (WAI-ARIA, pijltjes/Home/End); zonder JS of met maar één van beide gewoon onder elkaar. Tracklist reageert op de kolombreedte (container query).
+
 ### Toegevoegd
 - Mini-video versleepbaar: loslaten zet hem links of rechts onderin (onthouden). Ook via een wisselknop, zonder slepen.
 - Set van Ono-Sendai Sound (STACK/READY, via Bunny).
