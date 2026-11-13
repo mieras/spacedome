@@ -1,0 +1,37 @@
+---
+/* Rond portret: foto, of initialen op gegenereerde art. Decoratief (de naam staat ernaast). */
+import { initials } from '../lib/art';
+import type { DjEntry } from '../lib/content';
+import CoverArt from './CoverArt.astro';
+
+interface Props {
+  dj: DjEntry;
+  size?: string;
+  class?: string;
+}
+const { dj, size = '4rem', class: className } = Astro.props;
+---
+
+<div class:list={['avatar', className]} style={`--avatar-size:${size}`} aria-hidden="true">
+  <CoverArt seed={`dj-${dj.id}`} image={dj.data.photo} alt="" sizes={`calc(${size} * 2)`}>
+    {!dj.data.photo && <span class="avatar__initials">{initials(dj.data.name)}</span>}
+  </CoverArt>
+</div>
+
+<style>
+  .avatar { inline-size: var(--avatar-size); flex: none; }
+  .avatar :global(.art) { border-radius: 50%; }
+  .avatar :global(.art::before) { display: none; }
+  .avatar__initials {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: grid;
+    place-items: center;
+    color: oklch(97% 0.01 330);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: calc(var(--avatar-size) * 0.3);
+    letter-spacing: -0.02em;
+  }
+</style>

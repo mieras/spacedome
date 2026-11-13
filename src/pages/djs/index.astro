@@ -1,0 +1,43 @@
+---
+import DjAvatar from '../../components/DjAvatar.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import { t } from '../../i18n/ui';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { djHref, getLibrary, setsByDj } from '../../lib/content';
+
+const lib = await getLibrary();
+const djs = lib.djs.map((dj) => ({ dj, count: setsByDj(lib, dj.id).length }));
+---
+
+<BaseLayout title={t('djs.title')} description="The DJs and selectors behind Space Dome.">
+  <PageHeader title={t('djs.title')} eyebrow={`${djs.length} selectors`} />
+  <section class="wrapper section" aria-label={t('djs.title')}>
+    <ul class="grid dj-grid" role="list">
+      {
+        djs.map(({ dj, count }) => (
+          <li>
+            <a class="dj-card" href={djHref(dj.id)}>
+              <DjAvatar dj={dj} size="100%" />
+              <span class="dj-card__name">{dj.data.name}</span>
+              <span class="meta">
+                {[dj.data.resident && t('djs.resident'), dj.data.location, `${count} ${t('sets.count')}`].filter(Boolean).join(' · ')}
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</BaseLayout>
+
+<style>
+  .dj-grid { --grid-min: 11rem; }
+  .dj-card { display: grid; gap: var(--space-3xs); justify-items: center; text-align: center; text-decoration: none; }
+  .dj-card :global(.avatar) { inline-size: 100%; margin-block-end: var(--space-2xs); transition: scale var(--dur-slow) var(--ease-out); }
+  .dj-card :global(.avatar__initials) { font-size: clamp(1.5rem, 4vw, 3rem); }
+  .dj-card__name { font-family: var(--font-display); font-weight: 700; font-size: var(--step-1); }
+  .dj-card:hover .dj-card__name { text-decoration: underline; }
+  @media (hover: hover) {
+    .dj-card:hover :global(.avatar) { scale: 1.04; }
+  }
+</style>

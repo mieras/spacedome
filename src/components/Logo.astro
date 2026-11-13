@@ -1,0 +1,42 @@
+---
+/*
+ * Tijdelijk woordmerk: ring met SPACE DOME, nagebouwd in Unbounded met een stempel-ruwheid
+ * (feTurbulence + feDisplacementMap). Vervangen door het echte vectorlogo zodra dat er is.
+ */
+interface Props {
+  id: string; // uniek per instantie, voor het filter
+  class?: string;
+  title?: string;
+}
+const { id, class: className, title = 'Space Dome' } = Astro.props;
+const filterId = `stamp-${id}`;
+---
+
+<svg class:list={['logo', className]} viewBox="0 0 200 200" role="img" aria-label={title}>
+  <defs>
+    <filter id={filterId} x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="7" result="noise"></feTurbulence>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.4" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
+    </filter>
+  </defs>
+  <g filter={`url(#${filterId})`} fill="currentColor">
+    <circle cx="100" cy="100" r="91" fill="none" stroke="currentColor" stroke-width="7"></circle>
+    <text x="100" y="98" text-anchor="middle" textLength="132" lengthAdjust="spacingAndGlyphs">SPACE</text>
+    <text x="100" y="142" text-anchor="middle" textLength="124" lengthAdjust="spacingAndGlyphs">DOME</text>
+  </g>
+</svg>
+
+<style>
+  .logo {
+    inline-size: var(--logo-size, 3.25rem);
+    block-size: auto;
+    aspect-ratio: 1;
+    flex: none;
+  }
+  text {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 44px;
+    letter-spacing: -1px;
+  }
+</style>

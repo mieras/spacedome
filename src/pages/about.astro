@@ -1,0 +1,42 @@
+---
+import { getEntry, render } from 'astro:content';
+import Icon from '../components/Icon.astro';
+import PageHeader from '../components/PageHeader.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { settings } from '../settings';
+
+const page = (await getEntry('pages', 'about'))!;
+const { Content } = await render(page);
+---
+
+<BaseLayout title={page.data.title} description={page.data.description}>
+  <PageHeader title={page.data.title} lead={settings.tagline} />
+  <div class="wrapper about">
+    <div class="prose about__text"><Content /></div>
+    <aside class="about__aside" aria-labelledby="about-follow">
+      <h2 id="about-follow" class="meta">Follow</h2>
+      <ul role="list">
+        {
+          settings.socials.map((s) => (
+            <li>
+              <a class="button" href={s.url} rel="me noopener" target="_blank">
+                {s.label} {s.handle} <Icon name="external" />
+                <span class="visually-hidden">(opens in a new tab)</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </aside>
+  </div>
+</BaseLayout>
+
+<style>
+  .about { display: grid; gap: var(--space-xl); padding-block-end: var(--space-xl); }
+  @media (min-width: 56rem) {
+    .about { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
+  }
+  .about__text { font-size: var(--step-1); line-height: var(--leading-snug); }
+  .about__text :global(h2) { font-size: var(--step-3); }
+  .about__aside { display: grid; gap: var(--space-2xs); align-content: start; }
+</style>

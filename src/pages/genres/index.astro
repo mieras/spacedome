@@ -1,0 +1,51 @@
+---
+import CoverArt from '../../components/CoverArt.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import { t } from '../../i18n/ui';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { genreHref, getLibrary, setsByGenre } from '../../lib/content';
+
+const lib = await getLibrary();
+---
+
+<BaseLayout title={t('genres.title')} description="Beats, trip-hop, jazz, bass and more: browse Space Dome sets by genre.">
+  <PageHeader title={t('genres.title')} />
+  <section class="wrapper section" aria-label={t('genres.title')}>
+    <ul class="grid genre-grid" role="list">
+      {
+        lib.genres.map((g) => (
+          <li>
+            <a class="genre-card" href={genreHref(g.id)}>
+              <CoverArt seed={`genre-${g.id}`} ratio="16/9">
+                <span class="genre-card__title">{g.data.title}</span>
+              </CoverArt>
+              <span class="meta">
+                {setsByGenre(lib, g.id).length} {t('sets.count')}
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</BaseLayout>
+
+<style>
+  .genre-grid { --grid-min: 15rem; }
+  .genre-card { display: grid; gap: var(--space-2xs); text-decoration: none; }
+  .genre-card__title {
+    position: absolute;
+    inset: auto var(--space-s) var(--space-s);
+    z-index: 3;
+    color: oklch(97% 0.01 330);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--step-2);
+    text-transform: uppercase;
+    line-height: 1;
+  }
+  .genre-card :global(.art) { transition: scale var(--dur-slow) var(--ease-out); }
+  @media (hover: hover) {
+    .genre-card:hover :global(.art) { scale: 1.03; }
+  }
+</style>

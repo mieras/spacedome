@@ -1,0 +1,89 @@
+---
+import { render } from 'astro:content';
+import DjAvatar from '../../components/DjAvatar.astro';
+import Icon from '../../components/Icon.astro';
+import SetGrid from '../../components/SetGrid.astro';
+import { t } from '../../i18n/ui';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { genreHref, getLibrary, setsByDj, type DjEntry, type GenreEntry } from '../../lib/content';
+
+export async function getStaticPaths() {
+  const { djs } = await getLibrary();
+  return djs.map((dj) => ({ params: { id: dj.id }, props: { dj } }));
+}
+
+const { dj } = Astro.props as { dj: DjEntry };
+const lib = await getLibrary();
+const sets = setsByDj(lib, dj.id);
+const { Content } = await render(dj);
+
+// Genres die deze dj speelt, meest gespeeld eerst.
+const counts = new Map<string, { genre: GenreEntry; n: number }>();
+for (const s of sets) for (const g of lib.genresOf(s)) counts.set(g.id, { genre: g, n: (counts.get(g.id)?.n ?? 0) + 1 });
+const genres = [...counts.values()].sort((a, b) => b.n - a.n).map((x) => x.genre);
+---
+
+<BaseLayout title={dj.data.name} description={dj.body?.trim().split('\n')[0] ?? `${dj.data.name} on Space Dome.`}>
+  <header class="dj-head wrapper">
+    <DjAvatar dj={dj} size="clamp(8rem, 22vw, 16rem)" />
+    <div class="dj-head__text">
+      <p class="meta">{[dj.data.resident && t('djs.resident'), dj.data.location].filter(Boolean).join(' · ') || 'DJ'}</p>
+      <h1>{dj.data.name}</h1>
+      <div class="prose lead"><Content /></div>
+      {
+        dj.data.links.length > 0 && (
+          <ul class="dj-links" role="list">
+            {dj.data.links.map((l) => (
+              <li>
+                <a class="button" href={l.url} rel="noopener" target="_blank">
+                  {l.label} <Icon name="external" />
+                  <span class="visually-hidden">(opens in a new tab)</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+      {
+        genres.length > 0 && (
+          <div class="dj-genres">
+            <h2 class="meta">{t('djs.plays')}</h2>
+            <ul class="chips" role="list">
+              {genres.map((g) => (
+                <li>
+                  <a class="chip" href={genreHref(g.id)}>
+                    {g.data.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
+    </div>
+  </header>
+
+  <section class="wrapper section" aria-labelledby="dj-sets">
+    <div class="section-head">
+      <h2 id="dj-sets">{t('djs.sets')}</h2>
+      <span class="meta">{sets.length} {t('sets.count')}</span>
+    </div>
+    {sets.length ? <SetGrid sets={sets} lib={lib} /> : <p class="empty">No sets yet.</p>}
+  </section>
+</BaseLayout>
+
+<style>
+  .dj-head {
+    display: grid;
+    gap: var(--space-l);
+    align-items: center;
+    padding-block: var(--space-xl) var(--space-l);
+  }
+  @media (min-width: 48rem) {
+    .dj-head { grid-template-columns: auto 1fr; }
+  }
+  .dj-head__text { display: grid; gap: var(--space-s); }
+  .dj-head h1 { font-size: var(--step-6); text-transform: uppercase; letter-spacing: -0.035em; line-height: 0.98; }
+  .dj-links { display: flex; flex-wrap: wrap; gap: var(--space-2xs); }
+  .dj-genres { display: grid; gap: var(--space-2xs); }
+</style>

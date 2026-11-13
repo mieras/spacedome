@@ -1,0 +1,124 @@
+# DESIGN.md: Space Dome
+
+Het ontwerp van de Space Dome-site in één document: merk, kleur, typografie, ruimte, vorm, beweging en de player. Voor ontwerpers, ontwikkelaars en AI-agents.
+
+- **Bron van de waarden:** `src/styles/tokens.scss`. Staat er hier iets anders dan in de tokens, dan kloppen de tokens en moet dit document bij.
+- **Status:** globale eerste opzet (v0). Logo, definitieve fonts en fotografie volgen zodra de vectorbestanden en beelden er zijn.
+
+---
+
+## 1. Merk in het kort
+
+Space Dome is een avond (en straks een archief) rond de **LA beat scene**: beats, trip-hop, instrumentale hiphop, jazz en experimentele ritmes. Van J Dilla tot Flying Lotus, van Massive Attack tot DJ Shadow. *No rush, just hypnotic bass.*
+
+De beeldtaal komt van de eerste poster: **LA bij nacht**. Paars en magenta lucht, palmsilhouetten, lensflares als zwevende bollen, filmkorrel en een gestempeld logo in een cirkel.
+
+De site is een plek om sets te **kijken en te luisteren**, in de geest van NTS: de sets zijn het onderwerp, de interface stapt opzij.
+
+## 2. Principes
+
+1. **De set is de held.** Covers en video zijn groot, de interface is rustig en functioneel.
+2. **Nacht eerst.** Het donkere thema is het "echte" Space Dome; het lichte thema is de flyer bij daglicht. Beide volgen de systeemvoorkeur en zijn handmatig te kiezen.
+3. **De cirkel is de dome.** Ronde vormen keren terug: het logo, de playknop, dj-avatars, de bollen in de cover-art. Rechthoeken blijven zacht (`--radius-m`).
+4. **Korrel en gloed, met mate.** Filmkorrel over de hele site (`--grain-opacity`), één zachte gloed per scherm. Nooit ten koste van leesbaarheid.
+5. **Geen haast.** Beweging is traag en zacht (`--dur-slow`, `--ease-out`). Bij `prefers-reduced-motion` staat alles stil.
+6. **Toegankelijk is niet onderhandelbaar.** WCAG 2.2 AA, alles met het toetsenbord, de player ook.
+
+## 3. Kleur
+
+OKLCH-tokens met `light-dark()`: één token, twee waarden. Het thema volgt het systeem; `ThemeToggle` zet `data-theme` op `<html>`.
+
+| Token | Licht | Donker | Gebruik |
+|---|---|---|---|
+| `--color-bg` | lila papier `oklch(97% .012 320)` | nachtindigo `oklch(15% .045 292)` | Achtergrond |
+| `--color-surface` | `oklch(93.5% .02 318)` | `oklch(19.5% .055 296)` | Vlakken, player |
+| `--color-raised` | `oklch(99.5% .004 320)` | `oklch(24% .065 300)` | Panelen boven vlakken (wachtrij) |
+| `--color-fg` | `oklch(19% .06 292)` | `oklch(96% .012 330)` | Tekst |
+| `--color-muted` | `oklch(44% .06 300)` | `oklch(76% .045 315)` | Metadata, secundair |
+| `--color-line` | `oklch(85% .035 312)` | `oklch(33% .065 300)` | Lijnen, randen |
+| `--color-accent` | magenta `oklch(50% .22 356)` | roze `oklch(70% .22 352)` | Playknop, focus, actief |
+| `--color-glow` | violet, transparant | violet, transparant | Achtergrondgloed |
+
+Contrast: tekst, muted en accent halen in beide thema's minstens 4,5:1 op `--color-bg`. Bij `prefers-contrast: more` verdwijnt de korrel en wordt muted gelijk aan de tekstkleur.
+
+**Cover-art** (`CoverArt.astro`, `src/lib/art.ts`) is altijd "nacht", ook in het lichte thema: het is beeld, geen interface. Zonder eigen still krijgt elke set een vaste, unieke compositie (gradient, twee bollen, een ring) op basis van zijn ID.
+
+## 4. Typografie
+
+| Rol | Font | Gebruik |
+|---|---|---|
+| Display | **Unbounded** (variabel, 200–900) | Koppen, titels van sets, het woordmerk. Rond en breed, zoals de letters in het logo. |
+| Tekst | **Hanken Grotesk** (variabel) | Lopende tekst, interface, metadata. |
+
+Beide self-hosted via Fontsource (geen verzoeken naar Google, AVG). Voorlopige keuze: als het logo-font bekend is, kijken we of Unbounded blijft.
+
+**Schaal:** Utopia, fluid tussen 360 en 1920 px. Basis 18 → 20 px, ratio 1.2 → 1.25. Tokens `--step--2` t/m `--step-8`.
+
+- `h1` `--step-5`, `h2` `--step-3`, `h3` `--step-1`.
+- Metadata (`.meta`): `--step--1`, hoofdletters, `letter-spacing: .08em`, tabular nums. Datums zoals op de poster: `30.07.2026`.
+
+## 5. Ruimte en layout
+
+**Ruimte:** Utopia space-schaal, basis 18 → 20 px. Tokens `--space-3xs` t/m `--space-3xl`, de one-up paren (`--space-s-m` enz.) en de custom paren `s-l`, `s-xl`, `m-2xl`, `l-3xl`.
+
+- Zijmarge: `--gutter: var(--space-s-l)`.
+- **Breakout-grid** (`.layout`): `content` (46rem) / `popout` / `feature` / `full`.
+- **Wrapper** (`.wrapper`): breed raster voor header, footer en kaartrasters, max 96rem.
+- Kaartrasters: `.grid` met `--grid-min` (standaard 16rem).
+
+## 6. Vorm
+
+- Radius: `--radius-s` (6px), `--radius-m` (12px, covers en kaarten), `--radius-l`, `--radius-round` (knoppen, chips, avatars).
+- Knoppen zijn pillen. De playknop is een cirkel in het accent.
+- Randen 1px in `--color-line`.
+
+## 7. Beweging
+
+| Token | Waarde | Waarvoor |
+|---|---|---|
+| `--dur-fast` | 150ms | Hover, kleine toestanden |
+| `--dur` | 300ms | Standaard, wegfaden van de pagina |
+| `--dur-slow` | 600ms | Binnenkomen van de pagina, player |
+| `--ease-out` | `cubic-bezier(.22, 1, .36, 1)` | Bijna alles |
+
+- **Paginatransities:** `<ClientRouter />`. De oude pagina fadet weg, de nieuwe fadet in en schuift 0,75rem omhoog. Header en player hebben een eigen `view-transition-name` en blijven dus staan.
+- **Player:** de video schuift met een FLIP-animatie tussen gedockt (op de setpagina) en mini (rechtsonder). Tussen pagina's "morpht" hij via de view transition.
+- **Reduced motion:** alle duurtokens worden 0,01 ms en de view-transition-animaties staan uit.
+
+## 8. De player
+
+De kern van de site. Eén `<sd-player>` in de layout met `transition:persist`: hij blijft spelen terwijl je door de site navigeert.
+
+| Toestand | Wanneer | Hoe |
+|---|---|---|
+| Uit | Niets geladen | Niet zichtbaar |
+| Balk | Er is een set geladen | Vaste balk onderin: cover, titel, dj's, play, ±15/30 s, tijd, wachtrij, delen, sluiten. De voortgang is een dunne balk bovenaan. |
+| Gedockt | Op de pagina van de spelende set, podium in beeld | De video ligt precies over het podium (`[data-player-stage]`) |
+| Mini | Elders, of het podium is uit beeld gescrold | Video zwevend rechtsonder, boven de balk |
+| Alleen audio | Bezoeker kiest "luisteren" | Geen video, alleen de balk |
+
+- **Wachtrij:** sets toevoegen vanaf elke kaart. Opgeslagen in `localStorage`, dus geen account nodig. De speelpositie wordt bewaard: wie terugkomt, gaat verder waar hij was.
+- **Delen:** de link naar de set, of vanuit de player de link op het huidige moment (`?t=123`).
+- **Media Session:** titel en cover op het vergrendelscherm, met play, pauze en spoelen.
+- **Toetsenbord:** alle bediening zit in echte knoppen en een range-slider met `aria-valuetext`. Wijzigingen worden gemeld via een `aria-live`-regio.
+
+## 9. Componenten (v0)
+
+| Component | Doel |
+|---|---|
+| `Logo` | Ring met SPACE DOME. Tijdelijk, nagebouwd in Unbounded; vervangen door het vectorlogo. |
+| `CoverArt` | Still van de set, of gegenereerde art als fallback |
+| `SetCard` | Cover met playknop, titel, dj's, datum, duur |
+| `PlayButton`, `QueueButton`, `ShareButton` | Acties op een set, overal gelijk |
+| `Tracklist` | Genummerde lijst; tijdcodes optioneel (later: naar een track springen) |
+| `DjAvatar` | Rond, foto of initialen op cover-art |
+| `EventCard` | Avond met datum zoals op de poster |
+
+## 10. Open punten
+
+- [ ] Logo als vector (SVG/AI/PDF) en het font van het logo
+- [ ] Definitieve fontkeuze (Unbounded is een voorstel)
+- [ ] Fotografie van avonden en dj's
+- [ ] Stills uit de video (thumbnail-picker via Bunny Stream)
+- [ ] Nederlandse vertaling (interface staat klaar in `src/i18n/ui.ts`)
+- [ ] OG-afbeelding per set (nu: cover of standaardbeeld)

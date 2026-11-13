@@ -1,0 +1,24 @@
+---
+interface Props {
+  title: string;
+  eyebrow?: string;
+  lead?: string;
+}
+const { title, eyebrow, lead } = Astro.props;
+---
+
+<header class="page-header wrapper">
+  {eyebrow && <p class="meta">{eyebrow}</p>}
+  <h1>{title}</h1>
+  {lead && <p class="lead muted">{lead}</p>}
+  <slot />
+</header>
+
+<style>
+  .page-header {
+    display: grid;
+    gap: var(--space-xs);
+    padding-block: var(--space-xl) var(--space-l);
+  }
+  .page-header h1 { font-size: var(--step-6); text-transform: uppercase; letter-spacing: -0.03em; }
+</style>

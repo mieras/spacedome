@@ -1,0 +1,113 @@
+/*
+ * Gedeelde componentstijlen die ook door scripts (player) gebruikt worden.
+ * De rest staat scoped in de .astro-bestanden.
+ */
+
+/* ---------- Cover-art (zie src/lib/art.ts) ---------- */
+.art {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  aspect-ratio: var(--art-ratio, 1);
+  border-radius: var(--radius-m);
+  color-scheme: dark;
+  background:
+    radial-gradient(circle at var(--art-x1, 30%) var(--art-y1, 30%), oklch(80% 0.16 var(--art-h1, 330) / 0.95) 0 5%, oklch(66% 0.22 var(--art-h1, 330) / 0.55) 11%, transparent 30%),
+    radial-gradient(circle at var(--art-x2, 70%) var(--art-y2, 75%), oklch(58% 0.24 var(--art-h1, 330) / 0.9) 0, transparent 58%),
+    linear-gradient(var(--art-angle, 160deg), oklch(15% 0.06 var(--art-h2, 285)), oklch(28% 0.14 var(--art-h2, 285)) 55%, oklch(44% 0.2 var(--art-h1, 330)));
+}
+/* De dome: een ring met een zachte gloed */
+.art::before {
+  content: '';
+  position: absolute;
+  inset-inline-start: var(--art-ring-x, 50%);
+  inset-block-start: var(--art-ring-y, 50%);
+  inline-size: var(--art-ring-s, 40%);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border: max(1.5px, 0.5cqi) solid oklch(97% 0.02 330 / 0.75);
+  border-radius: 50%;
+  box-shadow: 0 0 2.5rem oklch(75% 0.18 var(--art-h1, 330) / 0.45), inset 0 0 2rem oklch(75% 0.18 var(--art-h1, 330) / 0.25);
+  z-index: 1;
+}
+/* Filmkorrel */
+.art::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  opacity: 0.35;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.art > img {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+.art:has(> img)::before { display: none; }
+.art { container-type: inline-size; }
+
+/* ---------- Playknop ---------- */
+.play-button {
+  --_size: 3rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2xs);
+  min-inline-size: var(--_size);
+  block-size: var(--_size);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-round);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  box-shadow: 0 0.5rem 1.5rem -0.5rem oklch(40% 0.2 350 / 0.6);
+  transition: scale var(--dur) var(--ease-out), background var(--dur-fast) var(--ease-out);
+}
+.play-button:hover { scale: 1.06; }
+.play-button:active { scale: 0.96; }
+.play-button .icon { inline-size: 45%; block-size: 45%; }
+.play-button--sm { --_size: 2.75rem; }
+.play-button--lg { --_size: clamp(4rem, 3rem + 3vw, 6rem); }
+.play-button--label { padding-inline: 1.1rem 1.4rem; font-weight: 700; font-size: var(--step--1); letter-spacing: 0.02em; }
+.play-button--label .icon { inline-size: 1.35rem; block-size: 1.35rem; }
+.play-button .icon-pause { display: none; }
+.play-button[data-state='playing'] .icon-play { display: none; }
+.play-button[data-state='playing'] .icon-pause { display: block; }
+
+/* Equalizer-streepjes naast "Now playing" */
+.eq { display: inline-flex; align-items: flex-end; gap: 2px; block-size: 0.8em; }
+.eq i { inline-size: 3px; block-size: 100%; background: currentColor; border-radius: 1px; transform-origin: bottom; }
+@media (prefers-reduced-motion: no-preference) {
+  .eq i { animation: eq 900ms var(--ease-in-out) infinite alternate; }
+  .eq i:nth-child(2) { animation-delay: -300ms; }
+  .eq i:nth-child(3) { animation-delay: -600ms; }
+  [data-state='paused'] .eq i { animation-play-state: paused; }
+}
+@keyframes eq { from { scale: 1 0.25; } to { scale: 1 1; } }
+
+/* ---------- Toast ---------- */
+.toast {
+  position: fixed;
+  inset-inline: 0;
+  inset-block-end: calc(var(--space-m) + var(--_player, 0px));
+  z-index: 150;
+  inline-size: fit-content;
+  margin-inline: auto;
+  padding: var(--space-2xs) var(--space-s);
+  border-radius: var(--radius-round);
+  background: var(--color-fg);
+  color: var(--color-bg);
+  font-weight: 600;
+  font-size: var(--step--1);
+  opacity: 0;
+  translate: 0 0.5rem;
+  pointer-events: none;
+  transition: opacity var(--dur) var(--ease-out), translate var(--dur) var(--ease-out);
+}
+:root[data-player='on'] .toast { --_player: var(--player-h); }
+.toast[data-visible] { opacity: 1; translate: 0 0; }

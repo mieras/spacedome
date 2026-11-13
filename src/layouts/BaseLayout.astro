@@ -1,0 +1,61 @@
+---
+import '@fontsource-variable/unbounded';
+import '@fontsource-variable/hanken-grotesk';
+import '../styles/index.scss';
+
+import { ClientRouter } from 'astro:transitions';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import PageProgress from '../components/PageProgress.astro';
+import Player from '../components/Player.astro';
+import SiteMeta from '../components/SiteMeta.astro';
+import ThemeScript from '../components/ThemeScript.astro';
+import { t } from '../i18n/ui';
+import { settings } from '../settings';
+
+interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+  type?: 'website' | 'article' | 'video.other';
+  isHome?: boolean;
+  noindex?: boolean;
+  jsonLd?: object[];
+}
+
+const props = Astro.props;
+---
+
+<!doctype html>
+<html lang={settings.lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <ThemeScript />
+    <SiteMeta {...props} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#f6f0f8" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#110c22" media="(prefers-color-scheme: dark)" />
+    <ClientRouter />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">{t('skip')}</a>
+    <PageProgress />
+    <Header />
+    <main id="main" data-page tabindex="-1">
+      <slot />
+    </main>
+    <Footer />
+    <Player />
+    <div class="toast" role="status" aria-live="polite" data-toast transition:persist="toast"></div>
+    <script>
+      import '../scripts/share';
+    </script>
+  </body>
+</html>
+
+<style>
+  main:focus { outline: none; }
+</style>

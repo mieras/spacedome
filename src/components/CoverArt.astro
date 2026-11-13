@@ -1,0 +1,38 @@
+---
+/*
+ * Cover van een set, dj of avond. Met een still/poster: die afbeelding.
+ * Zonder: gegenereerde art op basis van de seed (zie src/lib/art.ts).
+ */
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+import { artStyle } from '../lib/art';
+
+interface Props {
+  seed: string;
+  image?: ImageMetadata;
+  alt?: string;
+  ratio?: '1' | '16/9' | '4/5';
+  sizes?: string;
+  eager?: boolean;
+  class?: string;
+}
+
+const { seed, image, alt = '', ratio = '1', sizes = '(min-width: 60rem) 25vw, 50vw', eager = false, class: className } = Astro.props;
+const style = `${artStyle(seed)};--art-ratio:${ratio}`;
+---
+
+<div class:list={['art', className]} style={style}>
+  {
+    image && (
+      <Image
+        src={image}
+        alt={alt}
+        widths={[320, 640, 960, 1280, 1920].filter((w) => w <= image.width)}
+        sizes={sizes}
+        loading={eager ? 'eager' : 'lazy'}
+        fetchpriority={eager ? 'high' : 'auto'}
+      />
+    )
+  }
+  <slot />
+</div>

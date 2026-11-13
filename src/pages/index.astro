@@ -1,0 +1,210 @@
+---
+import CoverArt from '../components/CoverArt.astro';
+import DjAvatar from '../components/DjAvatar.astro';
+import EventCard from '../components/EventCard.astro';
+import PlayButton from '../components/PlayButton.astro';
+import QueueButton from '../components/QueueButton.astro';
+import SetGrid from '../components/SetGrid.astro';
+import { t } from '../i18n/ui';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { djHref, eventHref, genreHref, getLibrary, isUpcoming, setHref, setsByDj, setsByEvent, toPlayerItem } from '../lib/content';
+import { formatDate, formatDateLong, formatDuration, joinNames } from '../lib/format';
+import { settings } from '../settings';
+
+const lib = await getLibrary();
+const featured = lib.sets.find((s) => s.data.featured) ?? lib.sets[0];
+const featuredItem = featured && (await toPlayerItem(featured, lib));
+const latest = lib.sets.filter((s) => s.id !== featured?.id).slice(0, 8);
+const upcoming = lib.events.filter((e) => isUpcoming(e)).at(-1);
+const past = lib.events.filter((e) => !isUpcoming(e)).slice(0, 3);
+const djs = lib.djs.filter((d) => setsByDj(lib, d.id).length > 0);
+---
+
+<BaseLayout title={settings.siteName} isHome>
+  <section class="hero wrapper" aria-labelledby="hero-title">
+    <div class="hero__intro">
+      <h1 id="hero-title" class="hero__title">Low-end theory from the LA beat scene</h1>
+      <p class="lead">Beats, trip-hop, deep grooves and experimental rhythms. Recorded live at our nights, on repeat here.</p>
+    </div>
+
+    {
+      featured && featuredItem && (
+        <article class="hero__feature" aria-labelledby="featured-title">
+          <div class="hero__stage">
+            <a href={setHref(featured.id)} tabindex="-1" aria-hidden="true">
+              <CoverArt seed={featured.id} image={featured.data.poster} ratio="16/9" eager sizes="(min-width: 60rem) 55vw, 100vw" />
+            </a>
+            <PlayButton item={featuredItem} size="lg" class="hero__play" />
+          </div>
+          <div class="hero__meta">
+            <p class="meta">
+              Latest set · <time datetime={featured.data.date.toISOString().slice(0, 10)}>{formatDate(featured.data.date)}</time>
+              {featured.data.video.duration && <> · {formatDuration(featured.data.video.duration)}</>}
+            </p>
+            <h2 id="featured-title" class="hero__set-title">
+              <a href={setHref(featured.id)}>{featured.data.title}</a>
+            </h2>
+            <p class="muted">{joinNames(lib.djsOf(featured).map((d) => d.data.name))}</p>
+            <div class="hero__actions">
+              <PlayButton item={featuredItem} label={t('set.playSet')} size="sm" />
+              <QueueButton item={featuredItem} />
+            </div>
+          </div>
+        </article>
+      )
+    }
+  </section>
+
+  <section class="section wrapper" aria-labelledby="latest-title">
+    <div class="section-head">
+      <h2 id="latest-title">{t('sets.latest')}</h2>
+      <a class="more-link" href="/sets">{t('sets.all')} ({lib.sets.length}) →</a>
+    </div>
+    <SetGrid sets={latest} lib={lib} />
+  </section>
+
+  <section class="section wrapper" aria-labelledby="events-title">
+    <div class="section-head">
+      <h2 id="events-title">{t('events.title')}</h2>
+      <a class="more-link" href="/events">{t('events.past')} →</a>
+    </div>
+    <div class="next-night">
+      <p class="meta">{t('events.next')}</p>
+      {
+        upcoming ? (
+          <p class="next-night__text">
+            <a href={eventHref(upcoming.id)}>
+              {formatDateLong(upcoming.data.start)}, {upcoming.data.venue.name}, {upcoming.data.venue.city}
+            </a>
+          </p>
+        ) : (
+          <p class="next-night__text">
+            {t('events.tba')}{' '}
+            <a href={settings.socials[0]?.url} rel="noopener" target="_blank">
+              {settings.socials[0]?.handle}
+              <span class="visually-hidden">(opens in a new tab)</span>
+            </a>
+          </p>
+        )
+      }
+    </div>
+    <ul role="list">
+      {
+        past.map((event) => (
+          <li>
+            <EventCard event={event} setCount={setsByEvent(lib, event.id).length} />
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="section wrapper split" aria-label="Browse">
+    <div>
+      <div class="section-head"><h2>{t('nav.genres')}</h2></div>
+      <ul class="chips chips--large" role="list">
+        {
+          lib.genres.map((g) => (
+            <li>
+              <a class="chip" href={genreHref(g.id)}>{g.data.title}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+    <div>
+      <div class="section-head">
+        <h2>{t('djs.title')}</h2>
+        <a class="more-link" href="/djs">All DJs →</a>
+      </div>
+      <ul class="dj-row" role="list">
+        {
+          djs.map((dj) => (
+            <li>
+              <a href={djHref(dj.id)} class="dj-row__item">
+                <DjAvatar dj={dj} size="4.5rem" />
+                <span>{dj.data.name}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero {
+    position: relative;
+    display: grid;
+    gap: var(--space-l);
+    padding-block: var(--space-xl) var(--space-2xl);
+    align-items: end;
+  }
+  /* Eén zachte gloed per scherm (DESIGN.md §2.4) */
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: -20% -10% auto 30%;
+    block-size: 120%;
+    z-index: -1;
+    background: radial-gradient(closest-side, var(--color-glow), transparent);
+    pointer-events: none;
+  }
+  @media (min-width: 60rem) {
+    .hero { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); }
+  }
+  .hero__intro { display: grid; gap: var(--space-s); align-content: end; }
+  .hero__title {
+    font-size: var(--step-6);
+    text-transform: uppercase;
+    letter-spacing: -0.035em;
+    line-height: 0.98;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .hero__title { animation: rise var(--dur-slow) var(--ease-out) both; }
+    .hero__intro .lead { animation: rise var(--dur-slow) 120ms var(--ease-out) both; }
+    .hero__feature { animation: rise var(--dur-slow) 220ms var(--ease-out) both; }
+  }
+  @keyframes rise { from { opacity: 0; translate: 0 1rem; } }
+
+  .hero__feature { display: grid; gap: var(--space-s); }
+  .hero__stage { position: relative; }
+  .hero__stage :global(.hero__play) { position: absolute; inset: 50% auto auto 50%; translate: -50% -50%; z-index: 3; }
+  .hero__meta { display: grid; gap: var(--space-3xs); }
+  .hero__set-title { font-size: var(--step-3); }
+  .hero__set-title a { text-decoration: none; }
+  .hero__set-title a:hover { text-decoration: underline; }
+  .hero__actions { display: flex; flex-wrap: wrap; gap: var(--space-2xs); margin-block-start: var(--space-2xs); }
+
+  .next-night {
+    display: grid;
+    gap: var(--space-3xs);
+    padding: var(--space-s) var(--space-m);
+    margin-block-end: var(--space-s);
+    border-radius: var(--radius-l);
+    background: var(--color-surface);
+  }
+  .next-night__text { font-size: var(--step-1); line-height: var(--leading-snug); }
+
+  .split { display: grid; gap: var(--space-xl); }
+  @media (min-width: 56rem) {
+    .split { grid-template-columns: 1fr 1fr; }
+  }
+  .chips--large .chip { font-size: var(--step-0); min-block-size: 2.75rem; padding-inline: 1.1em; }
+
+  .dj-row { display: flex; flex-wrap: wrap; gap: var(--space-s); }
+  .dj-row__item {
+    display: grid;
+    justify-items: center;
+    gap: var(--space-3xs);
+    inline-size: 6.5rem;
+    text-align: center;
+    font-size: var(--step--1);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .dj-row__item:hover span { text-decoration: underline; }
+  .dj-row__item :global(.avatar) { transition: scale var(--dur) var(--ease-out); }
+  .dj-row__item:hover :global(.avatar) { scale: 1.06; }
+</style>

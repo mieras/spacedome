@@ -1,0 +1,10 @@
+<!-- Favicon: de dome-ring met een stip. Light/dark via prefers-color-scheme. Vervangen door het echte beeldmerk. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <style>
+    .bg { fill: #110c22; } .fg { stroke: #f8eef6; } .dot { fill: #f0559e; }
+    @media (prefers-color-scheme: dark) { .bg { fill: #f6f0f8; } .fg { stroke: #110c22; } .dot { fill: #c2186b; } }
+  </style>
+  <rect class="bg" width="32" height="32" rx="8"/>
+  <circle class="fg" cx="16" cy="16" r="9.5" fill="none" stroke-width="2.6"/>
+  <circle class="dot" cx="16" cy="16" r="3.4"/>
+</svg>

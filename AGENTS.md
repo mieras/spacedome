@@ -1,0 +1,39 @@
+# AGENTS.md: Space Dome
+
+Instructies voor AI-agents (Claude Code, Cursor, Codex) en ontwikkelaars die aan dit project werken.
+Lees eerst `README.md` voor context, `CHANGELOG.md` voor recente wijzigingen en `DESIGN.md` voor het ontwerp.
+
+## Project
+- Klant: Space Dome (vriendendienst) · Bedrijf: MIERAS · SLA: nee
+- Stack: Astro 7.4, Markdown-content (Sanity later), Node 22.23.5 (zie `.nvmrc`)
+- Maarten maakt geen kosten voor dit project: betaalde diensten (video, domein) komen op naam van Space Dome.
+
+## Werkwijze
+- Werk nooit direct op `main`. Branch vanaf `staging` → PR naar `staging` → deploy preview → merge. Naar `main` alleen gebundelde releases en hotfixes, volgens `~/Code/_standards/DEPLOY.md`.
+- Branchnamen: `feat/…`, `fix/…`, `chore/…`, `docs/…`.
+- Commit nooit `.env`-bestanden of tokens. Nieuwe variabelen: naam toevoegen aan `.env.example` en de README-tabel.
+- Variabelen met `PUBLIC_` komen in de browser terecht: nooit voor tokens.
+
+## Documentatie bijhouden (verplicht)
+- Elke wijziging die je commit: voeg een regel toe onder `## [Unreleased]` in `CHANGELOG.md`.
+- Bij een release (`staging → main`): zet `[Unreleased]` om naar een datumkop.
+- Verandert setup, env, stack of deploy? Werk `README.md` bij. Verandert het ontwerp? Werk `DESIGN.md` bij (de tokens in `src/styles/tokens.scss` zijn leidend).
+
+## Conventies
+- Moderne CSS: custom properties, OKLCH met `light-dark()`, logical properties, cascade layers. Type en ruimte alleen via de Utopia-tokens (`--step-*`, `--space-*`).
+- Klassen die je aan een child-component doorgeeft (`class="…"`) stijl je in de parent met `:global(.klasse)`, anders pakt Astro's scoping ze niet.
+- Toegankelijkheid: WCAG 2.2 AA. Semantische HTML, focus-states, `prefers-reduced-motion` respecteren.
+- AVG: geen cookies of tracking zonder toestemming; embeds pas na een klik (`~/Code/_standards/CONSENT.md`). Statistiek: TODO.
+- Content alleen via `src/lib/content.ts` (straks Sanity `loadQuery()`).
+- Afbeeldingen: profiel Website volgens `~/Code/_standards/IMAGES.md`.
+- Transities: laag 1-2 (ClientRouter + PageProgress) volgens `~/Code/_standards/TRANSITIONS.md`.
+- SEO en AI readiness volgens `~/Code/_standards/SEO.md`.
+
+## Projectspecifiek
+- **Player** (`src/scripts/player.ts`): het `<sd-player>`-element is persistent; het script draait één keer. Per pagina alleen opnieuw koppelen via `astro:after-swap` / `astro:page-load`. Niet het element uit het document halen (dan pauzeert de video).
+- Elke knop die iets met de player doet, gebruikt `data-player-play` / `data-player-queue` met `data-item` (JSON van `toPlayerItem()`). Geen eigen click-handlers per knop.
+- Het podium op een setpagina is `[data-player-stage="<set-id>"]`; de video ligt er absoluut overheen (documentcoördinaten).
+- HLS: hls.js overal behalve Safari (native). Chromium meldt soms "maybe" voor HLS maar kan niet alles; vertrouw daar niet op.
+- Teststreams (Mux) zijn placeholders. Straks Bunny Stream met signed URLs; `posterTime` is bedoeld voor de thumbnail op tijdstip.
+- Content is grotendeels dummy (fictieve dj's). Niet publiceren zonder echte content.
+- `src/settings.ts`: `noindex: true` tot livegang.

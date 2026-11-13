@@ -1,0 +1,82 @@
+---
+/*
+ * Wisselt Auto → Licht → Donker. "Auto" verwijdert de keuze: de OS-voorkeur is weer leidend.
+ * Echte <button>, label zichtbaar, aria-live meldt de nieuwe stand.
+ */
+import { t } from '../i18n/ui';
+import Icon from './Icon.astro';
+---
+
+<button type="button" class="theme-toggle" data-theme-toggle>
+  <Icon name="auto" class="theme-toggle__icon theme-toggle__icon--system" />
+  <Icon name="sun" class="theme-toggle__icon theme-toggle__icon--light" />
+  <Icon name="moon" class="theme-toggle__icon theme-toggle__icon--dark" />
+  <span class="visually-hidden">{t('theme.label')}: </span><span data-theme-label>{t('theme.system')}</span>
+</button>
+<span class="visually-hidden" aria-live="polite" data-theme-status></span>
+
+<script>
+  import { t } from '../i18n/ui';
+
+  const order = ['system', 'light', 'dark'] as const;
+  type Mode = (typeof order)[number];
+  const labels: Record<Mode, string> = { system: t('theme.system'), light: t('theme.light'), dark: t('theme.dark') };
+
+  function current(): Mode {
+    try {
+      const v = localStorage.getItem('theme');
+      return v === 'light' || v === 'dark' ? v : 'system';
+    } catch {
+      return 'system';
+    }
+  }
+
+  function set(mode: Mode, announce = false) {
+    const root = document.documentElement;
+    try {
+      if (mode === 'system') {
+        localStorage.removeItem('theme');
+        delete root.dataset.theme;
+      } else {
+        localStorage.setItem('theme', mode);
+        root.dataset.theme = mode;
+      }
+    } catch {}
+    document.querySelectorAll<HTMLElement>('[data-theme-toggle]').forEach((el) => (el.dataset.mode = mode));
+    document.querySelectorAll('[data-theme-label]').forEach((el) => (el.textContent = labels[mode]));
+    if (announce) document.querySelectorAll('[data-theme-status]').forEach((el) => (el.textContent = `${t('theme.label')}: ${labels[mode]}`));
+  }
+
+  function init() {
+    set(current());
+    document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]').forEach((btn) => {
+      btn.onclick = () => set(order[(order.indexOf(current()) + 1) % order.length]!, true);
+    });
+  }
+
+  init();
+  document.addEventListener('astro:page-load', init);
+</script>
+
+<style>
+  .theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3xs);
+    min-block-size: 2.75rem;
+    padding-inline: var(--space-2xs);
+    border: 0;
+    border-radius: var(--radius-round);
+    background: transparent;
+    font-size: var(--step--1);
+    font-weight: 600;
+    letter-spacing: var(--tracking-meta);
+    text-transform: uppercase;
+  }
+  .theme-toggle:hover { background: color-mix(in oklch, currentColor 10%, transparent); }
+  .theme-toggle :global(.icon) { inline-size: 1.25rem; block-size: 1.25rem; display: none; }
+  .theme-toggle[data-mode='system'] :global(.theme-toggle__icon--system),
+  .theme-toggle[data-mode='light'] :global(.theme-toggle__icon--light),
+  .theme-toggle[data-mode='dark'] :global(.theme-toggle__icon--dark),
+  .theme-toggle:not([data-mode]) :global(.theme-toggle__icon--system) { display: block; }
+</style>

@@ -1,0 +1,22 @@
+---
+import type { Library, SetEntry } from '../lib/content';
+import SetCard from './SetCard.astro';
+
+interface Props {
+  sets: SetEntry[];
+  lib: Library;
+  headingLevel?: 'h2' | 'h3';
+  eagerFirst?: number;
+}
+const { sets, lib, headingLevel = 'h3', eagerFirst = 0 } = Astro.props;
+---
+
+<ul class="grid" role="list">
+  {
+    sets.map((set, i) => (
+      <li>
+        <SetCard set={set} lib={lib} headingLevel={headingLevel} eager={i < eagerFirst} />
+      </li>
+    ))
+  }
+</ul>

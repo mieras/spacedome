@@ -1,0 +1,42 @@
+---
+// <head>: titel, beschrijving, canonical, Open Graph, JSON-LD. Zie ~/Code/_standards/SEO.md.
+import { settings } from '../settings';
+import { entityJsonLd, pageDescription, pageTitle, websiteJsonLd } from '../lib/seo';
+
+interface Props {
+  title: string;
+  description?: string;
+  image?: string; // absolute of root-relatieve URL
+  type?: 'website' | 'article' | 'video.other';
+  isHome?: boolean;
+  noindex?: boolean;
+  jsonLd?: object[];
+}
+
+const { type = 'website', isHome = false, jsonLd = [] } = Astro.props;
+const site = Astro.site!;
+const title = pageTitle(Astro.props.title, isHome);
+const description = pageDescription(Astro.props.description);
+const noindex = settings.noindex || Astro.props.noindex;
+const canonical = new URL(Astro.url.pathname, site).href;
+const ogImage = new URL(Astro.props.image ?? '/og-default.png', site).href;
+const structuredData = [entityJsonLd(site), websiteJsonLd(site), ...jsonLd];
+---
+
+<title>{title}</title>
+<meta name="description" content={description} />
+{noindex ? <meta name="robots" content="noindex, follow" /> : <link rel="canonical" href={canonical} />}
+
+<meta property="og:type" content={type} />
+<meta property="og:site_name" content={settings.siteName} />
+<meta property="og:locale" content={settings.locale} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={ogImage} />
+<meta name="twitter:card" content="summary_large_image" />
+
+<link rel="sitemap" href="/sitemap-index.xml" />
+<link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt" />
+
+{structuredData.map((data) => <script type="application/ld+json" set:html={JSON.stringify(data)} />)}

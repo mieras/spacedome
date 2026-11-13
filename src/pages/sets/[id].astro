@@ -1,0 +1,148 @@
+---
+import { getImage } from 'astro:assets';
+import { render } from 'astro:content';
+import CoverArt from '../../components/CoverArt.astro';
+import DjAvatar from '../../components/DjAvatar.astro';
+import PlayButton from '../../components/PlayButton.astro';
+import QueueButton from '../../components/QueueButton.astro';
+import SetGrid from '../../components/SetGrid.astro';
+import ShareButton from '../../components/ShareButton.astro';
+import Tracklist from '../../components/Tracklist.astro';
+import { t } from '../../i18n/ui';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { djHref, eventHref, genreHref, getLibrary, setHref, suggestionsFor, toPlayerItem, type SetEntry } from '../../lib/content';
+import { formatDate, formatDuration, joinNames } from '../../lib/format';
+
+export async function getStaticPaths() {
+  const { sets } = await getLibrary();
+  return sets.map((set) => ({ params: { id: set.id }, props: { set } }));
+}
+
+const { set } = Astro.props as { set: SetEntry };
+const lib = await getLibrary();
+const item = await toPlayerItem(set, lib);
+const djs = lib.djsOf(set);
+const genres = lib.genresOf(set);
+const event = lib.eventOf(set);
+const suggestions = suggestionsFor(set, lib);
+const { Content } = await render(set);
+const duration = formatDuration(set.data.video.duration);
+const ogImage = set.data.poster ? (await getImage({ src: set.data.poster, width: 1200, height: 630, fit: 'cover', format: 'jpg' })).src : undefined;
+const description = `${set.data.title} by ${joinNames(djs.map((d) => d.data.name))}. ${set.body?.split('\n').find(Boolean) ?? ''}`;
+---
+
+<BaseLayout title={`${set.data.title} – ${joinNames(djs.map((d) => d.data.name))}`} description={description} image={ogImage} type="video.other">
+  <article class="set">
+    <div class="set__stage-wrap wrapper">
+      <div class="stage" data-player-stage={set.id}>
+        <CoverArt seed={set.id} image={set.data.poster} alt={set.data.posterAlt ?? ''} ratio="16/9" eager sizes="(min-width: 96rem) 96rem, 100vw" />
+        <PlayButton item={item} size="lg" useUrlTime class="stage__play" />
+      </div>
+    </div>
+
+    <div class="set__grid wrapper">
+      <header class="set__head">
+        <p class="meta">
+          <time datetime={set.data.date.toISOString().slice(0, 10)}>{formatDate(set.data.date)}</time>
+          {duration && <> · {duration}</>}
+          {' · '}
+          {event ? <a href={eventHref(event.id)}>{t('set.recordedAt')} {event.data.title} @ {event.data.venue.name}</a> : t('set.standalone')}
+        </p>
+        <h1 class="set__title">{set.data.title}</h1>
+        <ul class="set__djs" role="list">
+          {
+            djs.map((dj) => (
+              <li>
+                <a href={djHref(dj.id)}>
+                  <DjAvatar dj={dj} size="2.5rem" />
+                  <span>{dj.data.name}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+        <div class="set__actions">
+          <PlayButton item={item} label={t('set.playSet')} size="sm" useUrlTime />
+          <QueueButton item={item} />
+          <ShareButton url={setHref(set.id)} title={set.data.title} />
+        </div>
+        {
+          genres.length > 0 && (
+            <ul class="chips" role="list" aria-label={t('nav.genres')}>
+              {genres.map((g) => (
+                <li>
+                  <a class="chip" href={genreHref(g.id)}>
+                    {g.data.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )
+        }
+        <div class="prose set__text">
+          <Content />
+        </div>
+      </header>
+
+      {
+        set.data.tracklist.length > 0 && (
+          <section class="set__tracklist" aria-labelledby="tracklist-title">
+            <h2 id="tracklist-title" class="set__subtitle">{t('set.tracklist')}</h2>
+            <Tracklist tracks={set.data.tracklist} />
+          </section>
+        )
+      }
+    </div>
+
+    {
+      suggestions.length > 0 && (
+        <section class="section wrapper" aria-labelledby="more-title">
+          <div class="section-head">
+            <h2 id="more-title">{t('set.more')}</h2>
+          </div>
+          <SetGrid sets={suggestions} lib={lib} />
+        </section>
+      )
+    }
+  </article>
+</BaseLayout>
+
+<style>
+  .set__stage-wrap { padding-block-start: var(--space-m); }
+  /* 16:9, maar nooit hoger dan het scherm min header en playerbalk. */
+  .stage {
+    position: relative;
+    max-inline-size: calc((100svh - var(--header-h) - var(--player-h) - var(--space-l)) * 16 / 9);
+    margin-inline: auto;
+  }
+  .stage::before {
+    content: '';
+    position: absolute;
+    inset: 10% 5% -12%;
+    z-index: -1;
+    background: radial-gradient(closest-side, var(--color-glow), transparent);
+    filter: blur(20px);
+  }
+  :global(.stage__play) { position: absolute; inset: 50% auto auto 50%; translate: -50% -50%; z-index: 3; }
+  /* Speelt deze set en ligt de video eroverheen: cover en knop onzichtbaar, ruimte blijft. */
+  .stage[data-player-docked] > :global(*) { visibility: hidden; }
+
+  .set__grid {
+    display: grid;
+    gap: var(--space-xl);
+    padding-block: var(--space-l) var(--space-xl);
+  }
+  @media (min-width: 60rem) {
+    .set__grid { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); align-items: start; }
+    .set__tracklist { position: sticky; inset-block-start: calc(var(--header-h) + var(--space-s)); }
+  }
+  .set__head { display: grid; gap: var(--space-s); align-content: start; }
+  .set__head .meta a { color: inherit; }
+  .set__title { font-size: var(--step-6); text-transform: uppercase; letter-spacing: -0.035em; line-height: 0.98; }
+  .set__djs { display: flex; flex-wrap: wrap; gap: var(--space-2xs) var(--space-s); }
+  .set__djs a { display: inline-flex; align-items: center; gap: var(--space-2xs); font-size: var(--step-1); font-weight: 600; text-decoration: none; }
+  .set__djs a:hover span { text-decoration: underline; }
+  .set__actions { display: flex; flex-wrap: wrap; gap: var(--space-2xs); }
+  .set__text { margin-block-start: var(--space-xs); font-size: var(--step-1); line-height: var(--leading-snug); }
+  .set__subtitle { font-size: var(--step-1); text-transform: uppercase; letter-spacing: 0; margin-block-end: var(--space-2xs); }
+</style>

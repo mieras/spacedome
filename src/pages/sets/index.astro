@@ -1,0 +1,19 @@
+---
+import GenreFilter from '../../components/GenreFilter.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import SetGrid from '../../components/SetGrid.astro';
+import { t } from '../../i18n/ui';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getLibrary } from '../../lib/content';
+
+const lib = await getLibrary();
+---
+
+<BaseLayout title={t('nav.sets')} description="All DJ sets recorded at Space Dome: beats, trip-hop, instrumental hip-hop and experimental bass.">
+  <PageHeader title={t('nav.sets')} eyebrow={`${lib.sets.length} ${t('sets.count')}`}>
+    <GenreFilter genres={lib.genres} />
+  </PageHeader>
+  <section class="wrapper section" aria-label={t('sets.all')}>
+    <SetGrid sets={lib.sets} lib={lib} headingLevel="h2" eagerFirst={4} />
+  </section>
+</BaseLayout>

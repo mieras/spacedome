@@ -1,0 +1,17 @@
+---
+/* Delen via het deelmenu van het toestel, anders link kopiëren (src/scripts/share.ts). */
+import { t } from '../i18n/ui';
+import Icon from './Icon.astro';
+
+interface Props {
+  url: string;
+  title: string;
+  class?: string;
+}
+const { url, title, class: className } = Astro.props;
+---
+
+<button type="button" class:list={['button', className]} data-share data-share-url={url} data-share-title={title}>
+  <Icon name="share" />
+  <span>{t('set.share')}</span>
+</button>

@@ -1,0 +1,26 @@
+---
+/* Genre-chips als filter. Echte links naar genrepagina's: werkt zonder JS en is deelbaar. */
+import { t } from '../i18n/ui';
+import { genreHref, type GenreEntry } from '../lib/content';
+
+interface Props {
+  genres: GenreEntry[];
+  current?: string;
+}
+const { genres, current } = Astro.props;
+---
+
+<nav aria-label={t('sets.filter')}>
+  <ul class="chips" role="list">
+    <li><a class="chip" href="/sets" aria-current={!current ? 'page' : undefined}>{t('sets.allGenres')}</a></li>
+    {
+      genres.map((g) => (
+        <li>
+          <a class="chip" href={genreHref(g.id)} aria-current={current === g.id ? 'page' : undefined}>
+            {g.data.title}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>

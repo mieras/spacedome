@@ -1,0 +1,108 @@
+---
+/*
+ * Site-brede player. Staat één keer in de layout met transition:persist, dus hij blijft
+ * spelen tijdens paginawissels. Logica: src/scripts/player.ts. Stijl: src/styles/player.scss.
+ *
+ * Opbouw:
+ * - [data-player-media]: de video. Gedockt over het podium op de setpagina, anders mini rechtsonder.
+ * - [data-player-bar]: vaste balk onderin met alle bediening.
+ * - [data-player-queue-panel]: de wachtrij, klapt open boven de balk.
+ */
+import { t } from '../i18n/ui';
+import Icon from './Icon.astro';
+---
+
+<sd-player data-player-root hidden transition:persist="player">
+  <div class="player-media" data-player-media data-mode="off">
+    <video playsinline preload="none" disablepictureinpicture={false} data-player-video></video>
+    <div class="player-media__tools">
+      <a class="player-media__tool" href="/" data-player-open aria-label={t('player.openSet')}>
+        <Icon name="external" />
+      </a>
+      <button type="button" class="player-media__tool" data-player-fullscreen aria-label="Fullscreen">
+        <Icon name="expand" />
+      </button>
+      <button type="button" class="player-media__tool" data-player-hide-video aria-label={t('player.hideVideo')}>
+        <Icon name="headphones" />
+      </button>
+    </div>
+  </div>
+
+  <section class="player-bar" data-player-bar aria-label={t('player.label')} data-state="paused">
+    <div class="player-bar__seek">
+      <input type="range" min="0" max="0" step="1" value="0" data-player-seek aria-label={t('player.seek')} aria-valuetext="0:00" />
+    </div>
+
+    <div class="player-bar__inner">
+      <a class="player-bar__now" href="/" data-player-link>
+        <span class="player-bar__thumb art" data-player-thumb aria-hidden="true"></span>
+        <span class="player-bar__text">
+          <span class="player-bar__label meta">
+            <span class="eq" aria-hidden="true"><i></i><i></i><i></i></span>
+            {t('player.nowPlaying')}
+          </span>
+          <span class="player-bar__title" data-player-title></span>
+          <span class="player-bar__artists" data-player-artists></span>
+        </span>
+      </a>
+
+      <div class="player-bar__controls">
+        <button type="button" class="icon-button player-bar__skip" data-player-back aria-label={t('player.back')}>
+          <Icon name="back" />
+        </button>
+        <button type="button" class="play-button player-bar__toggle" data-player-toggle aria-label={t('set.play')} data-state="paused">
+          <Icon name="play" class="icon-play" />
+          <Icon name="pause" class="icon-pause" />
+        </button>
+        <button type="button" class="icon-button player-bar__skip" data-player-forward aria-label={t('player.forward')}>
+          <Icon name="forward" />
+        </button>
+      </div>
+
+      <div class="player-bar__tools">
+        <p class="player-bar__time" aria-hidden="true">
+          <span data-player-current>0:00</span> / <span data-player-duration>0:00</span>
+        </p>
+        <button type="button" class="icon-button player-bar__optional" data-player-view aria-pressed="false" aria-label={t('player.audioOnly')}>
+          <Icon name="headphones" />
+        </button>
+        <button type="button" class="icon-button player-bar__optional" data-player-mute aria-pressed="false" aria-label={t('player.mute')}>
+          <Icon name="volume" class="player-bar__vol" />
+          <Icon name="mute" class="player-bar__muted" />
+        </button>
+        <button type="button" class="icon-button player-bar__optional" data-player-share aria-label={t('player.shareMoment')}>
+          <Icon name="share" />
+        </button>
+        <button
+          type="button"
+          class="icon-button player-bar__queue-toggle"
+          data-player-queue-toggle
+          aria-expanded="false"
+          aria-controls="player-queue"
+          aria-label={t('player.queue')}
+        >
+          <Icon name="queue" />
+          <span class="player-bar__count" data-player-queue-count hidden>0</span>
+        </button>
+        <button type="button" class="icon-button" data-player-close aria-label={t('player.close')}>
+          <Icon name="close" />
+        </button>
+      </div>
+    </div>
+
+    <div class="player-queue" id="player-queue" data-player-queue-panel hidden>
+      <div class="player-queue__head">
+        <h2 class="player-queue__title" tabindex="-1" data-player-queue-heading>{t('player.queue')}</h2>
+        <button type="button" class="button" data-player-queue-clear>{t('player.clear')}</button>
+      </div>
+      <p class="player-queue__empty" data-player-queue-empty>{t('player.queueEmpty')}</p>
+      <ol class="player-queue__list" role="list" data-player-queue-list></ol>
+    </div>
+
+    <p class="visually-hidden" aria-live="polite" data-player-status></p>
+  </section>
+</sd-player>
+
+<script>
+  import '../scripts/player';
+</script>

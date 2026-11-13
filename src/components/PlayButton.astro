@@ -1,0 +1,35 @@
+---
+/*
+ * Speelt een set af in de site-brede player. De player (src/scripts/player.ts) luistert
+ * met één click-handler op het document en houdt data-state (idle/playing/paused) bij.
+ */
+import { t } from '../i18n/ui';
+import type { PlayerItem } from '../lib/content';
+import Icon from './Icon.astro';
+
+interface Props {
+  item: PlayerItem;
+  size?: 'sm' | 'md' | 'lg';
+  label?: string;
+  /** Op de setpagina: start op ?t= uit de URL (gedeelde link met tijd). */
+  useUrlTime?: boolean;
+  class?: string;
+}
+
+const { item, size = 'md', label, useUrlTime = false, class: className } = Astro.props;
+---
+
+<button
+  type="button"
+  class:list={['play-button', `play-button--${size}`, label && 'play-button--label', className]}
+  data-player-play
+  data-id={item.id}
+  data-item={JSON.stringify(item)}
+  data-state="idle"
+  data-use-url-time={useUrlTime ? '' : undefined}
+  aria-label={label ? undefined : `${t('set.play')}: ${item.title}`}
+>
+  <Icon name="play" class="icon-play" />
+  <Icon name="pause" class="icon-pause" />
+  {label && <span data-play-label>{label}</span>}
+</button>

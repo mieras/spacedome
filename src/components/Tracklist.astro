@@ -1,0 +1,60 @@
+---
+/*
+ * Tracklist. Tijdcodes zijn optioneel; later worden ze knoppen die in de player naar de track springen.
+ */
+import type { SetEntry } from '../lib/content';
+
+interface Props {
+  tracks: SetEntry['data']['tracklist'];
+}
+const { tracks } = Astro.props;
+const hasTimes = tracks.some((t) => t.time);
+---
+
+<ol class:list={['tracklist', hasTimes && 'tracklist--times']} role="list">
+  {
+    tracks.map((track, i) => (
+      <li class="track">
+        <span class="track__num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+        {hasTimes && <span class="track__time">{track.time ?? ''}</span>}
+        <span class="track__main">
+          <span class="track__artist">{track.artist}</span>
+          <span class="visually-hidden"> – </span>
+          <span class="track__title">{track.title}</span>
+        </span>
+        {track.label && <span class="track__label">{track.label}</span>}
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .tracklist { counter-reset: track; }
+  .track {
+    display: grid;
+    grid-template-columns: 2.5ch 1fr;
+    grid-template-areas: 'num main' '. label';
+    column-gap: var(--space-s);
+    align-items: baseline;
+    padding-block: var(--space-xs);
+    border-block-end: var(--border-width) solid var(--color-line);
+  }
+  .tracklist--times .track {
+    grid-template-columns: 2.5ch 6ch 1fr;
+    grid-template-areas: 'num time main' '. . label';
+  }
+  @media (min-width: 40rem) {
+    .track { grid-template-columns: 2.5ch 1fr auto; grid-template-areas: 'num main label'; }
+    .tracklist--times .track { grid-template-columns: 2.5ch 6ch 1fr auto; grid-template-areas: 'num time main label'; }
+  }
+  .track__num, .track__time, .track__label {
+    font-size: var(--step--1);
+    color: var(--color-muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .track__num { grid-area: num; }
+  .track__time { grid-area: time; }
+  .track__main { grid-area: main; display: flex; flex-wrap: wrap; column-gap: 0.6ch; }
+  .track__artist { font-weight: 700; }
+  .track__label { grid-area: label; text-transform: uppercase; letter-spacing: var(--tracking-meta); font-weight: 600; }
+</style>

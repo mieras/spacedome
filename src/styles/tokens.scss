@@ -1,0 +1,107 @@
+/*
+ * Design-tokens. Bron van de waarden; DESIGN.md beschrijft de keuzes.
+ * Typografie en ruimte: utopia-core-scss. Kleur: OKLCH met light-dark().
+ *
+ * Type:  https://utopia.fyi/type/calculator?c=360,18,1.2,1920,20,1.25,8,2,&s=0.75|0.5|0.25,1.5|2|3|4|6,s-l&g=s,l,xl,12
+ * Space: https://utopia.fyi/space/calculator?c=360,18,1.2,1920,20,1.25,8,2,&s=0.75|0.5|0.25,1.5|2|3|4|6,s-l&g=s,l,xl,12
+ */
+@use 'utopia-core-scss/src/utopia' as utopia;
+
+:root {
+  color-scheme: light dark;
+  interpolate-size: allow-keywords;
+
+  /* ---------- Typografie ---------- */
+  --font-display: 'Unbounded Variable', ui-rounded, system-ui, sans-serif;
+  --font-sans: 'Hanken Grotesk Variable', ui-sans-serif, system-ui, sans-serif;
+  --leading-tight: 1.05;
+  --leading-snug: 1.25;
+  --leading-normal: 1.55;
+  --tracking-display: -0.02em;
+  --tracking-meta: 0.08em;
+  --measure: 62ch;
+
+  @include utopia.generateTypeScale((
+    'minWidth': 360,
+    'maxWidth': 1920,
+    'minFontSize': 18,
+    'maxFontSize': 20,
+    'minTypeScale': 1.2,
+    'maxTypeScale': 1.25,
+    'positiveSteps': 8,
+    'negativeSteps': 2,
+    'prefix': 'step-',
+    'relativeTo': 'viewport-width',
+  ));
+
+  /* ---------- Ruimte ---------- */
+  @include utopia.generateSpaceScale((
+    'minWidth': 360,
+    'maxWidth': 1920,
+    'minSize': 18,
+    'maxSize': 20,
+    'positiveSteps': (1.5, 2, 3, 4, 6),
+    'negativeSteps': (0.75, 0.5, 0.25),
+    'customSizes': ('s-l', 's-xl', 'm-2xl', 'l-3xl'),
+    'prefix': 'space-',
+    'relativeTo': 'viewport-width',
+  ));
+
+  /* ---------- Layout (breakout-grid, zie layout.scss) ---------- */
+  --gutter: var(--space-s-l);
+  --content-width: 46rem;
+  --popout-width: 5rem;
+  --feature-width: 16rem;
+  --wide-width: 96rem;
+  --header-h: 4.5rem;
+  --player-h: 4.75rem;
+
+  /* ---------- Vorm ---------- */
+  --radius-s: 0.375rem;
+  --radius-m: 0.75rem;
+  --radius-l: 1.25rem;
+  --radius-round: 999px;
+  --border-width: 1px;
+
+  /* ---------- Beweging: rustig, "no rush" ---------- */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 150ms;
+  --dur: 300ms;
+  --dur-slow: 600ms;
+
+  /* ---------- Kleur: light-dark(licht, donker) ---------- */
+  /* Nacht: diep indigo. Dag: lila flyerpapier. Accent: magenta van de poster. */
+  --color-bg: light-dark(oklch(97% 0.012 320), oklch(15% 0.045 292));
+  --color-surface: light-dark(oklch(93.5% 0.02 318), oklch(19.5% 0.055 296));
+  --color-raised: light-dark(oklch(99.5% 0.004 320), oklch(24% 0.065 300));
+  --color-fg: light-dark(oklch(19% 0.06 292), oklch(96% 0.012 330));
+  --color-muted: light-dark(oklch(44% 0.06 300), oklch(76% 0.045 315));
+  --color-line: light-dark(oklch(85% 0.035 312), oklch(33% 0.065 300));
+  --color-accent: light-dark(oklch(50% 0.22 356), oklch(70% 0.22 352));
+  --color-on-accent: light-dark(oklch(99% 0.005 330), oklch(15% 0.045 292));
+  --color-glow: light-dark(oklch(62% 0.2 310 / 0.22), oklch(55% 0.24 320 / 0.35));
+  --color-focus: var(--color-accent);
+  --color-scrim: oklch(12% 0.04 292 / 0.6);
+
+  /* Korrel (poster-grain). Iets sterker in het donker, waar hij beter wegvalt. */
+  --grain-opacity: light-dark(0.05, 0.08);
+}
+
+:root[data-theme='light'] { color-scheme: light; }
+:root[data-theme='dark'] { color-scheme: dark; }
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 0.01ms;
+    --dur: 0.01ms;
+    --dur-slow: 0.01ms;
+  }
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --grain-opacity: 0;
+    --color-muted: var(--color-fg);
+  }
+}

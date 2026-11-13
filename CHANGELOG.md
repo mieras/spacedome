@@ -1,0 +1,20 @@
+# Changelog
+
+Alle noemenswaardige wijzigingen aan dit project. Nieuwste bovenaan.
+Format gebaseerd op [Keep a Changelog](https://keepachangelog.com/nl/1.1.0/).
+
+Categorieën: **Toegevoegd**, **Gewijzigd**, **Opgelost**, **Verwijderd**, **Beveiliging**, **Onderhoud**.
+
+## [Unreleased]
+
+### Toegevoegd
+- Eerste versie op Astro 7.4 met Markdown-content (sets, dj's, genres, avonden, about).
+- Site-brede player met `transition:persist`: speelt door tijdens navigeren, dockt over het podium op de setpagina en wordt een mini-video elders. Wachtrij, speelpositie en audio-only in `localStorage`, Media Session, delen op tijdstip (`?t=`).
+- Suggesties op basis van dj, genre en avond.
+- Gegenereerde cover-art per set als er nog geen still is.
+- Design-tokens met Utopia (type en space) en OKLCH `light-dark()`, light/dark-toggle, `DESIGN.md`.
+- SEO: meta, OG, JSON-LD, sitemap, `robots.txt`, `llms.txt` (site staat op `noindex` tot livegang).
+- Intake-mail met open punten (`docs/mail-intake.md`).
+
+### Onderhoud
+- Node 22.23.5 vastgezet (`.nvmrc`, `netlify.toml`): Astro 7.4 vraagt ≥ 22.23.4.

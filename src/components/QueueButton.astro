@@ -1,0 +1,34 @@
+---
+/* Zet een set in (of uit) de wachtrij. Toestand via aria-pressed, bijgehouden door de player. */
+import { t } from '../i18n/ui';
+import type { PlayerItem } from '../lib/content';
+import Icon from './Icon.astro';
+
+interface Props {
+  item: PlayerItem;
+  variant?: 'button' | 'icon';
+  class?: string;
+}
+
+const { item, variant = 'button', class: className } = Astro.props;
+---
+
+<button
+  type="button"
+  class:list={[variant === 'icon' ? 'icon-button queue-button--icon' : 'button', 'queue-button', className]}
+  data-player-queue
+  data-id={item.id}
+  data-item={JSON.stringify(item)}
+  aria-pressed="false"
+  aria-label={variant === 'icon' ? `${t('set.queue')}: ${item.title}` : undefined}
+>
+  <Icon name="plus" class="queue-button__add" />
+  <Icon name="check" class="queue-button__done" />
+  {variant === 'button' && <span>{t('set.queue')}</span>}
+</button>
+
+<style>
+  .queue-button :global(.queue-button__done) { display: none; }
+  .queue-button[aria-pressed='true'] :global(.queue-button__add) { display: none; }
+  .queue-button[aria-pressed='true'] :global(.queue-button__done) { display: block; }
+</style>

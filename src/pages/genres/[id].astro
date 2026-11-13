@@ -1,0 +1,55 @@
+---
+import DjAvatar from '../../components/DjAvatar.astro';
+import GenreFilter from '../../components/GenreFilter.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import SetGrid from '../../components/SetGrid.astro';
+import { t } from '../../i18n/ui';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { djHref, getLibrary, setsByGenre, type DjEntry, type GenreEntry } from '../../lib/content';
+
+export async function getStaticPaths() {
+  const { genres } = await getLibrary();
+  return genres.map((genre) => ({ params: { id: genre.id }, props: { genre } }));
+}
+
+const { genre } = Astro.props as { genre: GenreEntry };
+const lib = await getLibrary();
+const sets = setsByGenre(lib, genre.id);
+const djs = [...new Map(sets.flatMap((s) => lib.djsOf(s)).map((d) => [d.id, d] as [string, DjEntry])).values()];
+---
+
+<BaseLayout title={genre.data.title} description={genre.data.description}>
+  <PageHeader title={genre.data.title} eyebrow={`${t('nav.genres')} · ${sets.length} ${t('sets.count')}`} lead={genre.data.description}>
+    <GenreFilter genres={lib.genres} current={genre.id} />
+  </PageHeader>
+
+  <section class="wrapper section" aria-label={`${genre.data.title} sets`}>
+    {sets.length ? <SetGrid sets={sets} lib={lib} headingLevel="h2" /> : <p class="empty">No sets in this genre yet.</p>}
+  </section>
+
+  {
+    djs.length > 0 && (
+      <section class="wrapper section" aria-labelledby="genre-djs">
+        <div class="section-head">
+          <h2 id="genre-djs">{t('genres.djs')}</h2>
+        </div>
+        <ul class="genre-djs" role="list">
+          {djs.map((dj) => (
+            <li>
+              <a href={djHref(dj.id)}>
+                <DjAvatar dj={dj} size="2.75rem" />
+                <span>{dj.data.name}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+</BaseLayout>
+
+<style>
+  .genre-djs { display: flex; flex-wrap: wrap; gap: var(--space-s) var(--space-m); }
+  .genre-djs a { display: inline-flex; align-items: center; gap: var(--space-2xs); font-weight: 600; text-decoration: none; }
+  .genre-djs a:hover span { text-decoration: underline; }
+</style>

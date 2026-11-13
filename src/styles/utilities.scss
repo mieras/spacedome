@@ -1,0 +1,25 @@
+.visually-hidden:not(:focus):not(:active) {
+  clip-path: inset(50%);
+  block-size: 1px;
+  inline-size: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}
+
+.skip-link {
+  position: fixed;
+  inset-block-start: var(--space-xs);
+  inset-inline-start: var(--space-xs);
+  z-index: 300;
+  padding: var(--space-2xs) var(--space-s);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  border-radius: var(--radius-round);
+  font-weight: 600;
+  translate: 0 -200%;
+}
+.skip-link:focus { translate: 0 0; }
+
+.muted { color: var(--color-muted); }
+.nowrap { white-space: nowrap; }

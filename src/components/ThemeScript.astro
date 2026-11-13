@@ -1,0 +1,22 @@
+---
+/*
+ * In <head>, vóór de CSS. Zet een eerder gekozen thema vóór de eerste paint (geen kleurflits).
+ * Zonder keuze: niets doen, het systeem bepaalt. Met <ClientRouter /> opnieuw na elke wissel.
+ * Uit ~/Code/_standards/snippets/ThemeScript.astro.
+ */
+---
+
+<script is:inline>
+  (() => {
+    const apply = (doc) => {
+      try {
+        const t = localStorage.getItem('theme');
+        if (t === 'light' || t === 'dark') doc.documentElement.dataset.theme = t;
+        else delete doc.documentElement.dataset.theme;
+      } catch {}
+    };
+    apply(document);
+    // before-swap: het nieuwe document krijgt het thema vóórdat het in beeld komt.
+    document.addEventListener('astro:before-swap', (e) => apply(e.newDocument));
+  })();
+</script>

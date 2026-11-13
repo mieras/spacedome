@@ -1,0 +1,65 @@
+---
+import { t } from '../i18n/ui';
+import { settings } from '../settings';
+import Icon from './Icon.astro';
+import Logo from './Logo.astro';
+---
+
+<footer class="site-footer">
+  <div class="wrapper site-footer__inner">
+    <div class="site-footer__brand">
+      <Logo id="footer" />
+      <p class="lead">{settings.tagline}</p>
+    </div>
+    <nav aria-label={t('footer.follow')} class="site-footer__nav">
+      <h2 class="meta">{t('footer.follow')}</h2>
+      <ul role="list">
+        {
+          settings.socials.map((s) => (
+            <li>
+              <a href={s.url} rel="me noopener" target="_blank">
+                {s.label} <span class="muted">{s.handle}</span>
+                <Icon name="external" />
+                <span class="visually-hidden">(opens in a new tab)</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+    <nav aria-label="Footer" class="site-footer__nav">
+      <h2 class="meta">Explore</h2>
+      <ul role="list">
+        <li><a href="/sets">{t('nav.sets')}</a></li>
+        <li><a href="/djs">{t('nav.djs')}</a></li>
+        <li><a href="/genres">{t('nav.genres')}</a></li>
+        <li><a href="/events">{t('nav.events')}</a></li>
+        <li><a href="/about">{t('nav.about')}</a></li>
+      </ul>
+    </nav>
+    <p class="site-footer__small meta">© {new Date().getFullYear()} {settings.siteName}</p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-block-start: var(--space-2xl);
+    padding-block: var(--space-xl) var(--space-l);
+    border-block-start: var(--border-width) solid var(--color-line);
+    background: radial-gradient(60% 120% at 10% 100%, var(--color-glow), transparent 70%);
+  }
+  .site-footer__inner {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+    gap: var(--space-l);
+    align-items: start;
+  }
+  .site-footer__brand { display: grid; gap: var(--space-s); --logo-size: clamp(6rem, 12vw, 9rem); }
+  .site-footer__brand .lead { font-size: var(--step-0); color: var(--color-muted); }
+  .site-footer__nav { display: grid; gap: var(--space-2xs); }
+  .site-footer__nav ul { display: grid; gap: var(--space-3xs); }
+  .site-footer__nav a { display: inline-flex; align-items: center; gap: 0.4ch; min-block-size: 2rem; text-decoration: none; }
+  .site-footer__nav a:hover { text-decoration: underline; }
+  .site-footer__nav :global(.icon) { inline-size: 1em; block-size: 1em; }
+  .site-footer__small { grid-column: 1 / -1; }
+</style>

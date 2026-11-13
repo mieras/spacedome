@@ -1,0 +1,11 @@
+---
+import PageHeader from '../components/PageHeader.astro';
+import { t } from '../i18n/ui';
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title={t('notFound.title')} noindex>
+  <PageHeader title={t('notFound.title')} eyebrow="404" lead={t('notFound.text')}>
+    <p><a class="button button--primary" href="/sets">{t('sets.all')}</a></p>
+  </PageHeader>
+</BaseLayout>

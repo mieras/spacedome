@@ -1,0 +1,138 @@
+html {
+  scroll-padding-block: calc(var(--header-h) + var(--space-s)) var(--player-h);
+  background: var(--color-bg);
+}
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+  font-size: var(--step-0);
+  line-height: var(--leading-normal);
+  overflow-x: clip;
+}
+
+/* Ruimte voor de vaste playerbalk zodra er iets geladen is. */
+:root[data-player='on'] body { padding-block-end: var(--player-h); }
+
+/* Korrel over alles, zoals op de poster. Puur decoratief: geen klikken, geen contrastverlies van betekenis. */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  pointer-events: none;
+  opacity: var(--grain-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-display);
+  font-weight: 700;
+}
+h1 { font-size: var(--step-5); }
+h2 { font-size: var(--step-3); }
+h3 { font-size: var(--step-1); font-weight: 600; }
+h4 { font-size: var(--step-0); font-weight: 600; }
+
+a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
+a:hover { text-decoration-thickness: 2px; }
+
+:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+::selection { background: var(--color-accent); color: var(--color-on-accent); }
+
+hr { border: 0; border-block-start: var(--border-width) solid var(--color-line); }
+
+.prose { max-inline-size: var(--measure); }
+.prose > * + * { margin-block-start: 1em; }
+.prose h2, .prose h3 { margin-block-start: 1.6em; }
+
+/* Lead-tekst */
+.lead { font-size: var(--step-1); line-height: var(--leading-snug); max-inline-size: 40ch; }
+
+/* Kleine kapitalen-achtige metadata: datum, duur, labels. */
+.meta {
+  font-size: var(--step--1);
+  font-weight: 600;
+  letter-spacing: var(--tracking-meta);
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-muted);
+}
+
+/* Knoppen */
+.button {
+  --_bg: transparent;
+  --_fg: var(--color-fg);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2xs);
+  min-block-size: 2.75rem; /* WCAG 2.5.8: ruim boven 24px */
+  padding: var(--space-2xs) var(--space-s);
+  border: var(--border-width) solid currentColor;
+  border-radius: var(--radius-round);
+  background: var(--_bg);
+  color: var(--_fg);
+  font-weight: 600;
+  font-size: var(--step--1);
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  transition: background var(--dur) var(--ease-out), color var(--dur) var(--ease-out), border-color var(--dur) var(--ease-out);
+}
+.button:hover { --_bg: var(--color-fg); --_fg: var(--color-bg); border-color: var(--color-fg); }
+.button--primary { --_bg: var(--color-accent); --_fg: var(--color-on-accent); border-color: var(--color-accent); }
+.button--primary:hover { --_bg: var(--color-fg); --_fg: var(--color-bg); }
+.button svg { inline-size: 1.15em; block-size: 1.15em; flex: none; }
+.button[aria-pressed='true'] { --_bg: var(--color-surface); }
+
+.icon-button {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+  flex: none;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-round);
+  background: transparent;
+  color: inherit;
+  transition: background var(--dur-fast) var(--ease-out);
+}
+.icon-button:hover { background: color-mix(in oklch, currentColor 12%, transparent); }
+.icon-button svg { inline-size: 1.4rem; block-size: 1.4rem; }
+.icon-button[aria-pressed='true'], .icon-button[aria-expanded='true'] { color: var(--color-accent); }
+
+/* Chips voor genres */
+.chips { display: flex; flex-wrap: wrap; gap: var(--space-3xs) var(--space-2xs); padding: 0; list-style: none; }
+.chip {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 2rem;
+  padding: 0.15em 0.8em;
+  border: var(--border-width) solid var(--color-line);
+  border-radius: var(--radius-round);
+  font-size: var(--step--1);
+  text-decoration: none;
+  transition: border-color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);
+}
+a.chip:hover { border-color: var(--color-fg); }
+.chip[aria-current='page'] { background: var(--color-fg); color: var(--color-bg); border-color: var(--color-fg); }
+
+/* Link met pijl */
+.more-link { font-weight: 600; font-size: var(--step--1); text-decoration: none; white-space: nowrap; }
+.more-link:hover { text-decoration: underline; }
+
+/* Lege staat */
+.empty { color: var(--color-muted); padding-block: var(--space-m); }

@@ -1,0 +1,25 @@
+# build output
+dist/
+.astro/
+.netlify/
+
+# dependencies
+node_modules/
+
+# logs
+npm-debug.log*
+
+# environment
+.env
+.env.*
+!.env.example
+
+# macOS
+.DS_Store
+
+# editors / tools
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.claude/settings.local.json
+.claude/launch.json

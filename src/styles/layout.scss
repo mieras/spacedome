@@ -1,0 +1,52 @@
+/*
+ * Breakout-grid. Kinderen staan standaard in `content`; met een klasse breken ze uit.
+ *
+ *  full ┃ feature ┃ popout ┃      content      ┃ popout ┃ feature ┃ full
+ */
+.layout {
+  display: grid;
+  grid-template-columns:
+    [full-start] minmax(var(--gutter), 1fr)
+    [feature-start] minmax(0, var(--feature-width))
+    [popout-start] minmax(0, var(--popout-width))
+    [content-start] min(var(--content-width), 100% - var(--gutter) * 2) [content-end]
+    minmax(0, var(--popout-width)) [popout-end]
+    minmax(0, var(--feature-width)) [feature-end]
+    minmax(var(--gutter), 1fr) [full-end];
+}
+.layout > * { grid-column: content; }
+.layout > .popout { grid-column: popout; }
+.layout > .feature { grid-column: feature; }
+.layout > .full { grid-column: full; }
+
+/* Verticaal ritme */
+.flow > * + * { margin-block-start: var(--flow-space, 1em); }
+
+/* Brede container voor header, footer en rasters */
+.wrapper {
+  inline-size: min(100% - var(--gutter) * 2, var(--wide-width));
+  margin-inline: auto;
+}
+
+/* Paginasecties */
+.section { padding-block: var(--space-xl-2xl, var(--space-xl)); }
+.section + .section { padding-block-start: 0; }
+
+.section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2xs) var(--space-m);
+  margin-block-end: var(--space-m);
+  padding-block-end: var(--space-xs);
+  border-block-end: var(--border-width) solid var(--color-line);
+}
+
+/* Kaartenraster */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--grid-min, 16rem)), 1fr));
+  gap: var(--space-l) var(--space-s-l);
+}
+.grid[role='list'] { padding: 0; }
