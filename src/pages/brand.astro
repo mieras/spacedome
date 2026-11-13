@@ -297,6 +297,8 @@ const toc = [
         </div>
         <p class="brand__note">Blurred columns with one vertical gradient. In the footer the shape itself grows as you scroll: every value blends from <em>Start</em> (footer just in view) to <em>End</em> (scrolled to the bottom), and back when you scroll up. Nothing is scaled. Pick a tab to edit that state (the preview jumps to it), press play to run Start → End, then paste the result into <code>PEAK_FOOTER</code> in <code>src/lib/peak.ts</code>.</p>
         <div class="peak-lab">
+          <!-- Preview en schuifjes in een eigen blok: de sticky preview mag niet over het codeblok schuiven. -->
+          <div class="peak-lab__main">
           <div class="peak-lab__preview">
             <div class="effect__peak">
               <PeakGradient id="brand-peak" still />
@@ -340,6 +342,7 @@ const toc = [
             </sd-tabs>
             <button class="button" type="reset">Reset</button>
           </form>
+          </div>
           <pre class="lab__code"><code data-peak-code></code></pre>
         </div>
       </div>
@@ -539,8 +542,8 @@ const toc = [
   .effect__headline { font-family: var(--font-display); font-weight: 800; font-size: var(--step-4); line-height: var(--leading-tight); text-transform: uppercase; letter-spacing: var(--tracking-display); }
   .effect__link { text-decoration: none; }
   .effect__mono { display: inline-flex; align-items: center; gap: 0.75ch; font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; text-transform: uppercase; letter-spacing: 0.04em; text-decoration: none; }
-  .smear-lab, .peak-lab { display: grid; gap: var(--space-s); }
-  @media (min-width: 64rem) { .smear-lab, .peak-lab { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); } }
+  .smear-lab, .peak-lab, .peak-lab__main { display: grid; gap: var(--space-s); }
+  @media (min-width: 64rem) { .smear-lab, .peak-lab__main { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); align-items: start; } }
   .lab__controls { display: grid; gap: var(--space-xs); align-content: start; padding: var(--space-m); border-radius: var(--radius-l); background: var(--color-surface); }
   .lab__controls label { display: grid; grid-template-columns: 1fr auto; gap: var(--space-3xs) var(--space-xs); font-size: var(--step--1); font-weight: 600; }
   .lab__controls input, .lab__controls select { grid-column: 1 / -1; inline-size: 100%; accent-color: var(--color-accent); }
@@ -550,7 +553,7 @@ const toc = [
   /* Desktop: preview blijft staan terwijl je door de schuifjes gaat. */
   .peak-lab__preview { display: grid; gap: var(--space-xs); align-content: start; }
   @media (min-width: 64rem) {
-    .peak-lab__preview { position: sticky; inset-block-start: calc(var(--header-h) + 5rem); }
+    .peak-lab__preview { position: sticky; inset-block-start: calc(var(--header-h) + 5rem); z-index: 1; padding-block-end: var(--space-2xs); background: var(--color-bg); }
   }
   .peak-lab__scrub { display: flex; flex-wrap: wrap; align-items: end; gap: var(--space-s); }
   .peak-lab__range { flex: 1 1 12rem; display: grid; grid-template-columns: 1fr auto; gap: var(--space-3xs) var(--space-xs); font-size: var(--step--1); font-weight: 600; }
