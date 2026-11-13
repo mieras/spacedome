@@ -284,7 +284,7 @@ const toc = [
           <h3 class="brand__sub">Peak gradient</h3>
           <button class="button" type="button" data-peak-apply><Icon name="arrow" /> Try in footer</button>
         </div>
-        <p class="brand__note">Blurred columns with one vertical gradient. In the footer it rises as you scroll down and sinks when you scroll back up. Tune it here, then paste the result into <code>PEAK_FOOTER</code> in <code>src/lib/peak.ts</code>.</p>
+        <p class="brand__note">Blurred columns with one vertical gradient. In the footer it starts calm (low, narrow, dim) when the footer comes into view and blooms into the full shape as you reach the bottom; scrolling back up calms it again. The sliders set the full bloom, the calm group sets the start, and the scroll preview shows the steps in between. Paste the result into <code>PEAK_FOOTER</code> in <code>src/lib/peak.ts</code>.</p>
         <div class="peak-lab">
           <div class="effect__peak">
             <PeakGradient id="brand-peak" still />
@@ -301,6 +301,14 @@ const toc = [
             <label>Valley <output data-for="valley"></output><input type="range" name="valley" min="0" max="1" step="0.01" value={PEAK_FOOTER.valley} /></label>
             <label>Falloff <output data-for="power"></output><input type="range" name="power" min="0.5" max="4" step="0.01" value={PEAK_FOOTER.power} /></label>
             <label>Overlap <output data-for="overlap"></output><input type="range" name="overlap" min="1" max="2" step="0.01" value={PEAK_FOOTER.overlap} /></label>
+            <fieldset class="lab__group">
+              <legend>Calm (footer just in view)</legend>
+              <label>Height <output data-for="calmHeight"></output><input type="range" name="calmHeight" min="0" max="1" step="0.01" value={PEAK_FOOTER.calmHeight} /></label>
+              <label>Width <output data-for="calmWidth"></output><input type="range" name="calmWidth" min="0.4" max="1" step="0.01" value={PEAK_FOOTER.calmWidth} /></label>
+              <label>Opacity <output data-for="calmOpacity"></output><input type="range" name="calmOpacity" min="0" max="1" step="0.01" value={PEAK_FOOTER.calmOpacity} /></label>
+              <label>Saturation <output data-for="calmSaturate"></output><input type="range" name="calmSaturate" min="0" max="1" step="0.01" value={PEAK_FOOTER.calmSaturate} /></label>
+            </fieldset>
+            <label class="lab__scroll">Scroll preview: calm → bloom <output data-peak-progress>100%</output><input type="range" min="0" max="1" step="0.01" value="1" data-peak-scroll /></label>
             <button class="button" type="reset">Reset</button>
           </form>
           <pre class="lab__code"><code data-peak-code></code></pre>
@@ -312,7 +320,7 @@ const toc = [
 
 <script>
   import { smear, SMEAR_DEFAULTS } from '../scripts/smear';
-  import { peakSvg, type PeakOptions, type PeakPalette } from '../lib/peak';
+  import { peakAt, peakCalmStyle, peakSvg, type PeakOptions, type PeakPalette } from '../lib/peak';
 
   // Peak-configurator: tekent de preview opnieuw met dezelfde functie als de footer en toont de
   // instelling om in src/lib/peak.ts te plakken. "Try in footer" past de footer op deze pagina aan
@@ -328,20 +336,34 @@ const toc = [
     const read = (): PeakOptions => {
       const d = new FormData(form);
       const n = (k: string) => Number(d.get(k));
-      return { bars: n('bars'), blur: n('blur'), peak: n('peak'), valley: n('valley'), power: n('power'), overlap: n('overlap'), palette: String(d.get('palette')) as PeakPalette };
+      return {
+        bars: n('bars'), blur: n('blur'), peak: n('peak'), valley: n('valley'), power: n('power'), overlap: n('overlap'),
+        palette: String(d.get('palette')) as PeakPalette,
+        calmHeight: n('calmHeight'), calmWidth: n('calmWidth'), calmOpacity: n('calmOpacity'), calmSaturate: n('calmSaturate'),
+      };
+    };
+    const scroll = document.querySelector<HTMLInputElement>('[data-peak-scroll]')!;
+    const progress = document.querySelector('[data-peak-progress]')!;
+    const showProgress = () => {
+      const p = Number(scroll.value);
+      Object.assign(preview.style, peakAt(current, p));
+      progress.textContent = `${Math.round(p * 100)}%`;
     };
     const update = () => {
       current = read();
       preview.innerHTML = peakSvg('brand-peak', current);
+      showProgress();
       form.querySelectorAll<HTMLOutputElement>('output[data-for]').forEach((o) => (o.textContent = String(current[o.dataset.for as keyof PeakOptions])));
       code.textContent = `export const PEAK_FOOTER: PeakOptions = ${JSON.stringify(current, null, 2).replace(/"(\w+)":/g, '$1:').replace(/"/g, "'")};`;
     };
     form.addEventListener('input', update);
     form.addEventListener('reset', () => requestAnimationFrame(update));
+    scroll.addEventListener('input', showProgress);
     document.querySelector('[data-peak-apply]')?.addEventListener('click', () => {
       const footer = document.querySelector<SVGSVGElement>('.site-footer [data-peak-svg]');
       if (!footer) return;
       footer.innerHTML = peakSvg(footer.dataset.peakSvg!, current);
+      footer.parentElement!.setAttribute('style', peakCalmStyle(current));
       footer.closest('.site-footer')?.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'end' });
     });
     update();
@@ -450,6 +472,13 @@ const toc = [
   .lab__controls select { min-block-size: 2.5rem; padding-inline: var(--space-2xs); border: var(--border-width) solid var(--color-line); border-radius: var(--radius-s); background: var(--color-bg); color: inherit; font: inherit; }
   .lab__controls output { color: var(--color-muted); font-variant-numeric: tabular-nums; }
   .lab__controls .button { justify-self: start; }
+  /* Desktop: preview blijft staan terwijl je door de schuifjes gaat. */
+  @media (min-width: 64rem) {
+    .peak-lab .effect__peak { position: sticky; inset-block-start: calc(var(--header-h) + 5rem); }
+  }
+  .lab__group { display: grid; gap: var(--space-xs); margin: 0; padding: var(--space-s); border: var(--border-width) solid var(--color-line); border-radius: var(--radius-m); }
+  .lab__group legend { padding-inline: var(--space-3xs); font-size: var(--step--1); font-weight: 700; color: var(--color-muted); }
+  .lab__scroll { padding-block-start: var(--space-2xs); border-block-start: var(--border-width) solid var(--color-line); }
   .lab__code { grid-column: 1 / -1; overflow-x: auto; padding: var(--space-s); border-radius: var(--radius-m); background: var(--color-raised); font-size: var(--step--1); }
   /* Zelfde ondergrond als de footer, zodat de preview klopt. */
   .effect__peak { display: grid; align-self: start; block-size: clamp(12rem, 30vw, 24rem); overflow: hidden; border-radius: var(--radius-l); background: var(--color-bg); box-shadow: inset 0 0 0 var(--border-width) var(--color-line); }

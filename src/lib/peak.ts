@@ -62,18 +62,51 @@ export type PeakOptions = {
   /** Hoeveel de kolommen overlappen (1 = naad aan naad). */
   overlap: number;
   palette: PeakPalette;
+  /*
+   * Rustige stand: zo staat hij als de footer net in beeld komt. Naar beneden scrollen laat hem
+   * openbloeien tot de stand hierboven (helemaal onderaan); terugscrollen maakt hem weer rustig.
+   */
+  /** Hoogte als deel van de eindstand. */
+  calmHeight: number;
+  /** Breedte als deel van de eindstand. */
+  calmWidth: number;
+  calmOpacity: number;
+  /** Verzadiging (1 = vol). */
+  calmSaturate: number;
 };
 
 /** De footer. */
 export const PEAK_FOOTER: PeakOptions = {
-  bars: 9,
-  blur: 15,
-  peak: 0.98,
-  valley: 0.55,
-  power: 1.24,
-  overlap: 1.23,
-  palette: 'pink',
+  bars: 10,
+  blur: 35,
+  peak: 0.84,
+  valley: 0.45,
+  power: 2.17,
+  overlap: 2,
+  palette: 'magenta',
+  calmHeight: 0.3,
+  calmWidth: 0.85,
+  calmOpacity: 0.45,
+  calmSaturate: 0.5,
 };
+
+/** De rustige stand als CSS custom properties (voor de keyframes in PeakGradient). */
+export const peakCalmStyle = (o: PeakOptions) =>
+  `--peak-calm-h: ${o.calmHeight}; --peak-calm-w: ${o.calmWidth}; --peak-calm-o: ${o.calmOpacity}; --peak-calm-s: ${o.calmSaturate};`;
+
+/** Bloei-curve: ease-in, zodat het meeste gebeurt als je onderaan aankomt. Zelfde als de CSS. */
+export const peakBloomEase = (p: number) => p * p;
+
+/** De stand bij scrollvoortgang p (0 = rustig, 1 = bloei), voor de preview op /brand. */
+export function peakAt(o: PeakOptions, p: number) {
+  const e = peakBloomEase(Math.min(Math.max(p, 0), 1));
+  const mix = (a: number) => a + (1 - a) * e;
+  return {
+    transform: `scale(${mix(o.calmWidth)}, ${mix(o.calmHeight)})`,
+    opacity: String(mix(o.calmOpacity)),
+    filter: `saturate(${mix(o.calmSaturate)})`,
+  };
+}
 
 export const PEAK_W = 1271;
 export const PEAK_H = 599;
