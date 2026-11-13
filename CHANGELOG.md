@@ -7,6 +7,18 @@ Categorieën: **Toegevoegd**, **Gewijzigd**, **Opgelost**, **Verwijderd**, **Bev
 
 ## [Unreleased]
 
+### Toegevoegd
+- Mini-video versleepbaar: loslaten zet hem links of rechts onderin (onthouden). Ook via een wisselknop, zonder slepen.
+- Set van Ono-Sendai Sound (STACK/READY, via Bunny).
+
+### Gewijzigd
+- Mini-video op telefoon groter (ruim de helft van de schermbreedte).
+- Audiomodus laadt alleen de laagste videokwaliteit (240p): ongeveer 5× minder data. Terug naar video schakelt direct op.
+- Set van Drvg Cvltvre gepubliceerd (was draft).
+
+### Opgelost
+- Op mobiel kon je na "alleen audio" niet meer terug naar video: de knop in de balk blijft nu staan (als camera-icoon).
+
 ### Onderhoud
 - Netlify gekoppeld aan GitHub: `main` is productie, `staging` een branch deploy. README bijgewerkt.
 - Branch protection op `staging` en `main` (PR verplicht, geen force-push of verwijderen).

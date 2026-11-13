@@ -85,7 +85,7 @@ Beide self-hosted via Fontsource (geen verzoeken naar Google, AVG). Voorlopige k
 | `--ease-out` | `cubic-bezier(.22, 1, .36, 1)` | Bijna alles |
 
 - **Paginatransities:** `<ClientRouter />`. De oude pagina fadet weg, de nieuwe fadet in en schuift 0,75rem omhoog. Header en player hebben een eigen `view-transition-name` en blijven dus staan.
-- **Player:** de video schuift met een FLIP-animatie tussen gedockt (op de setpagina) en mini (rechtsonder). Tussen pagina's "morpht" hij via de view transition.
+- **Player:** de video schuift met een FLIP-animatie tussen gedockt (op de setpagina) en mini (onderin, rechts of links). Tussen pagina's "morpht" hij via de view transition.
 - **Reduced motion:** alle duurtokens worden 0,01 ms en de view-transition-animaties staan uit.
 
 ## 8. De player
@@ -97,8 +97,8 @@ De kern van de site. Eén `<sd-player>` in de layout met `transition:persist`: h
 | Uit | Niets geladen | Niet zichtbaar |
 | Balk | Er is een set geladen | Vaste balk onderin: cover, titel, dj's, play, ±15/30 s, tijd, wachtrij, delen, sluiten. De voortgang is een dunne balk bovenaan. |
 | Gedockt | Op de pagina van de spelende set, podium in beeld | De video ligt precies over het podium (`[data-player-stage]`) |
-| Mini | Elders, of het podium is uit beeld gescrold | Video zwevend rechtsonder, boven de balk |
-| Alleen audio | Bezoeker kiest "luisteren" | Geen video, alleen de balk |
+| Mini | Elders, of het podium is uit beeld gescrold | Video zwevend onderin boven de balk, rechts of links. Versleepbaar (snapt naar de dichtste kant) of via de wisselknop (WCAG 2.5.7). Breedte `clamp(12rem, 28vw, 22rem)`, op telefoon `clamp(12rem, 58vw, 16rem)` |
+| Alleen audio | Bezoeker kiest "luisteren" | Geen video, alleen de balk; stream op de laagste kwaliteit (240p). De knop in de balk wordt een camera en blijft ook op mobiel staan als weg terug |
 
 - **Wachtrij:** sets toevoegen vanaf elke kaart. Opgeslagen in `localStorage`, dus geen account nodig. De speelpositie wordt bewaard: wie terugkomt, gaat verder waar hij was.
 - **Delen:** de link naar de set, of vanuit de player de link op het huidige moment (`?t=123`).

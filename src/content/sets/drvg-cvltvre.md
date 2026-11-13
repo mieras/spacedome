@@ -12,7 +12,6 @@ video:
 posterTime: 497
 # Tracklist: - { artist: …, title: …, label: …, time: "12:34" }
 tracklist: []
-draft: true
 ---
 
 Beschrijving volgt.
