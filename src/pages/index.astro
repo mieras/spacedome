@@ -23,8 +23,12 @@ const djs = lib.djs.filter((d) => setsByDj(lib, d.id).length > 0);
 <BaseLayout title={settings.siteName} isHome>
   <section class="hero wrapper" aria-labelledby="hero-title">
     <div class="hero__intro">
-      <h1 id="hero-title" class="hero__title">Recorded live in the dome</h1>
-      <p class="lead">DJ sets from our nights: beats, trip-hop, deep grooves and experimental rhythms. Watch, listen, repeat.</p>
+      <h1 id="hero-title" class="hero__title" data-reveal="words">Recorded live in the dome</h1>
+      <p class="lead" data-reveal="up">DJ sets from our nights: beats, trip-hop, deep grooves and experimental rhythms. Watch, listen, repeat.</p>
+      <p class="hero__cta" data-reveal="up">
+        <a class="button button--primary" href="/sets">{t('home.browseSets')}</a>
+        <a class="button" href="/about">{t('nav.about')}</a>
+      </p>
     </div>
 
     {
@@ -140,7 +144,7 @@ const djs = lib.djs.filter((d) => setsByDj(lib, d.id).length > 0);
     gap: var(--space-l);
     grid-template-columns: minmax(0, 1fr);
     padding-block: var(--space-xl) var(--space-2xl);
-    align-items: end;
+    align-items: start; /* intro en video bovenaan gelijk */
   }
   /* Eén zachte gloed per scherm (DESIGN.md §2.4) */
   .hero::before {
@@ -155,7 +159,8 @@ const djs = lib.djs.filter((d) => setsByDj(lib, d.id).length > 0);
   @media (min-width: 60rem) {
     .hero { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); }
   }
-  .hero__intro { display: grid; gap: var(--space-s); align-content: end; }
+  .hero__intro { display: grid; gap: var(--space-s); align-content: start; }
+  .hero__cta { display: flex; flex-wrap: wrap; gap: var(--space-2xs); margin-block-start: var(--space-2xs); }
   .hero__title {
     font-size: var(--step-5);
     text-transform: uppercase;
@@ -163,8 +168,6 @@ const djs = lib.djs.filter((d) => setsByDj(lib, d.id).length > 0);
     line-height: 0.98;
   }
   @media (prefers-reduced-motion: no-preference) {
-    .hero__title { animation: rise var(--dur-slow) var(--ease-out) both; }
-    .hero__intro .lead { animation: rise var(--dur-slow) 120ms var(--ease-out) both; }
     .hero__feature { animation: rise var(--dur-slow) 220ms var(--ease-out) both; }
   }
   @keyframes rise { from { opacity: 0; translate: 0 1rem; } }

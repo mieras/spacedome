@@ -14,6 +14,7 @@ const en = {
   'theme.system': 'Auto',
   'theme.light': 'Light',
   'theme.dark': 'Dark',
+  'home.browseSets': 'Browse all sets',
   'set.play': 'Play',
   'set.pause': 'Pause',
   'set.queue': 'Add to queue',
