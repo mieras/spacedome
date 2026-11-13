@@ -163,6 +163,7 @@ function init() {
     if (attachedId !== item.id) {
       await attach(item);
       seekWhenReady(state.position);
+      dock(true); // nu er een bron is, mag de video zichtbaar worden
     } else if (start !== undefined) {
       video.currentTime = start;
     }

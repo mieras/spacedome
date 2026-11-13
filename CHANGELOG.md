@@ -16,5 +16,12 @@ Categorieën: **Toegevoegd**, **Gewijzigd**, **Opgelost**, **Verwijderd**, **Bev
 - SEO: meta, OG, JSON-LD, sitemap, `robots.txt`, `llms.txt` (site staat op `noindex` tot livegang).
 - Intake-mail met open punten (`docs/mail-intake.md`).
 
+### Gewijzigd
+- Video van de uitgelichte set speelt in het hero-podium op de home en zweeft rechtsonder als je wegscrollt.
+- Tagline, hero- en about-tekst neutraal gemaakt (placeholder): "Low End Theory" is inspiratie, geen slogan.
+
+### Opgelost
+- Video bleef verborgen na de eerste keer afspelen (docken gebeurde voor de bron gekoppeld was).
+
 ### Onderhoud
 - Node 22.23.5 vastgezet (`.nvmrc`, `netlify.toml`): Astro 7.4 vraagt ≥ 22.23.4.

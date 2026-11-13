@@ -3,9 +3,10 @@
  */
 export const settings = {
   siteName: 'Space Dome',
-  tagline: 'Low-end theory from the LA beat scene. Recorded live, on repeat.',
+  /** TODO: placeholder, definitieve tekst komt van Space Dome. */
+  tagline: 'DJ sets recorded live at Space Dome. Watch, listen, repeat.',
   description:
-    'Space Dome brings the bass of the West Coast beat scene to the Netherlands: beats, trip-hop, deep grooves and experimental rhythms. Watch and listen to DJ sets recorded at our nights.',
+    'Watch and listen to DJ sets recorded live at Space Dome nights: beats, trip-hop, deep grooves and experimental rhythms.',
   titleTemplate: '%s · Space Dome',
   lang: 'en',
   locale: 'en_GB',

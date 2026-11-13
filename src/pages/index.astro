@@ -23,14 +23,14 @@ const djs = lib.djs.filter((d) => setsByDj(lib, d.id).length > 0);
 <BaseLayout title={settings.siteName} isHome>
   <section class="hero wrapper" aria-labelledby="hero-title">
     <div class="hero__intro">
-      <h1 id="hero-title" class="hero__title">Low-end theory from the LA beat scene</h1>
-      <p class="lead">Beats, trip-hop, deep grooves and experimental rhythms. Recorded live at our nights, on repeat here.</p>
+      <h1 id="hero-title" class="hero__title">Recorded live in the dome</h1>
+      <p class="lead">DJ sets from our nights: beats, trip-hop, deep grooves and experimental rhythms. Watch, listen, repeat.</p>
     </div>
 
     {
       featured && featuredItem && (
         <article class="hero__feature" aria-labelledby="featured-title">
-          <div class="hero__stage">
+          <div class="hero__stage" data-player-stage={featured.id}>
             <a href={setHref(featured.id)} tabindex="-1" aria-hidden="true">
               <CoverArt seed={featured.id} image={featured.data.poster} ratio="16/9" eager sizes="(min-width: 60rem) 55vw, 100vw" />
             </a>
@@ -170,6 +170,8 @@ const djs = lib.djs.filter((d) => setsByDj(lib, d.id).length > 0);
 
   .hero__feature { display: grid; gap: var(--space-s); }
   .hero__stage { position: relative; }
+  /* Speelt de uitgelichte set: de video ligt erover (zie player.ts), cover en knop onzichtbaar. */
+  .hero__stage[data-player-docked] > :global(*) { visibility: hidden; }
   .hero__stage :global(.hero__play) { position: absolute; inset: 50% auto auto 50%; translate: -50% -50%; z-index: 3; }
   .hero__meta { display: grid; gap: var(--space-3xs); }
   .hero__set-title { font-size: var(--step-3); }
