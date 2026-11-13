@@ -33,9 +33,9 @@ npm run dev        # http://localhost:4321
 
 Overige scripts: `npm run build`, `npm run preview`, `npm run check`.
 
-### Testvideo (lokaal)
+### Testvideo
 
-De set `stack-test` is een draft (alleen zichtbaar in `npm run dev`) en speelt `public/media/stack-test.mp4`: een korte opname uit de STACK-map van Space Dome. `public/media/` zit niet in git; zet er zelf een mp4 neer met die naam.
+De set `stack-test` speelt `public/media/stack-test.mp4` (8,6 MB): een korte opname uit de STACK-map van Space Dome. Tijdelijk; straks komen video's uit Bunny Stream en gaat dit bestand uit git.
 
 ### Environment-variabelen
 

@@ -15,7 +15,7 @@ Categorieën: **Toegevoegd**, **Gewijzigd**, **Opgelost**, **Verwijderd**, **Bev
 - Design-tokens met Utopia (type en space) en OKLCH `light-dark()`, light/dark-toggle, `DESIGN.md`.
 - SEO: meta, OG, JSON-LD, sitemap, `robots.txt`, `llms.txt` (site staat op `noindex` tot livegang).
 - Intake-mail met open punten (`docs/mail-intake.md`).
-- Draft-set `stack-test` met een echte opname (mp4, lokaal in `public/media/`, niet in git) om de player te testen.
+- Testset `stack-test` met een echte opname (mp4 in `public/media/`) om de player met echt materiaal te testen. Tijdelijk, tot Bunny Stream.
 
 ### Gewijzigd
 - Video van de uitgelichte set speelt in het hero-podium op de home en zweeft rechtsonder als je wegscrollt.
@@ -26,4 +26,5 @@ Categorieën: **Toegevoegd**, **Gewijzigd**, **Opgelost**, **Verwijderd**, **Bev
 - Video bleef verborgen na de eerste keer afspelen (docken gebeurde voor de bron gekoppeld was).
 
 ### Onderhoud
+- Netlify-site `spacedome` aangemaakt op het MIERAS-team; eerste deploy staat op spacedome.netlify.app (noindex).
 - Node 22.23.5 vastgezet (`.nvmrc`, `netlify.toml`): Astro 7.4 vraagt ≥ 22.23.4.

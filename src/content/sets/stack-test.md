@@ -1,13 +1,12 @@
 ---
-# Alleen lokaal (draft): test met echte opname uit STACK. Video staat in public/media/ en zit niet in git.
-title: STACK test
+# Test met een echte opname uit STACK (mp4 in public/media/). Weg zodra Bunny Stream er is.
+title: Test recording
 date: 2026-05-15
 djs: [low-orbit]
 genres: [beats]
 video:
   src: /media/stack-test.mp4
   duration: 11
-draft: true
 ---
 
-Testopname (10 s, 1080p, mp4) om de player met echt materiaal te proberen. Niet publiceren.
+A short test recording from the dome, to try the player with real footage. Full sets coming soon.

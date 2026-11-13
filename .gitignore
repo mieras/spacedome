@@ -24,5 +24,3 @@ npm-debug.log*
 .claude/settings.local.json
 .claude/launch.json
 
-# lokale testmedia (niet publiceren)
-public/media/
