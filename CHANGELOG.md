@@ -7,6 +7,8 @@ Categorieën: **Toegevoegd**, **Gewijzigd**, **Opgelost**, **Verwijderd**, **Bev
 
 ## [Unreleased]
 
+## [2026-11-13]
+
 ### Toegevoegd
 - Eerste versie op Astro 7.4 met Markdown-content (sets, dj's, genres, avonden, about).
 - Site-brede player met `transition:persist`: speelt door tijdens navigeren, dockt over het podium op de setpagina en wordt een mini-video elders. Wachtrij, speelpositie en audio-only in `localStorage`, Media Session, delen op tijdstip (`?t=`).
