@@ -11,13 +11,15 @@
  * laatste stop is transparant, dus de toppen lossen op. Hoogte valt vanuit het midden af met
  * 1 - t^1.24 (vlakker dan een cosinus, meer piramide).
  *
- * Oprijzen: alleen een transform (scaleY 0 → 1 vanaf de onderkant), gekoppeld aan het scrollen via
- * een scroll-driven animation (view timeline). Hij groeit mee terwijl de footer in beeld schuift en
- * zakt weer weg als je terug omhoog scrollt; volledig opgerezen zodra hij helemaal in beeld is.
+ * Bloei: gekoppeld aan het scrollen via een scroll-driven animation (view timeline). Komt de footer
+ * in beeld, dan staat hij rustig (laag, smaller, doffer, minder verzadigd: de calm-waarden). Naar
+ * beneden scrollen laat hem openbloeien; helemaal onderaan staat de volle eindstand. Terugscrollen
+ * maakt hem weer rustig. Alleen transform, opacity en filter: goedkoop per frame.
+ * Ease-in (p²): het meeste gebeurt als je onderaan aankomt, dat maakt het een bloei.
  * Geen JS. Browsers zonder scroll-driven animations (Firefox nu nog) en prefers-reduced-motion:
  * hij staat er gewoon.
  */
-import { PEAK_FOOTER, PEAK_H, PEAK_W, peakSvg, type PeakOptions } from '../lib/peak';
+import { PEAK_FOOTER, PEAK_H, PEAK_W, peakCalmStyle, peakSvg, type PeakOptions } from '../lib/peak';
 
 interface Props extends Partial<PeakOptions> {
   /** Uniek per instantie op een pagina (gradient- en filter-id's). */
@@ -31,7 +33,7 @@ const { id = 'peak', class: className, still = false, ...overrides } = Astro.pro
 const options = { ...PEAK_FOOTER, ...overrides };
 ---
 
-<div class:list={['peak', className]} aria-hidden="true" data-still={still || undefined}>
+<div class:list={['peak', className]} aria-hidden="true" data-still={still || undefined} style={peakCalmStyle(options)}>
   <svg viewBox={`0 0 ${PEAK_W} ${PEAK_H}`} preserveAspectRatio="none" focusable="false" data-peak-svg={id} set:html={peakSvg(id, options)} />
 </div>
 
@@ -50,7 +52,8 @@ const options = { ...PEAK_FOOTER, ...overrides };
   /* Scroll-gekoppeld: de timeline hangt aan de container (niet aan de svg, die schaalt zelf). */
   @supports (animation-timeline: view()) {
     @media (prefers-reduced-motion: no-preference) {
-      .peak { view-timeline: --peak block; }
+      /* inset 0: anders telt de scroll-padding (playerbalk) mee en haalt hij onderaan de 100% niet. */
+      .peak { view-timeline: --peak block; view-timeline-inset: 0; }
       .peak svg {
         animation: peak-rise linear both;
         animation-timeline: --peak;
@@ -59,9 +62,14 @@ const options = { ...PEAK_FOOTER, ...overrides };
     }
   }
   .peak[data-still] svg { animation: none; }
-  /* Zachte ease-out in de keyframes zelf: scrollen is lineair, zo voelt het als oprijzen. */
+  /* Ease-in in de keyframe zelf (≈ p², zie peakBloomEase): scrollen is lineair. */
   @keyframes peak-rise {
-    from { transform: scaleY(0); animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1); }
-    to { transform: scaleY(1); }
+    from {
+      transform: scale(var(--peak-calm-w), var(--peak-calm-h));
+      opacity: var(--peak-calm-o);
+      filter: saturate(var(--peak-calm-s));
+      animation-timing-function: cubic-bezier(0.11, 0, 0.5, 0);
+    }
+    to { transform: none; opacity: 1; filter: none; }
   }
 </style>
