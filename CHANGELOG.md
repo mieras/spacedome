@@ -8,6 +8,7 @@ Categorieën: **Toegevoegd**, **Gewijzigd**, **Opgelost**, **Verwijderd**, **Bev
 ## [Unreleased]
 
 ### Toegevoegd
+- Peak-configurator op `/brand#peak`: palet (pink, sunset, magenta, rainbow), kolommen, blur, piek, dal, afval en overlap met schuifjes, live preview, "Try in footer" op de pagina zelf en de instelling om te plakken. Geometrie en paletten staan nu in `src/lib/peak.ts` (`PEAK_FOOTER` is de footer).
 - `/brand`: interne stijlgids met logo, kleuren (rechtstreeks uit `tokens.scss`), type- en ruimteschaal, radii, iconen, knoppen, player-knoppen, chips, kaarten, carousel, tracklist en de effecten (reveal met replay, smear-speeltuin met schuifjes, peak gradient). Noindex en niet in de sitemap.
 - Smear-effect instelbaar per element: `data-smear-amount`, `-shift`, `-spread`, `-duration`, `-dir`, `-ease`.
 - Footer-test: peak gradient onderaan (geblurde kolommen in Space Dome-kleuren die oprijzen als de footer in beeld komt, `PeakGradient.astro`) en een smear-effect op de footerlinks (mono-kapitalen, tekst veegt bij hover/focus zijwaarts uit, `src/scripts/smear.ts`). Beide naar design.how/vault (MIT), zelf nagebouwd zonder externe bestanden. Niet bij `prefers-reduced-motion`.

@@ -20,6 +20,7 @@ import ShareButton from '../components/ShareButton.astro';
 import Tracklist from '../components/Tracklist.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getLibrary, setHref, setsByEvent, toPlayerItem } from '../lib/content';
+import { PEAK_FOOTER, PEAK_PALETTES } from '../lib/peak';
 
 const lib = await getLibrary();
 const featured = lib.sets.find((s) => s.data.featured) ?? lib.sets[0];
@@ -254,7 +255,7 @@ const toc = [
             <a class="effect__headline effect__link" href={setHref(featured.id)} data-smear data-smear-demo>{featured.data.title}</a>
             <a class="effect__mono" href="/sets" data-smear data-smear-demo>Sets <span class="badge">{lib.sets.length}</span></a>
           </div>
-          <form class="smear-lab__controls" data-smear-lab>
+          <form class="lab__controls" data-smear-lab>
             <label>Amount <output data-for="amount"></output><input type="range" name="amount" min="0" max="60" step="1" value="14" /></label>
             <label>Shift <output data-for="shift"></output><input type="range" name="shift" min="0" max="40" step="1" value="10" /></label>
             <label>Spread <output data-for="spread"></output><input type="range" name="spread" min="0" max="8" step="0.1" value="0.6" /></label>
@@ -274,15 +275,35 @@ const toc = [
             </label>
             <button class="button" type="reset">Reset</button>
           </form>
-          <pre class="smear-lab__code"><code data-smear-code>data-smear</code></pre>
+          <pre class="lab__code"><code data-smear-code>data-smear</code></pre>
         </div>
       </div>
 
-      <div class="effect">
-        <h3 class="brand__sub">Peak gradient</h3>
-        <p class="brand__note">Nine blurred columns with one vertical gradient, rising from the floor when in view. Bottom of the footer.</p>
-        <div class="effect__peak">
-          <PeakGradient id="brand-peak" />
+      <div class="effect" id="peak">
+        <div class="effect__head">
+          <h3 class="brand__sub">Peak gradient</h3>
+          <button class="button" type="button" data-peak-apply><Icon name="arrow" /> Try in footer</button>
+        </div>
+        <p class="brand__note">Blurred columns with one vertical gradient. In the footer it rises as you scroll down and sinks when you scroll back up. Tune it here, then paste the result into <code>PEAK_FOOTER</code> in <code>src/lib/peak.ts</code>.</p>
+        <div class="peak-lab">
+          <div class="effect__peak">
+            <PeakGradient id="brand-peak" still />
+          </div>
+          <form class="lab__controls" data-peak-lab>
+            <label>Palette
+              <select name="palette">
+                {Object.keys(PEAK_PALETTES).map((p) => <option selected={p === PEAK_FOOTER.palette}>{p}</option>)}
+              </select>
+            </label>
+            <label>Columns <output data-for="bars"></output><input type="range" name="bars" min="3" max="25" step="1" value={PEAK_FOOTER.bars} /></label>
+            <label>Blur <output data-for="blur"></output><input type="range" name="blur" min="0" max="45" step="1" value={PEAK_FOOTER.blur} /></label>
+            <label>Peak <output data-for="peak"></output><input type="range" name="peak" min="0.3" max="1" step="0.01" value={PEAK_FOOTER.peak} /></label>
+            <label>Valley <output data-for="valley"></output><input type="range" name="valley" min="0" max="1" step="0.01" value={PEAK_FOOTER.valley} /></label>
+            <label>Falloff <output data-for="power"></output><input type="range" name="power" min="0.5" max="4" step="0.01" value={PEAK_FOOTER.power} /></label>
+            <label>Overlap <output data-for="overlap"></output><input type="range" name="overlap" min="1" max="2" step="0.01" value={PEAK_FOOTER.overlap} /></label>
+            <button class="button" type="reset">Reset</button>
+          </form>
+          <pre class="lab__code"><code data-peak-code></code></pre>
         </div>
       </div>
     </section>
@@ -291,6 +312,40 @@ const toc = [
 
 <script>
   import { smear, SMEAR_DEFAULTS } from '../scripts/smear';
+  import { peakSvg, type PeakOptions, type PeakPalette } from '../lib/peak';
+
+  // Peak-configurator: tekent de preview opnieuw met dezelfde functie als de footer en toont de
+  // instelling om in src/lib/peak.ts te plakken. "Try in footer" past de footer op deze pagina aan
+  // (alleen hier, tot je herlaadt) en scrolt ernaartoe.
+  document.addEventListener('astro:page-load', () => {
+    const form = document.querySelector<HTMLFormElement>('[data-peak-lab]');
+    if (!form || form.dataset.bound) return;
+    form.dataset.bound = '';
+    const preview = document.querySelector<SVGSVGElement>('[data-peak-svg="brand-peak"]')!;
+    const code = document.querySelector('[data-peak-code]')!;
+    let current: PeakOptions;
+
+    const read = (): PeakOptions => {
+      const d = new FormData(form);
+      const n = (k: string) => Number(d.get(k));
+      return { bars: n('bars'), blur: n('blur'), peak: n('peak'), valley: n('valley'), power: n('power'), overlap: n('overlap'), palette: String(d.get('palette')) as PeakPalette };
+    };
+    const update = () => {
+      current = read();
+      preview.innerHTML = peakSvg('brand-peak', current);
+      form.querySelectorAll<HTMLOutputElement>('output[data-for]').forEach((o) => (o.textContent = String(current[o.dataset.for as keyof PeakOptions])));
+      code.textContent = `export const PEAK_FOOTER: PeakOptions = ${JSON.stringify(current, null, 2).replace(/"(\w+)":/g, '$1:').replace(/"/g, "'")};`;
+    };
+    form.addEventListener('input', update);
+    form.addEventListener('reset', () => requestAnimationFrame(update));
+    document.querySelector('[data-peak-apply]')?.addEventListener('click', () => {
+      const footer = document.querySelector<SVGSVGElement>('.site-footer [data-peak-svg]');
+      if (!footer) return;
+      footer.innerHTML = peakSvg(footer.dataset.peakSvg!, current);
+      footer.closest('.site-footer')?.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'end' });
+    });
+    update();
+  });
 
   // Smear-speeltuin: schuifjes zetten de data-smear-* attributen op de voorbeelden en tonen de
   // markup die je kunt overnemen (alleen wat afwijkt van de standaard).
@@ -387,15 +442,16 @@ const toc = [
   .effect__headline { font-family: var(--font-display); font-weight: 800; font-size: var(--step-4); line-height: var(--leading-tight); text-transform: uppercase; letter-spacing: var(--tracking-display); }
   .effect__link { text-decoration: none; }
   .effect__mono { display: inline-flex; align-items: center; gap: 0.75ch; font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; text-transform: uppercase; letter-spacing: 0.04em; text-decoration: none; }
-  .smear-lab { display: grid; gap: var(--space-s); }
-  @media (min-width: 64rem) { .smear-lab { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); } }
-  .smear-lab__controls { display: grid; gap: var(--space-xs); align-content: start; padding: var(--space-m); border-radius: var(--radius-l); background: var(--color-surface); }
-  .smear-lab__controls label { display: grid; grid-template-columns: 1fr auto; gap: var(--space-3xs) var(--space-xs); font-size: var(--step--1); font-weight: 600; }
-  .smear-lab__controls input, .smear-lab__controls select { grid-column: 1 / -1; inline-size: 100%; accent-color: var(--color-accent); }
-  .smear-lab__controls select { min-block-size: 2.5rem; padding-inline: var(--space-2xs); border: var(--border-width) solid var(--color-line); border-radius: var(--radius-s); background: var(--color-bg); color: inherit; font: inherit; }
-  .smear-lab__controls output { color: var(--color-muted); font-variant-numeric: tabular-nums; }
-  .smear-lab__controls .button { justify-self: start; }
-  .smear-lab__code { grid-column: 1 / -1; overflow-x: auto; padding: var(--space-s); border-radius: var(--radius-m); background: var(--color-raised); font-size: var(--step--1); }
-  .effect__peak { display: grid; block-size: clamp(10rem, 30vw, 20rem); overflow: hidden; border-radius: var(--radius-l); background: var(--color-surface); }
+  .smear-lab, .peak-lab { display: grid; gap: var(--space-s); }
+  @media (min-width: 64rem) { .smear-lab, .peak-lab { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); } }
+  .lab__controls { display: grid; gap: var(--space-xs); align-content: start; padding: var(--space-m); border-radius: var(--radius-l); background: var(--color-surface); }
+  .lab__controls label { display: grid; grid-template-columns: 1fr auto; gap: var(--space-3xs) var(--space-xs); font-size: var(--step--1); font-weight: 600; }
+  .lab__controls input, .lab__controls select { grid-column: 1 / -1; inline-size: 100%; accent-color: var(--color-accent); }
+  .lab__controls select { min-block-size: 2.5rem; padding-inline: var(--space-2xs); border: var(--border-width) solid var(--color-line); border-radius: var(--radius-s); background: var(--color-bg); color: inherit; font: inherit; }
+  .lab__controls output { color: var(--color-muted); font-variant-numeric: tabular-nums; }
+  .lab__controls .button { justify-self: start; }
+  .lab__code { grid-column: 1 / -1; overflow-x: auto; padding: var(--space-s); border-radius: var(--radius-m); background: var(--color-raised); font-size: var(--step--1); }
+  /* Zelfde ondergrond als de footer, zodat de preview klopt. */
+  .effect__peak { display: grid; align-self: start; block-size: clamp(12rem, 30vw, 24rem); overflow: hidden; border-radius: var(--radius-l); background: var(--color-bg); box-shadow: inset 0 0 0 var(--border-width) var(--color-line); }
   .effect__peak :global(.peak) { block-size: 100%; }
 </style>

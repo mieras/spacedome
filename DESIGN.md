@@ -138,4 +138,4 @@ De kern van de site. Eén `<sd-player>` in de layout met `transition:persist`: h
 - Uit bij `prefers-reduced-motion`.
 
 ## Stijlgids
-- `/brand` toont tokens, componenten en effecten live uit de code. Nieuw component of token: zet het daar ook bij.
+- `/brand` toont tokens, componenten en effecten live uit de code. Smear en peak gradient hebben er een speeltuin; de peak-instelling van de footer staat in `PEAK_FOOTER` (`src/lib/peak.ts`). Nieuw component of token: zet het daar ook bij.

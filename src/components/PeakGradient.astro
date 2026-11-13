@@ -3,6 +3,8 @@
  * Peak gradient: een zachte regenboog van geblurde kolommen die uit de vloer oprijst, het hoogst
  * in het midden. Naar het idee van design.how/vault#peak-gradient (MIT), in Space Dome-kleuren.
  *
+ * Instellingen en paletten: src/lib/peak.ts (de footer gebruikt PEAK_FOOTER; uitproberen op /brand#peak).
+ *
  * Hoe het werkt: BARS rechthoeken naast elkaar in één SVG, elk 1.23× zo breed als de stap zodat ze
  * overlappen. Allemaal dezelfde verticale gradient (objectBoundingBox: elke kolom draagt de hele
  * regenboog over zijn eigen hoogte) en een gaussian blur, zodat ze samensmelten tot één vlak. De
@@ -15,61 +17,22 @@
  * Geen JS. Browsers zonder scroll-driven animations (Firefox nu nog) en prefers-reduced-motion:
  * hij staat er gewoon.
  */
-interface Props {
+import { PEAK_FOOTER, PEAK_H, PEAK_W, peakSvg, type PeakOptions } from '../lib/peak';
+
+interface Props extends Partial<PeakOptions> {
   /** Uniek per instantie op een pagina (gradient- en filter-id's). */
   id?: string;
   class?: string;
+  /** Niet aan het scrollen koppelen (preview op /brand). */
+  still?: boolean;
 }
 
-const W = 1271;
-const H = 599;
-const BARS = 9;
-const BLUR = 15;
-const PEAK = 0.98;
-const VALLEY = 0.55;
-
-const pitch = W / BARS;
-const width = pitch * 1.23;
-const mid = (BARS - 1) / 2;
-const bars = Array.from({ length: BARS }, (_, i) => {
-  const t = Math.abs(i - mid) / mid;
-  const h = PEAK * H * (VALLEY + (1 - VALLEY) * (1 - t ** 1.24));
-  return { x: i * pitch - (width - pitch) / 2, y: H - h, h };
-});
-
-// Onder naar boven, roze/paars: indigo vloer, violet, magenta, een zachtroze kern, poster-magenta,
-// paars, weg. Geen geel of blauw: dicht bij de oude radiale gloed van de footer.
-const stops = [
-  [0, 'oklch(20% 0.08 290)'],
-  [0.16, 'oklch(38% 0.19 298)'],
-  [0.34, 'oklch(60% 0.25 335)'],
-  [0.5, 'oklch(82% 0.12 350)'],
-  [0.66, 'oklch(68% 0.23 352)'],
-  [0.84, 'oklch(48% 0.22 315)'],
-  [1, 'oklch(48% 0.22 315 / 0)'],
-] as const;
-
-const { id = 'peak', class: className } = Astro.props;
+const { id = 'peak', class: className, still = false, ...overrides } = Astro.props;
+const options = { ...PEAK_FOOTER, ...overrides };
 ---
 
-<div class:list={['peak', className]} aria-hidden="true">
-  <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" focusable="false">
-    <defs>
-      <linearGradient id={`${id}-fill`} x1="0" y1="1" x2="0" y2="0">
-        {stops.map(([offset, color]) => <stop offset={offset} style={`stop-color: ${color}`} />)}
-      </linearGradient>
-      <filter id={`${id}-blur`} x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation={BLUR} />
-      </filter>
-    </defs>
-    {
-      bars.map((b) => (
-        <g filter={`url(#${id}-blur)`}>
-          <rect x={b.x.toFixed(1)} y={b.y.toFixed(1)} width={width.toFixed(1)} height={(b.h + BLUR * 3).toFixed(1)} fill={`url(#${id}-fill)`} />
-        </g>
-      ))
-    }
-  </svg>
+<div class:list={['peak', className]} aria-hidden="true" data-still={still || undefined}>
+  <svg viewBox={`0 0 ${PEAK_W} ${PEAK_H}`} preserveAspectRatio="none" focusable="false" data-peak-svg={id} set:html={peakSvg(id, options)} />
 </div>
 
 <style>
@@ -95,6 +58,7 @@ const { id = 'peak', class: className } = Astro.props;
       }
     }
   }
+  .peak[data-still] svg { animation: none; }
   /* Zachte ease-out in de keyframes zelf: scrollen is lineair, zo voelt het als oprijzen. */
   @keyframes peak-rise {
     from { transform: scaleY(0); animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1); }
