@@ -32,7 +32,7 @@ Lees eerst `README.md` voor context, `CHANGELOG.md` voor recente wijzigingen en 
 ## Projectspecifiek
 - **Player** (`src/scripts/player.ts`): het `<sd-player>`-element is persistent; het script draait één keer. Per pagina alleen opnieuw koppelen via `astro:after-swap` / `astro:page-load`. Niet het element uit het document halen (dan pauzeert de video).
 - Elke knop die iets met de player doet, gebruikt `data-player-play` / `data-player-queue` met `data-item` (JSON van `toPlayerItem()`). Geen eigen click-handlers per knop.
-- Het podium op een setpagina is `[data-player-stage="<set-id>"]`; de video ligt er absoluut overheen (documentcoördinaten).
+- Het podium op een setpagina is `[data-player-stage="<set-id>"]`; de video ligt er overheen via CSS anchor positioning (`anchor-name: --sd-stage`), fallback absoluut in documentcoördinaten. Op desktop is het podium sticky.
 - HLS: hls.js overal behalve Safari (native). Chromium meldt soms "maybe" voor HLS maar kan niet alles; vertrouw daar niet op.
 - Video: STACK (map READY) → Bunny Stream via `npm run set:add` (zie README). Bunny weigert verzoeken zonder Referer: haal Bunny-stills nooit op tijdens de build (geen `getImage`/`<Image>` op Bunny-URL's). Signed URLs (`BUNNY_STREAM_TOKEN_KEY`) komen later en vragen een edge function.
 - Mux-teststreams in de dummy-sets zijn placeholders.

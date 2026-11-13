@@ -8,6 +8,8 @@ Categorieën: **Toegevoegd**, **Gewijzigd**, **Opgelost**, **Verwijderd**, **Bev
 ## [Unreleased]
 
 ### Gewijzigd
+- Setpagina (desktop): de video blijft sticky staan terwijl je door beschrijving en tracklist scrolt, en wordt een mini-video als de content op is. Gedockte video plakt via CSS anchor positioning aan het podium (fallback: JS).
+- Datum op de avondpagina een stuk kleiner (step-5 in plaats van step-7).
 - Setpagina: op desktop video en info naast elkaar in de hero (video ~2/3, info ~1/3); op mobiel onder elkaar. Beschrijving en tracklist als tabs (WAI-ARIA, pijltjes/Home/End); zonder JS of met maar één van beide gewoon onder elkaar. Tracklist reageert op de kolombreedte (container query).
 
 ### Toegevoegd

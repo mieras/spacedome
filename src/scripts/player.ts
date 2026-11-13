@@ -11,8 +11,9 @@
  *   en de knoppen in de balk. Eén click-handler op het document.
  * - Video-modus: "docked" over het podium van de spelende set ([data-player-stage]), "mini"
  *   onderin als je elders bent of het podium uit beeld scrolt, "hidden" bij alleen audio.
- *   Gedockt zetten we de video absoluut in documentcoördinaten: hij scrollt dan vanzelf mee,
- *   zonder scroll-listener. Wisselen tussen docked en mini animeren we met FLIP.
+ *   Gedockt plakt CSS anchor positioning de video aan het podium (volgt ook een sticky podium).
+ *   Zonder anchor-support: absoluut in documentcoördinaten, plus meebewegen bij een sticky
+ *   podium. Wisselen tussen docked en mini animeren we met FLIP.
  * - HLS (.m3u8): Safari en iOS spelen het native af; elders laden we hls.js pas als het nodig is.
  * - Toestand (huidige set, positie, wachtrij, audio/video, mute) staat in localStorage.
  */
@@ -28,6 +29,8 @@ type Saved = { current: PlayerItem | null; position: number; queue: PlayerItem[]
 
 const STORAGE_KEY = 'spacedome:player';
 const reducedMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+/** Anchor positioning: CSS houdt de gedockte video over het podium (zie player.scss). */
+const anchorSupport = typeof CSS !== 'undefined' && CSS.supports('anchor-name: --a');
 /** Safari/iOS: native HLS (zuiniger, AirPlay). Elders hls.js, ook als de browser "maybe" zegt. */
 const preferNativeHls = () => /^((?!chrome|chromium|android|crios|fxios).)*safari/i.test(navigator.userAgent);
 
@@ -455,9 +458,13 @@ function init(found: HTMLElement) {
     media.dataset.mode = m;
     document.querySelectorAll('[data-player-docked]').forEach((el) => el.removeAttribute('data-player-docked'));
     if (m === 'docked' && stage) {
+      stage.setAttribute('data-player-docked', '');
+      if (anchorSupport) {
+        media.style.cssText = '';
+        return;
+      }
       const r = stage.getBoundingClientRect();
       media.style.cssText = `top:${r.top + scrollY}px;left:${r.left + scrollX}px;width:${r.width}px;height:${r.height}px`;
-      stage.setAttribute('data-player-docked', '');
     } else {
       media.style.cssText = '';
     }
@@ -515,6 +522,22 @@ function init(found: HTMLElement) {
   }
 
   addEventListener('resize', () => mode === 'docked' && place('docked'));
+  // Zonder anchor positioning: een sticky podium verschuift bij scrollen, dus dan meebewegen.
+  if (!anchorSupport) {
+    let ticking = false;
+    addEventListener(
+      'scroll',
+      () => {
+        if (mode !== 'docked' || !stage || getComputedStyle(stage).position !== 'sticky' || ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => {
+          ticking = false;
+          if (mode === 'docked') place('docked');
+        });
+      },
+      { passive: true },
+    );
+  }
 
   /* ---------- Mini verslepen: links of rechts ---------- */
   // Slepen werkt met muis en vinger (pointer events). Loslaten = naar de dichtstbijzijnde kant.
