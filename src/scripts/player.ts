@@ -398,7 +398,7 @@ function init(found: HTMLElement) {
       title: item.title,
       artist: item.artists,
       album: 'Space Dome',
-      artwork: item.cover ? [{ src: new URL(item.cover, location.origin).href, sizes: '256x256', type: 'image/webp' }] : [],
+      artwork: item.cover ? [{ src: new URL(item.cover, location.origin).href }] : [], // webp (eigen poster) of jpg (Bunny-still)
     });
     navigator.mediaSession.playbackState = isPlaying() ? 'playing' : 'paused';
   }

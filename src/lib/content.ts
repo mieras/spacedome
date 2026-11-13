@@ -64,8 +64,14 @@ export const djHref = (id: string) => `/djs/${id}`;
 export const genreHref = (id: string) => `/genres/${id}`;
 export const eventHref = (id: string) => `/events/${id}`;
 
+/** Beeld van een set: eigen poster, anders de still uit de video (Bunny), anders niets (gegenereerde art). */
+export const setStill = (set: SetEntry) => set.data.poster ?? set.data.video.thumbnail;
+
 export async function toPlayerItem(set: SetEntry, lib: Library): Promise<PlayerItem> {
-  const cover = set.data.poster ? (await getImage({ src: set.data.poster, width: 256, height: 256, fit: 'cover', format: 'webp' })).src : undefined;
+  const still = setStill(set);
+  // Bunny-still: URL direct (de build mag hem niet ophalen, zie CoverArt). Eigen poster: verkleinen.
+  const cover =
+    typeof still === 'string' ? still : still ? (await getImage({ src: still, width: 256, height: 256, fit: 'cover', format: 'webp' })).src : undefined;
   return {
     id: set.id,
     title: set.data.title,

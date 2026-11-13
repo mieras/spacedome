@@ -64,10 +64,16 @@ const sets = defineCollection({
       /** Leeg = losse set */
       event: reference('events').optional(),
       video: z.object({
-        /** HLS (.m3u8) of MP4. Straks: Bunny Stream-URL met token. */
+        /** HLS (.m3u8) of MP4. Bunny Stream: https://<cdn-host>/<guid>/playlist.m3u8 */
         src: z.string(),
         /** In seconden; voor de weergave vóór de video geladen is. */
         duration: z.number().int().positive().optional(),
+        /** Bunny Stream-video (guid). Gezet door `npm run set:add`. */
+        bunny: z.string().optional(),
+        /** Bestand in STACK waar de video vandaan komt (node-id). Voorkomt dubbel importeren. */
+        stack: z.number().int().optional(),
+        /** Still uit de video (Bunny-thumbnail). Gebruikt als er geen eigen poster is. */
+        thumbnail: z.url().optional(),
       }),
       /** Still als cover. Straks gekozen in de Studio via posterTime (Bunny-thumbnail). */
       poster: image().optional(),

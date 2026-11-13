@@ -10,7 +10,7 @@ import ShareButton from '../../components/ShareButton.astro';
 import Tracklist from '../../components/Tracklist.astro';
 import { t } from '../../i18n/ui';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { djHref, eventHref, genreHref, getLibrary, setHref, suggestionsFor, toPlayerItem, type SetEntry } from '../../lib/content';
+import { djHref, eventHref, genreHref, getLibrary, setHref, setStill, suggestionsFor, toPlayerItem, type SetEntry } from '../../lib/content';
 import { formatDate, formatDuration, joinNames } from '../../lib/format';
 
 export async function getStaticPaths() {
@@ -27,6 +27,8 @@ const event = lib.eventOf(set);
 const suggestions = suggestionsFor(set, lib);
 const { Content } = await render(set);
 const duration = formatDuration(set.data.video.duration);
+const still = setStill(set);
+// Alleen een eigen poster als OG-beeld: crawlers sturen geen Referer, dus Bunny zou ze weigeren.
 const ogImage = set.data.poster ? (await getImage({ src: set.data.poster, width: 1200, height: 630, fit: 'cover', format: 'jpg' })).src : undefined;
 const description = `${set.data.title} by ${joinNames(djs.map((d) => d.data.name))}. ${set.body?.split('\n').find(Boolean) ?? ''}`;
 ---
@@ -35,7 +37,7 @@ const description = `${set.data.title} by ${joinNames(djs.map((d) => d.data.name
   <article class="set">
     <div class="set__stage-wrap wrapper">
       <div class="stage" data-player-stage={set.id}>
-        <CoverArt seed={set.id} image={set.data.poster} alt={set.data.posterAlt ?? ''} ratio="16/9" eager sizes="(min-width: 96rem) 96rem, 100vw" />
+        <CoverArt seed={set.id} image={still} alt={set.data.posterAlt ?? ''} ratio="16/9" eager sizes="(min-width: 96rem) 96rem, 100vw" />
         <PlayButton item={item} size="lg" useUrlTime class="stage__play" />
       </div>
     </div>

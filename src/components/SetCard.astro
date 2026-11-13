@@ -4,7 +4,7 @@
  * De cover-link is een dubbele van de titel-link en daarom uit de tabvolgorde gehaald.
  */
 import { formatDate, formatDuration } from '../lib/format';
-import { djHref, setHref, toPlayerItem, type Library, type SetEntry } from '../lib/content';
+import { djHref, setHref, setStill, toPlayerItem, type Library, type SetEntry } from '../lib/content';
 import CoverArt from './CoverArt.astro';
 import PlayButton from './PlayButton.astro';
 import QueueButton from './QueueButton.astro';
@@ -27,7 +27,7 @@ const duration = formatDuration(set.data.video.duration);
 <article class="set-card">
   <div class="set-card__media">
     <a href={href} tabindex="-1" aria-hidden="true" class="set-card__cover">
-      <CoverArt seed={set.id} image={set.data.poster} alt="" eager={eager} />
+      <CoverArt seed={set.id} image={setStill(set)} alt="" eager={eager} />
     </a>
     <PlayButton item={item} class="set-card__play" />
     <QueueButton item={item} variant="icon" class="set-card__queue" />
