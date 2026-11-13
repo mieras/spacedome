@@ -131,6 +131,7 @@ const description = `${set.data.title} by ${joinNames(djs.map((d) => d.data.name
 
   .set__grid {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--space-xl);
     padding-block: var(--space-l) var(--space-xl);
   }
@@ -140,11 +141,15 @@ const description = `${set.data.title} by ${joinNames(djs.map((d) => d.data.name
   }
   .set__head { display: grid; gap: var(--space-s); align-content: start; }
   .set__head .meta a { color: inherit; }
-  .set__title { font-size: var(--step-6); text-transform: uppercase; letter-spacing: -0.035em; line-height: 0.98; }
+  .set__title { font-size: var(--step-5); text-transform: uppercase; letter-spacing: -0.035em; line-height: 0.98; }
   .set__djs { display: flex; flex-wrap: wrap; gap: var(--space-2xs) var(--space-s); }
   .set__djs a { display: inline-flex; align-items: center; gap: var(--space-2xs); font-size: var(--step-1); font-weight: 600; text-decoration: none; }
   .set__djs a:hover span { text-decoration: underline; }
   .set__actions { display: flex; flex-wrap: wrap; gap: var(--space-2xs); }
   .set__text { margin-block-start: var(--space-xs); font-size: var(--step-1); line-height: var(--leading-snug); }
   .set__subtitle { font-size: var(--step-1); text-transform: uppercase; letter-spacing: 0; margin-block-end: var(--space-2xs); }
+  /* Grote titel pas als er ruimte is (op mobiel past een lang woord anders niet). */
+  @media (min-width: 60rem) {
+    .set__title { font-size: var(--step-6); }
+  }
 </style>

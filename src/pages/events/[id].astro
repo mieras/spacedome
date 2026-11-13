@@ -128,6 +128,7 @@ const jsonLd = musicEventJsonLd(
   .event-head {
     display: grid;
     gap: var(--space-l);
+    grid-template-columns: minmax(0, 1fr);
     padding-block: var(--space-xl) var(--space-l);
     align-items: start;
   }
@@ -135,11 +136,12 @@ const jsonLd = musicEventJsonLd(
     .event-head { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); }
     .event-head :global(.event-head__poster) { position: sticky; inset-block-start: calc(var(--header-h) + var(--space-s)); }
   }
-  .event-head__text { display: grid; gap: var(--space-s); }
+  .event-head__text { display: grid; gap: var(--space-s); container-type: inline-size; }
   .event-head__date {
     font-family: var(--font-display);
     font-weight: 800;
-    font-size: var(--step-7);
+    /* "30.07.2026" is ±6,7× de lettergrootte breed: nooit breder dan de kolom. */
+    font-size: min(var(--step-7), 14cqi);
     line-height: 0.95;
     letter-spacing: -0.04em;
     color: var(--color-accent);

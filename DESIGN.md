@@ -55,6 +55,9 @@ Beide self-hosted via Fontsource (geen verzoeken naar Google, AVG). Voorlopige k
 **Schaal:** Utopia, fluid tussen 360 en 1920 px. Basis 18 → 20 px, ratio 1.2 → 1.25. Tokens `--step--2` t/m `--step-8`.
 
 - `h1` `--step-5`, `h2` `--step-3`, `h3` `--step-1`.
+- Grote display-titels (hero, set, dj, paginakop): `--step-5` op mobiel, `--step-6` vanaf 48–60rem. Unbounded in kapitalen is breed; een lang woord past anders niet op 320px.
+- Grote datums (avondpagina, eventkaart) schalen mee met hun kolom: `min(--step-x, 14cqi)` met `container-type: inline-size` op de ouder.
+- Koppen hebben `overflow-wrap: anywhere` + `hyphens: auto` als vangnet. Grids met één kolom altijd `minmax(0, 1fr)`, nooit `auto`/`1fr` (anders rekt lange tekst de pagina op).
 - Metadata (`.meta`): `--step--1`, hoofdletters, `letter-spacing: .08em`, tabular nums. Datums zoals op de poster: `30.07.2026`.
 
 ## 5. Ruimte en layout
