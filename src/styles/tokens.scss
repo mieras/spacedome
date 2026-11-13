@@ -12,8 +12,11 @@
   interpolate-size: allow-keywords;
 
   /* ---------- Typografie ---------- */
-  --font-display: 'Unbounded Variable', ui-rounded, system-ui, sans-serif;
-  --font-sans: 'Hanken Grotesk Variable', ui-sans-serif, system-ui, sans-serif;
+  /* Koppen: Big Shoulders (smal, met optische maten: groot = strakker). Tekst: Funnel Sans.
+     Het logo blijft in Unbounded (woordmerk van de poster), los van de koppen. */
+  --font-display: 'Big Shoulders Variable', 'Arial Narrow', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Funnel Sans Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-logo: 'Unbounded Variable', ui-rounded, system-ui, sans-serif;
   --leading-tight: 1.05;
   --leading-snug: 1.25;
   --leading-normal: 1.55;
