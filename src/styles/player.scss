@@ -37,7 +37,7 @@ sd-player[hidden] { display: none; }
   z-index: 60;
   inset-block-end: calc(var(--player-h) + var(--space-s));
   inset-inline-end: var(--gutter);
-  inline-size: clamp(11rem, 26vw, 22rem);
+  inline-size: clamp(9rem, 28vw, 22rem);
   aspect-ratio: 16 / 9;
   border-radius: var(--radius-m);
   box-shadow: 0 1.5rem 3rem -1rem oklch(5% 0.03 292 / 0.7), 0 0 0 1px oklch(100% 0 0 / 0.08);

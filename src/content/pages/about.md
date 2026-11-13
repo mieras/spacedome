@@ -1,14 +1,12 @@
 ---
 title: About
-description: Space Dome brings the bass of the West Coast beat scene to the Netherlands.
+description: Space Dome is a night for beats, trip-hop, deep grooves and experimental rhythms.
 ---
 
-Space Dome is more than a party; it's a tribute to the low-end theory of the underground LA beat scene. Inspired by the legendary nights at Melkweg Amsterdam, we bring the bass of the West Coast beat scene to the Netherlands. Trip-hop, beats, deep grooves and experimental rhythms. No rush, just hypnotic bass and a close-knit vibe.
+<!-- TODO: placeholder. Definitieve about-tekst komt van Space Dome. -->
 
-## The LA beat scene
+Space Dome is a night for beats, trip-hop, deep grooves and experimental rhythms. Every set is recorded live, so you can watch and listen back here.
 
-The LA beat scene is more than a genre, it's a state of mind. It's the sound of Los Angeles in the 2000s: a post-sunset drive where jazz, hip-hop and electronic music blend into a heavy, cosmic whole. Born from a community of producers in bedrooms and basements, the scene pushed instrumental hip-hop into thrilling new territory.
+## Inspiration
 
-It was shaped by producer nights like the legendary Low End Theory, weekly at The Airliner in Lincoln Heights. For ten dollars you could hear future greats like Flying Lotus in an intimate room. It's all about raw creativity: sampling and drum programming with no rules. Dusty samples meet futuristic synths, and swinging, off-kilter rhythms create a hypnotic head-nod.
-
-That history is the DNA of Space Dome: eclectic, bass-heavy and completely unique.
+The sound of Space Dome draws on the LA beat scene of the 2000s, where jazz, hip-hop and electronic music blended into something heavy and cosmic. Nights like the legendary Low End Theory at The Airliner showed what a room full of producers and dusty samples could do.

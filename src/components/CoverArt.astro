@@ -9,7 +9,8 @@ import { artStyle } from '../lib/art';
 
 interface Props {
   seed: string;
-  image?: ImageMetadata;
+  /** Lokale afbeelding of externe URL (Bunny-still). */
+  image?: ImageMetadata | string;
   alt?: string;
   ratio?: '1' | '16/9' | '4/5';
   sizes?: string;
@@ -23,12 +24,27 @@ const style = `${artStyle(seed)};--art-ratio:${ratio}`;
 
 <div class:list={['art', className]} style={style}>
   {
-    image && (
+    image && typeof image !== 'string' && (
       <Image
         src={image}
         alt={alt}
         widths={[320, 640, 960, 1280, 1920].filter((w) => w <= image.width)}
         sizes={sizes}
+        loading={eager ? 'eager' : 'lazy'}
+        fetchpriority={eager ? 'high' : 'auto'}
+      />
+    )
+  }
+  {
+    // Externe still (Bunny): direct van de CDN. Niet via Astro's beeldoptimalisatie, want Bunny
+    // weigert verzoeken zonder Referer (hotlinkbescherming) en de build stuurt die niet mee.
+    typeof image === 'string' && (
+      <img
+        src={image}
+        alt={alt}
+        width="1920"
+        height="1080"
+        decoding="async"
         loading={eager ? 'eager' : 'lazy'}
         fetchpriority={eager ? 'high' : 'auto'}
       />

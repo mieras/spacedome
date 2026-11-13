@@ -6,6 +6,7 @@
  *   een paginawissel naar de nieuwe pagina zonder het uit het document te halen, dus de video
  *   speelt door. Dit script draait daarom maar één keer; per pagina doen we alleen
  *   "opnieuw koppelen" (knoppen bijwerken, podium zoeken) in astro:after-swap / astro:page-load.
+ *   Let op: de module-vlag `started` bewaakt dat; een vlag op het element werkt niet (zie init).
  * - Bediening via data-attributen: [data-player-play], [data-player-queue] (overal op de site)
  *   en de knoppen in de balk. Eén click-handler op het document.
  * - Video-modus: "docked" over het podium van de spelende set ([data-player-stage]), "mini"
@@ -60,9 +61,15 @@ function parseItem(el: HTMLElement): PlayerItem | null {
   }
 }
 
-function init() {
-  const found = document.querySelector<HTMLElement>('[data-player-root]');
-  if (!found || found.dataset.ready) return;
+// Moduleniveau, niet op het element: bij een swap zet Astro eerst de nieuwe <body> (met een
+// verse, lege <sd-player>) in het document en pas daarna het oude element terug. Die verse
+// speler triggert connectedCallback; zonder deze vlag startte elke paginawissel een extra
+// player met eigen handlers en een eigen (losgekoppelde) video die onzichtbaar meespeelde.
+let started = false;
+
+function init(found: HTMLElement) {
+  if (started) return;
+  started = true;
   const root: HTMLElement = found;
   root.dataset.ready = '';
 
@@ -163,6 +170,7 @@ function init() {
     if (attachedId !== item.id) {
       await attach(item);
       seekWhenReady(state.position);
+      dock(true); // nu er een bron is, mag de video zichtbaar worden
     } else if (start !== undefined) {
       video.currentTime = start;
     }
@@ -390,7 +398,7 @@ function init() {
       title: item.title,
       artist: item.artists,
       album: 'Space Dome',
-      artwork: item.cover ? [{ src: new URL(item.cover, location.origin).href, sizes: '256x256', type: 'image/webp' }] : [],
+      artwork: item.cover ? [{ src: new URL(item.cover, location.origin).href }] : [], // webp (eigen poster) of jpg (Bunny-still)
     });
     navigator.mediaSession.playbackState = isPlaying() ? 'playing' : 'paused';
   }
@@ -629,7 +637,7 @@ customElements.define(
   'sd-player',
   class extends HTMLElement {
     connectedCallback() {
-      init();
+      init(this);
     }
   },
 );

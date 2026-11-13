@@ -11,7 +11,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
-    "astro": "astro"
+    "astro": "astro",
+    "set:add": "node --env-file=.env scripts/set-add.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",

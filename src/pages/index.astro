@@ -7,7 +7,7 @@ import QueueButton from '../components/QueueButton.astro';
 import SetGrid from '../components/SetGrid.astro';
 import { t } from '../i18n/ui';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { djHref, eventHref, genreHref, getLibrary, isUpcoming, setHref, setsByDj, setsByEvent, toPlayerItem } from '../lib/content';
+import { djHref, eventHref, genreHref, getLibrary, isUpcoming, setHref, setsByDj, setsByEvent, setStill, toPlayerItem } from '../lib/content';
 import { formatDate, formatDateLong, formatDuration, joinNames } from '../lib/format';
 import { settings } from '../settings';
 
@@ -23,16 +23,16 @@ const djs = lib.djs.filter((d) => setsByDj(lib, d.id).length > 0);
 <BaseLayout title={settings.siteName} isHome>
   <section class="hero wrapper" aria-labelledby="hero-title">
     <div class="hero__intro">
-      <h1 id="hero-title" class="hero__title">Low-end theory from the LA beat scene</h1>
-      <p class="lead">Beats, trip-hop, deep grooves and experimental rhythms. Recorded live at our nights, on repeat here.</p>
+      <h1 id="hero-title" class="hero__title">Recorded live in the dome</h1>
+      <p class="lead">DJ sets from our nights: beats, trip-hop, deep grooves and experimental rhythms. Watch, listen, repeat.</p>
     </div>
 
     {
       featured && featuredItem && (
         <article class="hero__feature" aria-labelledby="featured-title">
-          <div class="hero__stage">
+          <div class="hero__stage" data-player-stage={featured.id}>
             <a href={setHref(featured.id)} tabindex="-1" aria-hidden="true">
-              <CoverArt seed={featured.id} image={featured.data.poster} ratio="16/9" eager sizes="(min-width: 60rem) 55vw, 100vw" />
+              <CoverArt seed={featured.id} image={setStill(featured)} ratio="16/9" eager sizes="(min-width: 60rem) 55vw, 100vw" />
             </a>
             <PlayButton item={featuredItem} size="lg" class="hero__play" />
           </div>
@@ -138,6 +138,7 @@ const djs = lib.djs.filter((d) => setsByDj(lib, d.id).length > 0);
     position: relative;
     display: grid;
     gap: var(--space-l);
+    grid-template-columns: minmax(0, 1fr);
     padding-block: var(--space-xl) var(--space-2xl);
     align-items: end;
   }
@@ -145,7 +146,7 @@ const djs = lib.djs.filter((d) => setsByDj(lib, d.id).length > 0);
   .hero::before {
     content: '';
     position: absolute;
-    inset: -20% -10% auto 30%;
+    inset: -20% 0 auto 30%; /* niet buiten de pagina: dat gaf horizontaal scrollen */
     block-size: 120%;
     z-index: -1;
     background: radial-gradient(closest-side, var(--color-glow), transparent);
@@ -156,7 +157,7 @@ const djs = lib.djs.filter((d) => setsByDj(lib, d.id).length > 0);
   }
   .hero__intro { display: grid; gap: var(--space-s); align-content: end; }
   .hero__title {
-    font-size: var(--step-6);
+    font-size: var(--step-5);
     text-transform: uppercase;
     letter-spacing: -0.035em;
     line-height: 0.98;
@@ -170,6 +171,8 @@ const djs = lib.djs.filter((d) => setsByDj(lib, d.id).length > 0);
 
   .hero__feature { display: grid; gap: var(--space-s); }
   .hero__stage { position: relative; }
+  /* Speelt de uitgelichte set: de video ligt erover (zie player.ts), cover en knop onzichtbaar. */
+  .hero__stage[data-player-docked] > :global(*) { visibility: hidden; }
   .hero__stage :global(.hero__play) { position: absolute; inset: 50% auto auto 50%; translate: -50% -50%; z-index: 3; }
   .hero__meta { display: grid; gap: var(--space-3xs); }
   .hero__set-title { font-size: var(--step-3); }
@@ -207,4 +210,8 @@ const djs = lib.djs.filter((d) => setsByDj(lib, d.id).length > 0);
   .dj-row__item:hover span { text-decoration: underline; }
   .dj-row__item :global(.avatar) { transition: scale var(--dur) var(--ease-out); }
   .dj-row__item:hover :global(.avatar) { scale: 1.06; }
+  /* Grote titel pas als er ruimte is (op mobiel past een lang woord anders niet). */
+  @media (min-width: 60rem) {
+    .hero__title { font-size: var(--step-6); }
+  }
 </style>
