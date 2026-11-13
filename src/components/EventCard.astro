@@ -14,7 +14,7 @@ const { start, end, venue, title, poster, posterAlt } = event.data;
 ---
 
 <article class="event-card">
-  <CoverArt seed={`event-${event.id}`} image={poster} alt={posterAlt ?? ''} class="event-card__art" sizes="10rem" dither />
+  <CoverArt seed={`event-${event.id}`} image={poster} alt={posterAlt ?? ''} class="event-card__art" sizes="10rem" />
   <div class="event-card__body">
     <p class="event-card__date">
       <time datetime={start.toISOString()}>

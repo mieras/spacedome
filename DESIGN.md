@@ -137,9 +137,9 @@ De kern van de site. Eén `<sd-player>` in de layout met `transition:persist`: h
 - `.button`: pil met rand. Hover met een muis: een cirkel (170% van de knop) vult de knop vanaf het punt waar de pointer binnenkomt, volgt hem (0,4s, power2) en rolt eruit waar hij weggaat (0,3s). Naar "Position Aware Button Hover w/ GSAP" (CodePen OJYywaJ), in `src/scripts/button-flair.ts` met event delegation. Kleur van de vulling: `--_bg-hover`, tekst: `--_fg-hover`.
 - Touch, toetsenbord, geen JS en `prefers-reduced-motion`: gewoon omkleuren.
 
-## Dither
-- Echte stills en flyers op set- en avondkaarten krijgen een tweekleurige dither (blue noise, WebGL) in `--dither-dark` (indigo) en `--dither-light` (magenta): `@krisenstab/dither-dither`, aangezet met `dither` op `CoverArt`. De kleurenfoto ligt eronder en komt terug bij hover/focus op de kaart; dat is ook de hover-feedback van de kaarten (geen underline).
-- Eén canvaspixel per CSS-pixel, zodat de korrel op elk formaat even grof is. Gegenereerde art wordt niet gedithered. Geen WebGL2 of laadfout: de kleurenfoto blijft staan.
+## Cover-art
+- Zonder still of flyer: gegenereerde art per seed (`src/lib/art.ts`). Die leeft: de twee lichtbollen drijven rond, de tint schuift ±12° en de ring zweeft en ademt (`art-drift`, `art-ring` in `components.scss`, via `@property`). Duur 14–24s en startpunt uit de seed, zodat covers niet gelijk lopen. Hover op een kaart: ring schaalt naar 1,14.
+- Niet bij `prefers-reduced-motion` en niet zodra er een echte afbeelding is.
 
 ## Stijlgids
 - `/brand` toont tokens, componenten en effecten live uit de code. De peak gradient heeft er een speeltuin; de peak-instelling van de footer staat in `PEAK_FOOTER` (`src/lib/peak.ts`). Nieuw component of token: zet het daar ook bij.

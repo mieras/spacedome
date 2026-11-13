@@ -8,7 +8,7 @@ Categorieën: **Toegevoegd**, **Gewijzigd**, **Opgelost**, **Verwijderd**, **Bev
 ## [Unreleased]
 
 ### Toegevoegd
-- Dither op covers: echte stills en flyers op set- en avondkaarten tonen een tweekleurige dither (indigo/magenta, `@krisenstab/dither-dither` 2.2.2, MIT); bij hover/focus komt de kleurenfoto terug. Alleen client-side, lazy geladen, nooit tijdens de build.
+- Gegenereerde covers bewegen: de lichtbollen drijven, de kleur schuift mee en de ring (dome) zweeft en ademt; tempo en startpunt per seed, ring zet aan bij hover. Alleen CSS (`@property`), niet bij echte stills of `prefers-reduced-motion`.
 - Knoppen: position-aware hover (GSAP), een cirkel vult de knop vanaf de muis en rolt eruit waar je weggaat. Naar CodePen OJYywaJ. Niet op touch of bij reduced motion.
 - Home: de intro ("Recorded live in the dome") blijft op desktop staan tot de hero voorbij is.
 - Peak-configurator op `/brand#peak`: palet (pink, sunset, magenta, rainbow), kolommen, blur, piek, dal, afval en overlap met schuifjes, live preview, "Try in footer" op de pagina zelf en de instelling om te plakken. Geometrie en paletten staan nu in `src/lib/peak.ts` (`PEAK_FOOTER` is de footer).

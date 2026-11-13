@@ -43,6 +43,9 @@ export function artStyle(seed: string) {
     `--art-ring-y:${pct(0.25 + r() * 0.5)}`,
     `--art-ring-s:${(28 + r() * 30).toFixed(0)}%`,
     `--art-angle:${(140 + r() * 60).toFixed(0)}deg`,
+    // Animatie (components.scss): eigen tempo en startpunt, na de compositie zodat die gelijk blijft.
+    `--art-dur:${(14 + r() * 10).toFixed(1)}s`,
+    `--art-delay:-${(r() * 20).toFixed(1)}s`,
   ].join(';');
 }
 
