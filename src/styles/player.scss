@@ -24,11 +24,24 @@ sd-player[hidden] { display: none; }
 .player-media[data-mode='off'],
 .player-media[data-mode='hidden'] { display: none; }
 
-/* Gedockt: exact over het podium van de setpagina (positie via JS, in documentcoördinaten). */
+/* Gedockt: exact over het podium ([data-player-stage]). Fallback: JS zet de positie in
+   documentcoördinaten (en volgt bij scrollen een sticky podium). */
 .player-media[data-mode='docked'] {
   position: absolute;
   z-index: 10;
   border-radius: var(--radius-m);
+}
+/* Met anchor positioning plakt de browser de video zelf aan het podium, ook als dat sticky is,
+   zonder scroll-listener of haperen. */
+@supports (anchor-name: --a) {
+  [data-player-docked] { anchor-name: --sd-stage; }
+  .player-media[data-mode='docked'] {
+    position: fixed;
+    position-anchor: --sd-stage;
+    inset: anchor(top) auto auto anchor(left);
+    inline-size: anchor-size(width);
+    block-size: anchor-size(height);
+  }
 }
 
 /* Mini: zwevend onderin boven de balk, rechts of links (versleepbaar, zie player.ts). */

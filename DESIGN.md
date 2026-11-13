@@ -56,7 +56,7 @@ Beide self-hosted via Fontsource (geen verzoeken naar Google, AVG). Voorlopige k
 
 - `h1` `--step-5`, `h2` `--step-3`, `h3` `--step-1`.
 - Grote display-titels (hero, set, dj, paginakop): `--step-5` op mobiel, `--step-6` vanaf 48–60rem. Unbounded in kapitalen is breed; een lang woord past anders niet op 320px.
-- Grote datums (avondpagina, eventkaart) schalen mee met hun kolom: `min(--step-x, 14cqi)` met `container-type: inline-size` op de ouder.
+- Grote datums (avondpagina, eventkaart) schalen mee met hun kolom: `min(--step-x, 11–14cqi)` (avondpagina step-5) met `container-type: inline-size` op de ouder.
 - Koppen hebben `overflow-wrap: anywhere` + `hyphens: auto` als vangnet. Grids met één kolom altijd `minmax(0, 1fr)`, nooit `auto`/`1fr` (anders rekt lange tekst de pagina op).
 - Metadata (`.meta`): `--step--1`, hoofdletters, `letter-spacing: .08em`, tabular nums. Datums zoals op de poster: `30.07.2026`.
 
@@ -70,7 +70,7 @@ Beide self-hosted via Fontsource (geen verzoeken naar Google, AVG). Voorlopige k
 - Kaartrasters: `.grid` met `--grid-min` (standaard 16rem).
 - Carousel (`SetCarousel`): horizontale rij met `scroll-snap-type: x mandatory`. Telefoon 78% per kaart (stukje van de volgende zichtbaar), tablet 2,5, desktop 4. Pijlknoppen rechts in de sectiekop, uitgeschakeld aan begin/eind, verborgen als alles past.
 - Footer: merk (1,6fr) + Explore, Genres, Follow; tablet drie kolommen onder het merk, telefoon twee. Aantallen als `.badge` (pil, `--step--2`, tabular-nums).
-- Setpagina: hero met video en info naast elkaar vanaf 64rem (`1.8fr / 1fr`). Titel `min(var(--step-6), 12cqi)` op de infokolom. Beschrijving en tracklist als tabs (`<sd-tabs>`, `src/scripts/tabs.ts`): onderstreepte tabs in meta-stijl, actieve tab met accentlijn, aantal tracks als pil.
+- Setpagina: hero met video en info naast elkaar vanaf 64rem (`1.8fr / 1fr`). Het podium is daar sticky (onder de header) tot het einde van de hero; daarna mini-video. Titel `min(var(--step-6), 12cqi)` op de infokolom. Beschrijving en tracklist als tabs (`<sd-tabs>`, `src/scripts/tabs.ts`): onderstreepte tabs in meta-stijl, actieve tab met accentlijn, aantal tracks als pil.
 - Play-knop met tekst: `min-inline-size: 7.25rem`, zodat Play en Pause even breed zijn.
 
 ## 6. Vorm

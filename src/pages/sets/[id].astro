@@ -161,6 +161,11 @@ const description = `${set.data.title} by ${joinNames(djs.map((d) => d.data.name
     filter: blur(20px);
   }
   :global(.stage__play) { position: absolute; inset: 50% auto auto 50%; translate: -50% -50%; z-index: 3; }
+  /* Desktop: video blijft staan terwijl je door beschrijving/tracklist scrolt. Aan het eind van
+     de hero scrolt hij mee weg; de player maakt er dan een mini-video van (IntersectionObserver). */
+  @media (min-width: 64rem) {
+    .stage { position: sticky; inset-block-start: calc(var(--header-h) + var(--space-s)); }
+  }
   /* Speelt deze set en ligt de video eroverheen: cover en knop onzichtbaar, ruimte blijft. */
   .stage[data-player-docked] > :global(*) { visibility: hidden; }
 
