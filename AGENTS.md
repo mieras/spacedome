@@ -38,3 +38,4 @@ Lees eerst `README.md` voor context, `CHANGELOG.md` voor recente wijzigingen en 
 - Mux-teststreams in de dummy-sets zijn placeholders.
 - Content is grotendeels dummy (fictieve dj's). Niet publiceren zonder echte content.
 - `src/settings.ts`: `noindex: true` tot livegang.
+- `/brand` (`src/pages/brand.astro`) is de stijlgids: nieuwe componenten, tokens of effecten daar ook tonen. Hover-feedback op titels is het smear-effect (`data-smear`), geen underline.

@@ -9,7 +9,8 @@ export default defineConfig({
   trailingSlash: 'never',
   build: { format: 'file' },
   prefetch: { prefetchAll: false, defaultStrategy: 'hover' },
-  integrations: [sitemap()],
+  // /brand is een interne stijlgids: niet in de sitemap (en noindex).
+  integrations: [sitemap({ filter: (page) => !page.endsWith('/brand') })],
   vite: {
     css: {
       preprocessorOptions: {

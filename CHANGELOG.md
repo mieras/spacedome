@@ -8,6 +8,8 @@ Categorieën: **Toegevoegd**, **Gewijzigd**, **Opgelost**, **Verwijderd**, **Bev
 ## [Unreleased]
 
 ### Toegevoegd
+- `/brand`: interne stijlgids met logo, kleuren (rechtstreeks uit `tokens.scss`), type- en ruimteschaal, radii, iconen, knoppen, player-knoppen, chips, kaarten, carousel, tracklist en de effecten (reveal met replay, smear-speeltuin met schuifjes, peak gradient). Noindex en niet in de sitemap.
+- Smear-effect instelbaar per element: `data-smear-amount`, `-shift`, `-spread`, `-duration`, `-dir`, `-ease`.
 - Footer-test: peak gradient onderaan (geblurde kolommen in Space Dome-kleuren die oprijzen als de footer in beeld komt, `PeakGradient.astro`) en een smear-effect op de footerlinks (mono-kapitalen, tekst veegt bij hover/focus zijwaarts uit, `src/scripts/smear.ts`). Beide naar design.how/vault (MIT), zelf nagebouwd zonder externe bestanden. Niet bij `prefers-reduced-motion`.
 - Flyers bij de drie avonden (Melkweg 14-07-2023 en 23-12-2023, De Nachtzuster 30-07-2026): op de avondpagina in eigen verhouding, in de lijst als thumbnail en als OG-beeld. Bronnen in `src/assets/events/`.
 - Reveal-animatie bij het laden (GSAP 3.15 + SplitText): datum per teken, titel per woord, content-blokken en flyer schuiven zacht in. Op home, de avondpagina en de setpagina (titel, meta, dj's, knoppen, genres, tabs; de video zelf niet vanwege de docking). Niet bij `prefers-reduced-motion`; zonder JS gewoon zichtbaar.
@@ -19,6 +21,7 @@ Categorieën: **Toegevoegd**, **Gewijzigd**, **Opgelost**, **Verwijderd**, **Bev
 - De eerste twee Space Dome-avonden in Melkweg (14-07-2023 en 23-12-2023) met line-up; nieuwe dj-pagina's voor Mono/Poly, Kutmah, Cintasoul, Cheyanne Hudson, Odaira en Sunny Saimuns.
 
 ### Gewijzigd
+- Smear-effect ook op titels (uitgelichte set, setkaarten, avondkaarten, dj-kaarten) in plaats van de hover-underline; hover op de hele kaart telt. Filter staat nu globaal in `BaseLayout`, `.badge` is een globale stijl.
 - Home-hero: intro bovenaan uitgelijnd met de video.
 - Avondpagina: datum nog kleiner (step-4), titel step-3. Flyer in eigen verhouding (`ratio="auto"` in CoverArt).
 - Setpagina (desktop): de video blijft sticky staan terwijl je door beschrijving en tracklist scrolt, en wordt een mini-video als de content op is. Gedockte video plakt via CSS anchor positioning aan het podium (fallback: JS).

@@ -16,9 +16,9 @@ const djs = lib.djs.map((dj) => ({ dj, count: setsByDj(lib, dj.id).length }));
       {
         djs.map(({ dj, count }) => (
           <li>
-            <a class="dj-card" href={djHref(dj.id)}>
+            <a class="dj-card" href={djHref(dj.id)} data-smear-scope>
               <DjAvatar dj={dj} size="100%" />
-              <span class="dj-card__name">{dj.data.name}</span>
+              <span class="dj-card__name" data-smear>{dj.data.name}</span>
               <span class="meta">
                 {[dj.data.resident && t('djs.resident'), dj.data.location, `${count} ${t('sets.count')}`].filter(Boolean).join(' · ')}
               </span>
@@ -36,7 +36,6 @@ const djs = lib.djs.map((dj) => ({ dj, count: setsByDj(lib, dj.id).length }));
   .dj-card :global(.avatar) { inline-size: 100%; margin-block-end: var(--space-2xs); transition: scale var(--dur-slow) var(--ease-out); }
   .dj-card :global(.avatar__initials) { font-size: clamp(1.5rem, 4vw, 3rem); }
   .dj-card__name { font-family: var(--font-display); font-weight: 700; font-size: var(--step-1); }
-  .dj-card:hover .dj-card__name { text-decoration: underline; }
   @media (hover: hover) {
     .dj-card:hover :global(.avatar) { scale: 1.04; }
   }
