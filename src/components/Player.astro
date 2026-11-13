@@ -4,7 +4,7 @@
  * spelen tijdens paginawissels. Logica: src/scripts/player.ts. Stijl: src/styles/player.scss.
  *
  * Opbouw:
- * - [data-player-media]: de video. Gedockt over het podium op de setpagina, anders mini rechtsonder.
+ * - [data-player-media]: de video. Gedockt over het podium op de setpagina, anders mini onderin (links of rechts, versleepbaar).
  * - [data-player-bar]: vaste balk onderin met alle bediening.
  * - [data-player-queue-panel]: de wachtrij, klapt open boven de balk.
  */
@@ -16,6 +16,9 @@ import Icon from './Icon.astro';
   <div class="player-media" data-player-media data-mode="off">
     <video playsinline preload="none" disablepictureinpicture={false} data-player-video></video>
     <div class="player-media__tools">
+      <button type="button" class="player-media__tool" data-player-move aria-label={t('player.moveLeft')}>
+        <Icon name="swap" />
+      </button>
       <a class="player-media__tool" href="/" data-player-open aria-label={t('player.openSet')}>
         <Icon name="external" />
       </a>
@@ -63,8 +66,9 @@ import Icon from './Icon.astro';
         <p class="player-bar__time" aria-hidden="true">
           <span data-player-current>0:00</span> / <span data-player-duration>0:00</span>
         </p>
-        <button type="button" class="icon-button player-bar__optional" data-player-view aria-pressed="false" aria-label={t('player.audioOnly')}>
-          <Icon name="headphones" />
+        <button type="button" class="icon-button player-bar__optional player-bar__view" data-player-view aria-label={t('player.audioOnly')}>
+          <Icon name="headphones" class="player-bar__to-audio" />
+          <Icon name="video" class="player-bar__to-video" />
         </button>
         <button type="button" class="icon-button player-bar__optional" data-player-mute aria-pressed="false" aria-label={t('player.mute')}>
           <Icon name="volume" class="player-bar__vol" />

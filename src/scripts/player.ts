@@ -10,7 +10,7 @@
  * - Bediening via data-attributen: [data-player-play], [data-player-queue] (overal op de site)
  *   en de knoppen in de balk. Eén click-handler op het document.
  * - Video-modus: "docked" over het podium van de spelende set ([data-player-stage]), "mini"
- *   rechtsonder als je elders bent of het podium uit beeld scrolt, "hidden" bij alleen audio.
+ *   onderin als je elders bent of het podium uit beeld scrolt, "hidden" bij alleen audio.
  *   Gedockt zetten we de video absoluut in documentcoördinaten: hij scrollt dan vanzelf mee,
  *   zonder scroll-listener. Wisselen tussen docked en mini animeren we met FLIP.
  * - HLS (.m3u8): Safari en iOS spelen het native af; elders laden we hls.js pas als het nodig is.
@@ -23,7 +23,8 @@ import { share, toast } from './share';
 
 type View = 'video' | 'audio';
 type Mode = 'off' | 'docked' | 'mini' | 'hidden';
-type Saved = { current: PlayerItem | null; position: number; queue: PlayerItem[]; view: View; muted: boolean };
+type Side = 'left' | 'right';
+type Saved = { current: PlayerItem | null; position: number; queue: PlayerItem[]; view: View; muted: boolean; side: Side };
 
 const STORAGE_KEY = 'spacedome:player';
 const reducedMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -33,7 +34,7 @@ const preferNativeHls = () => /^((?!chrome|chromium|android|crios|fxios).)*safar
 /* ---------- Opslag ---------- */
 
 function read(): Saved {
-  const fallback: Saved = { current: null, position: 0, queue: [], view: 'video', muted: false };
+  const fallback: Saved = { current: null, position: 0, queue: [], view: 'video', muted: false, side: 'right' };
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     return raw ? { ...fallback, ...JSON.parse(raw) } : fallback;
@@ -88,6 +89,7 @@ function init(found: HTMLElement) {
   const durationEl = $('[data-player-duration]');
   const muteBtn = $<HTMLButtonElement>('[data-player-mute]');
   const viewBtn = $<HTMLButtonElement>('[data-player-view]');
+  const moveBtn = $<HTMLButtonElement>('[data-player-move]');
   const queueToggle = $<HTMLButtonElement>('[data-player-queue-toggle]');
   const queueCount = $('[data-player-queue-count]');
   const queuePanel = $('[data-player-queue-panel]');
@@ -102,6 +104,7 @@ function init(found: HTMLElement) {
     position: saved.position,
     queue: saved.queue,
     view: saved.view,
+    side: saved.side,
   };
   video.muted = saved.muted;
 
@@ -138,6 +141,7 @@ function init(found: HTMLElement) {
         instance.loadSource(item.src);
         instance.attachMedia(video);
         hls = instance;
+        instance.on(Hls.Events.MANIFEST_PARSED, () => applyQuality());
         instance.on(Hls.Events.ERROR, (_e, data) => {
           if (data.fatal) toast('This set could not be loaded.');
         });
@@ -148,6 +152,19 @@ function init(found: HTMLElement) {
       video.src = item.src;
     }
     attachedId = item.id;
+  }
+
+  /**
+   * Audiomodus: alleen de laagste rendition (240p, ~0,4 Mbit/s in plaats van ~2 bij 720p).
+   * Bunny levert audio en video samen in één stream, dus helemaal zonder beeld kan niet.
+   * hls.js sorteert levels op bitrate, dus index 0 is de lichtste. Safari (native HLS) kiest zelf.
+   */
+  function applyQuality(switching = false) {
+    if (!hls) return;
+    const audio = state.view === 'audio';
+    hls.autoLevelCapping = audio ? 0 : -1;
+    // Terug naar video: de gebufferde 240p weggooien en meteen de beste passende kwaliteit laden.
+    if (switching && !audio) hls.nextLevel = -1;
   }
 
   function seekWhenReady(time: number) {
@@ -243,6 +260,7 @@ function init(found: HTMLElement) {
 
   function setView(view: View) {
     state.view = view;
+    applyQuality(true);
     render();
     dock(true);
     save();
@@ -379,7 +397,10 @@ function init(found: HTMLElement) {
     toggleBtn.dataset.state = playing ? 'playing' : 'paused';
     toggleBtn.setAttribute('aria-label', playing ? t('set.pause') : t('set.play'));
     muteBtn.setAttribute('aria-pressed', String(video.muted));
-    viewBtn.setAttribute('aria-pressed', String(state.view === 'audio'));
+    // Label zegt wat de knop doet; op mobiel blijft hij in audiomodus zichtbaar als weg terug naar video.
+    viewBtn.dataset.view = state.view;
+    viewBtn.setAttribute('aria-label', state.view === 'audio' ? t('player.showVideo') : t('player.audioOnly'));
+    renderSide();
 
     renderTime();
     renderQueue();
@@ -494,6 +515,72 @@ function init(found: HTMLElement) {
   }
 
   addEventListener('resize', () => mode === 'docked' && place('docked'));
+
+  /* ---------- Mini verslepen: links of rechts ---------- */
+  // Slepen werkt met muis en vinger (pointer events). Loslaten = naar de dichtstbijzijnde kant.
+  // De knop [data-player-move] doet hetzelfde zonder slepen (WCAG 2.5.7) en met het toetsenbord.
+
+  function renderSide() {
+    media.dataset.side = state.side;
+    moveBtn.setAttribute('aria-label', state.side === 'right' ? t('player.moveLeft') : t('player.moveRight'));
+  }
+
+  function setSide(next: Side, from = media.getBoundingClientRect()) {
+    state.side = next;
+    renderSide();
+    save();
+    if (reducedMotion() || mode !== 'mini') return;
+    const to = media.getBoundingClientRect();
+    media.animate([{ translate: `${from.left - to.left}px ${from.top - to.top}px` }, { translate: '0 0' }], {
+      duration: 350,
+      easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+    });
+  }
+
+  let drag: { id: number; x: number; y: number; moved: boolean } | null = null;
+  let suppressClick = false;
+
+  media.addEventListener('pointerdown', (e) => {
+    if (mode !== 'mini' || !e.isPrimary || e.button !== 0 || (e.target as Element).closest('a, button')) return;
+    drag = { id: e.pointerId, x: e.clientX, y: e.clientY, moved: false };
+  });
+  media.addEventListener('pointermove', (e) => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const dx = e.clientX - drag.x;
+    const dy = e.clientY - drag.y;
+    if (!drag.moved) {
+      if (Math.hypot(dx, dy) < 8) return; // kleine beweging = gewoon een tik (play/pauze)
+      drag.moved = true;
+      media.setPointerCapture(e.pointerId);
+      media.dataset.dragging = '';
+    }
+    media.style.translate = `${dx}px ${dy}px`;
+  });
+  const endDrag = (e: PointerEvent) => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const { moved } = drag;
+    drag = null;
+    if (!moved) return;
+    suppressClick = true;
+    setTimeout(() => (suppressClick = false));
+    const from = media.getBoundingClientRect();
+    delete media.dataset.dragging;
+    media.style.translate = '';
+    setSide(from.left + from.width / 2 < innerWidth / 2 ? 'left' : 'right', from);
+  };
+  media.addEventListener('pointerup', endDrag);
+  media.addEventListener('pointercancel', endDrag);
+  // Na slepen geen klik doorlaten naar de video (die zou pauzeren).
+  media.addEventListener(
+    'click',
+    (e) => {
+      if (!suppressClick) return;
+      e.stopPropagation();
+      e.preventDefault();
+    },
+    true,
+  );
+  moveBtn.addEventListener('click', () => setSide(state.side === 'right' ? 'left' : 'right'));
 
   /* ---------- Events ---------- */
 

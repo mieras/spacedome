@@ -1,0 +1,125 @@
+---
+/*
+ * Horizontale rij sets met scroll-snap: swipen op touch, scrollen met trackpad,
+ * pijlknoppen voor muis en toetsenbord. Zonder JS blijft het een scrollbare lijst.
+ * De pijlen staan rechts in de sectiekop en zijn uitgeschakeld aan het begin/eind.
+ */
+import { t } from '../i18n/ui';
+import type { Library, SetEntry } from '../lib/content';
+import Icon from './Icon.astro';
+import SetCard from './SetCard.astro';
+
+interface Props {
+  sets: SetEntry[];
+  lib: Library;
+  title: string;
+  id: string;
+}
+const { sets, lib, title, id } = Astro.props;
+const trackId = `${id}-track`;
+---
+
+<sd-carousel class="carousel">
+  <div class="section-head carousel__head">
+    <h2 id={id}>{title}</h2>
+    <div class="carousel__nav" data-carousel-nav hidden>
+      <button type="button" class="icon-button carousel__btn" data-carousel-prev aria-controls={trackId} aria-label={t('carousel.prev')}>
+        <Icon name="arrow" class="carousel__prev-icon" />
+      </button>
+      <button type="button" class="icon-button carousel__btn" data-carousel-next aria-controls={trackId} aria-label={t('carousel.next')}>
+        <Icon name="arrow" />
+      </button>
+    </div>
+  </div>
+  <ul class="carousel__track" id={trackId} role="list" data-carousel-track>
+    {
+      sets.map((set) => (
+        <li class="carousel__item">
+          <SetCard set={set} lib={lib} />
+        </li>
+      ))
+    }
+  </ul>
+</sd-carousel>
+
+<script>
+  const reducedMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  class SdCarousel extends HTMLElement {
+    #ro?: ResizeObserver;
+
+    connectedCallback() {
+      const track = this.querySelector<HTMLElement>('[data-carousel-track]');
+      const nav = this.querySelector<HTMLElement>('[data-carousel-nav]');
+      const prev = this.querySelector<HTMLButtonElement>('[data-carousel-prev]');
+      const next = this.querySelector<HTMLButtonElement>('[data-carousel-next]');
+      if (!track || !nav || !prev || !next) return;
+
+      const update = () => {
+        const max = track.scrollWidth - track.clientWidth;
+        nav.hidden = max <= 1; // past alles in beeld: geen pijlen
+        prev.disabled = track.scrollLeft <= 1;
+        next.disabled = track.scrollLeft >= max - 1;
+      };
+      // Eén "pagina" verder: zoveel kaarten als er volledig in beeld staan.
+      const go = (dir: 1 | -1) => {
+        const item = track.querySelector<HTMLElement>('li');
+        const gap = parseFloat(getComputedStyle(track).columnGap) || 0;
+        const step = item ? item.offsetWidth + gap : track.clientWidth;
+        const perPage = Math.max(1, Math.floor((track.clientWidth + gap) / step));
+        track.scrollBy({ left: dir * perPage * step, behavior: reducedMotion() ? 'auto' : 'smooth' });
+      };
+
+      prev.addEventListener('click', () => go(-1));
+      next.addEventListener('click', () => go(1));
+      track.addEventListener('scroll', update, { passive: true });
+      this.#ro = new ResizeObserver(update);
+      this.#ro.observe(track);
+      update();
+    }
+
+    disconnectedCallback() {
+      this.#ro?.disconnect();
+    }
+  }
+
+  if (!customElements.get('sd-carousel')) customElements.define('sd-carousel', SdCarousel);
+</script>
+
+<style>
+  .carousel { display: block; }
+  .carousel__head { align-items: center; }
+  .carousel__nav { display: flex; gap: var(--space-3xs); }
+  .carousel__nav[hidden] { display: none; }
+  .carousel__btn { border: var(--border-width) solid var(--color-line); }
+  .carousel__btn:disabled { opacity: 0.35; cursor: default; }
+  .carousel__btn:disabled:hover { background: none; }
+  :global(.carousel__prev-icon) { rotate: 180deg; }
+
+  .carousel__track {
+    --_gap: var(--space-s-l);
+    display: grid;
+    grid-auto-flow: column;
+    /* Telefoon: één kaart met een stukje van de volgende (laat zien dat je kunt swipen). */
+    grid-auto-columns: 78%;
+    gap: var(--_gap);
+    padding: 0;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    /* Ruimte voor focusrand en schaduw van de kaarten. */
+    padding-block: var(--space-3xs) var(--space-xs);
+  }
+  .carousel__track::-webkit-scrollbar { display: none; }
+  @media (min-width: 40rem) {
+    .carousel__track { grid-auto-columns: calc((100% - var(--_gap) * 1.5) / 2.5); }
+  }
+  @media (min-width: 64rem) {
+    .carousel__track { grid-auto-columns: calc((100% - var(--_gap) * 3) / 4); }
+  }
+  .carousel__item { scroll-snap-align: start; min-inline-size: 0; }
+  @media (prefers-reduced-motion: no-preference) {
+    .carousel__track { scroll-behavior: smooth; }
+  }
+</style>

@@ -73,7 +73,7 @@
 .play-button .icon { inline-size: 45%; block-size: 45%; }
 .play-button--sm { --_size: 2.75rem; }
 .play-button--lg { --_size: clamp(4rem, 3rem + 3vw, 6rem); }
-.play-button--label { padding-inline: 1.1rem 1.4rem; font-weight: 700; font-size: var(--step--1); letter-spacing: 0.02em; }
+.play-button--label { min-inline-size: 7.25rem; padding-inline: 1.1rem 1.4rem; font-weight: 700; font-size: var(--step--1); letter-spacing: 0.02em; }
 .play-button--label .icon { inline-size: 1.35rem; block-size: 1.35rem; }
 .play-button .icon-pause { display: none; }
 .play-button[data-state='playing'] .icon-play { display: none; }

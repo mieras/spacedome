@@ -5,7 +5,7 @@ import CoverArt from '../../components/CoverArt.astro';
 import DjAvatar from '../../components/DjAvatar.astro';
 import PlayButton from '../../components/PlayButton.astro';
 import QueueButton from '../../components/QueueButton.astro';
-import SetGrid from '../../components/SetGrid.astro';
+import SetCarousel from '../../components/SetCarousel.astro';
 import ShareButton from '../../components/ShareButton.astro';
 import Tracklist from '../../components/Tracklist.astro';
 import { t } from '../../i18n/ui';
@@ -24,7 +24,7 @@ const item = await toPlayerItem(set, lib);
 const djs = lib.djsOf(set);
 const genres = lib.genresOf(set);
 const event = lib.eventOf(set);
-const suggestions = suggestionsFor(set, lib);
+const suggestions = suggestionsFor(set, lib, 10);
 const { Content } = await render(set);
 const duration = formatDuration(set.data.video.duration);
 const still = setStill(set);
@@ -64,7 +64,7 @@ const description = `${set.data.title} by ${joinNames(djs.map((d) => d.data.name
           }
         </ul>
         <div class="set__actions">
-          <PlayButton item={item} label={t('set.playSet')} size="sm" useUrlTime />
+          <PlayButton item={item} label={t('set.play')} size="sm" useUrlTime />
           <QueueButton item={item} />
           <ShareButton url={setHref(set.id)} title={set.data.title} />
         </div>
@@ -99,10 +99,7 @@ const description = `${set.data.title} by ${joinNames(djs.map((d) => d.data.name
     {
       suggestions.length > 0 && (
         <section class="section wrapper" aria-labelledby="more-title">
-          <div class="section-head">
-            <h2 id="more-title">{t('set.more')}</h2>
-          </div>
-          <SetGrid sets={suggestions} lib={lib} />
+          <SetCarousel sets={suggestions} lib={lib} title={t('set.more')} id="more-title" />
         </section>
       )
     }
