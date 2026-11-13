@@ -491,7 +491,7 @@ const toc = [
 </script>
 
 <style>
-  .brand { display: grid; gap: var(--space-2xl); padding-block-end: var(--space-xl); }
+  .brand { display: grid; gap: var(--space-3xl); padding-block-end: var(--space-2xl); }
   /* Sticky direct onder de header, zonder kier: zelfde glasachtergrond als de header, over de
      volle breedte (border-image-truc), zodat er niets tussendoor schijnt. */
   .brand__toc {
@@ -506,7 +506,10 @@ const toc = [
   /* Eén rij die horizontaal scrolt, anders neemt hij op mobiel drie regels in beslag. */
   .brand__toc .chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
   .brand__toc .chips li { flex: none; }
-  .brand__section { display: grid; gap: var(--space-m); scroll-margin-block-start: calc(var(--header-h) + 5rem); }
+  .brand__section { display: grid; gap: var(--space-m); }
+  /* Ankers (de h2's en #peak): html heeft al scroll-padding voor de header; hier komt de sticky
+     sectiebalk (~3,5rem) en wat lucht bij, zodat de titel er net onder staat. */
+  .brand__title, .effect[id] { scroll-margin-block-start: calc(3.5rem + var(--space-m)); }
   .brand__title { font-size: var(--step-4); text-transform: uppercase; padding-block-end: var(--space-xs); border-block-end: var(--border-width) solid var(--color-line); }
   .brand__sub { font-size: var(--step-1); font-family: var(--font-sans); letter-spacing: 0; margin-block-start: var(--space-s); }
   .brand__note { max-inline-size: var(--measure); color: var(--color-muted); font-size: var(--step--1); }
