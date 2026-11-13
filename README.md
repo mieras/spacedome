@@ -9,7 +9,7 @@
 | **Status** | WIP · eerste versie op Markdown-content, Sanity volgt |
 | **SLA** | Nee |
 | **Live** | TODO (domein nog niet gekozen, spacedome.xyz is niet beschikbaar; zie `docs/mail-intake.md`) |
-| **Netlify** | team MIERAS, site TODO (later naar het account van Space Dome) |
+| **Netlify** | team MIERAS, site `spacedome` (later naar het account van Space Dome) |
 | **CMS** | Nog geen: Markdown in `src/content/`. Later Sanity (eerst MIERAS-account, daarna overdragen) |
 | **Repo** | [github.com/mieras/spacedome](https://github.com/mieras/spacedome) |
 | **Notion** | Repo-overzicht (privé) |
@@ -94,7 +94,7 @@ Het script (`scripts/set-add.mjs`) laat Bunny Stream de video zelf uit STACK oph
 - Nodig in `.env`: `STACK_SHARE_URL`, `BUNNY_STREAM_LIBRARY_ID`, `BUNNY_STREAM_CDN_HOSTNAME`, `BUNNY_STREAM_API_KEY`.
 - Bij STACK doet het script alleen lees-verzoeken.
 - Opties: `--folder Recordings` (andere map), `--draft` (alleen zichtbaar in dev), `--no-wait`.
-- Bunny staat op **Block direct url file access**: zonder Referer geen toegang. Stills laden daarom direct in de browser (geen Astro-beeldoptimalisatie) en zijn geen OG-beeld. Vul bij livegang **Allowed domains** in: het echte domein, `spacedome.netlify.app`, `staging--spacedome.netlify.app` en `localhost`.
+- Bunny staat op **Block direct url file access**: zonder Referer geen toegang. Stills laden daarom direct in de browser (geen Astro-beeldoptimalisatie) en zijn geen OG-beeld. **Allowed domains** staan op `localhost`, `localhost:4321`, `spacedome.netlify.app` en `*--spacedome.netlify.app` (staging en previews); bij livegang het echte domein toevoegen.
 
 ## Privacy, toegankelijkheid en SEO
 
@@ -106,8 +106,7 @@ Het script (`scripts/set-add.mjs`) laat Bunny Stream de video zelf uit STACK oph
 ## Deploy
 
 - Netlify-site `spacedome` op het MIERAS-team: https://spacedome.netlify.app (admin: app.netlify.com/projects/spacedome). Later over naar Space Dome.
-- De eerste deploys zijn handmatig gedaan vanaf `staging` (`netlify deploy --prod --dir dist`). De GitHub-repo moet nog gekoppeld worden in Netlify.
-- Na het koppelen: `main` → productie, `staging` → branch deploy (staging--spacedome.netlify.app), PR's → deploy preview (zie `~/Code/_standards/DEPLOY.md`).
+- Gekoppeld aan GitHub: `main` → productie (spacedome.netlify.app), `staging` → branch deploy (staging--spacedome.netlify.app), PR's → deploy preview. Werkwijze volgens `~/Code/_standards/DEPLOY.md`.
 
 ## Bekende issues en afspraken
 
