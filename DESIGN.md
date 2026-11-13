@@ -56,7 +56,7 @@ Beide self-hosted via Fontsource (geen verzoeken naar Google, AVG). Voorlopige k
 
 - `h1` `--step-5`, `h2` `--step-3`, `h3` `--step-1`.
 - Grote display-titels (hero, set, dj, paginakop): `--step-5` op mobiel, `--step-6` vanaf 48–60rem. Unbounded in kapitalen is breed; een lang woord past anders niet op 320px.
-- Grote datums (avondpagina, eventkaart) schalen mee met hun kolom: `min(--step-x, 11–14cqi)` (avondpagina step-5) met `container-type: inline-size` op de ouder.
+- Grote datums (avondpagina, eventkaart) schalen mee met hun kolom: `min(--step-x, 11–14cqi)` (avondpagina step-4) met `container-type: inline-size` op de ouder.
 - Koppen hebben `overflow-wrap: anywhere` + `hyphens: auto` als vangnet. Grids met één kolom altijd `minmax(0, 1fr)`, nooit `auto`/`1fr` (anders rekt lange tekst de pagina op).
 - Metadata (`.meta`): `--step--1`, hoofdletters, `letter-spacing: .08em`, tabular nums. Datums zoals op de poster: `30.07.2026`.
 
@@ -90,6 +90,7 @@ Beide self-hosted via Fontsource (geen verzoeken naar Google, AVG). Voorlopige k
 
 - **Paginatransities:** `<ClientRouter />`. De oude pagina fadet weg, de nieuwe fadet in en schuift 0,75rem omhoog. Header en player hebben een eigen `view-transition-name` en blijven dus staan.
 - **Player:** de video schuift met een FLIP-animatie tussen gedockt (op de setpagina) en mini (onderin, rechts of links). Tussen pagina's "morpht" hij via de view transition.
+- **Reveal bij laden** (`data-reveal`, GSAP SplitText): `chars` (datum, per teken uit een masker), `words` (titels, per woord), `up` (blokken: 18px omhoog + fade, stagger 0,07s), `media` (flyer: clip-path van onder naar boven + zoom 1,04 → 1). Easing `expo.out` voor tekst en beeld, `power3.out` voor blokken, ±1s. Gebruikt op home (titel, intro, knoppen) en de avondpagina.
 - **Reduced motion:** alle duurtokens worden 0,01 ms en de view-transition-animaties staan uit.
 
 ## 8. De player

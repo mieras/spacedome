@@ -12,14 +12,16 @@ interface Props {
   /** Lokale afbeelding of externe URL (Bunny-still). */
   image?: ImageMetadata | string;
   alt?: string;
-  ratio?: '1' | '16/9' | '4/5';
+  /** 'auto': de verhouding van het beeld zelf (flyers), anders 4/5. */
+  ratio?: '1' | '16/9' | '4/5' | 'auto';
   sizes?: string;
   eager?: boolean;
   class?: string;
 }
 
 const { seed, image, alt = '', ratio = '1', sizes = '(min-width: 60rem) 25vw, 50vw', eager = false, class: className } = Astro.props;
-const style = `${artStyle(seed)};--art-ratio:${ratio}`;
+const artRatio = ratio === 'auto' ? (image && typeof image !== 'string' ? `${image.width}/${image.height}` : '4/5') : ratio;
+const style = `${artStyle(seed)};--art-ratio:${artRatio}`;
 ---
 
 <div class:list={['art', className]} style={style}>

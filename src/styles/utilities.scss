@@ -23,3 +23,10 @@
 
 .muted { color: var(--color-muted); }
 .nowrap { white-space: nowrap; }
+
+/* Reveal (src/scripts/reveal.ts): alleen verbergen als JS draait en beweging mag.
+   Vangnet: faalt het script, dan na 2,5s toch zichtbaar. */
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  [data-reveal]:not([data-revealed]) { visibility: hidden; animation: reveal-failsafe 0s 2.5s forwards; }
+}
+@keyframes reveal-failsafe { to { visibility: visible; } }

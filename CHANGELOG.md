@@ -7,12 +7,9 @@ Categorieën: **Toegevoegd**, **Gewijzigd**, **Opgelost**, **Verwijderd**, **Bev
 
 ## [Unreleased]
 
-### Gewijzigd
-- Setpagina (desktop): de video blijft sticky staan terwijl je door beschrijving en tracklist scrolt, en wordt een mini-video als de content op is. Gedockte video plakt via CSS anchor positioning aan het podium (fallback: JS).
-- Datum op de avondpagina een stuk kleiner (step-5 in plaats van step-7).
-- Setpagina: op desktop video en info naast elkaar in de hero (video ~2/3, info ~1/3); op mobiel onder elkaar. Beschrijving en tracklist als tabs (WAI-ARIA, pijltjes/Home/End); zonder JS of met maar één van beide gewoon onder elkaar. Tracklist reageert op de kolombreedte (container query).
-
 ### Toegevoegd
+- Reveal-animatie bij het laden (GSAP 3.15 + SplitText): datum per teken, titel per woord, content-blokken en flyer schuiven zacht in. Op home en de avondpagina. Niet bij `prefers-reduced-motion`; zonder JS gewoon zichtbaar.
+- Home: knoppen "Browse all sets" (primary) en "About".
 - Mini-video versleepbaar: loslaten zet hem links of rechts onderin (onthouden). Ook via een wisselknop, zonder slepen.
 - Set van Ono-Sendai Sound (STACK/READY, via Bunny).
 - "You might also like" als horizontale carousel: swipen/scrollen met scroll-snap, pijlknoppen voor muis en toetsenbord. Aangevuld tot 10 sets (eerst verwant, dan nieuwste).
@@ -20,6 +17,10 @@ Categorieën: **Toegevoegd**, **Gewijzigd**, **Opgelost**, **Verwijderd**, **Bev
 - De eerste twee Space Dome-avonden in Melkweg (14-07-2023 en 23-12-2023) met line-up; nieuwe dj-pagina's voor Mono/Poly, Kutmah, Cintasoul, Cheyanne Hudson, Odaira en Sunny Saimuns.
 
 ### Gewijzigd
+- Home-hero: intro bovenaan uitgelijnd met de video.
+- Avondpagina: datum nog kleiner (step-4), titel step-3. Flyer in eigen verhouding (`ratio="auto"` in CoverArt).
+- Setpagina (desktop): de video blijft sticky staan terwijl je door beschrijving en tracklist scrolt, en wordt een mini-video als de content op is. Gedockte video plakt via CSS anchor positioning aan het podium (fallback: JS).
+- Setpagina: op desktop video en info naast elkaar in de hero (video ~2/3, info ~1/3); op mobiel onder elkaar. Beschrijving en tracklist als tabs (WAI-ARIA, pijltjes/Home/End); zonder JS of met maar één van beide gewoon onder elkaar. Tracklist reageert op de kolombreedte (container query).
 - Mini-video op telefoon groter (ruim de helft van de schermbreedte).
 - Audiomodus laadt alleen de laagste videokwaliteit (240p): ongeveer 5× minder data. Terug naar video schakelt direct op.
 - Set van Drvg Cvltvre gepubliceerd (was draft) en featured bovenaan home ("Featured set").

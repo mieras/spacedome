@@ -20,7 +20,7 @@
 - Styling: SCSS met `utopia-core-scss` (fluid type en space), OKLCH-tokens met `light-dark()`, cascade layers
 - Fonts: Unbounded + Hanken Grotesk, self-hosted via Fontsource
 - Video: HLS via hls.js (Safari native). Nu teststreams van Mux; straks Bunny Stream
-- Animatie: CSS + View Transitions (`<ClientRouter />`), geen GSAP
+- Animatie: CSS + View Transitions (`<ClientRouter />`); GSAP 3.15 + SplitText alleen voor de reveal bij het laden (`src/scripts/reveal.ts`, `data-reveal`)
 - Consent: geen cookies of tracking. Statistiek: geen (TODO) · Hosting: Netlify
 
 ## Lokaal starten
