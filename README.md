@@ -46,8 +46,11 @@ Nog geen nodig. De namen voor later staan in `.env.example`.
 | `PUBLIC_SANITY_PROJECT_ID` | Sanity-project (later) | sanity.io/manage |
 | `PUBLIC_SANITY_DATASET` | Dataset (later) | sanity.io/manage |
 | `SANITY_API_READ_TOKEN` | Drafts / visual editing, geheim (later) | sanity.io/manage → API → Tokens |
-| `BUNNY_STREAM_LIBRARY_ID` | Videobibliotheek (later) | Bunny → Stream |
-| `BUNNY_STREAM_TOKEN_KEY` | Signed URLs tegen hotlinken, geheim (later) | Bunny → Stream → Security |
+| `BUNNY_STREAM_LIBRARY_ID` | Videobibliotheek | Bunny → Stream → library → API |
+| `BUNNY_STREAM_CDN_HOSTNAME` | Hostnaam voor de HLS-URL's (`vz-….b-cdn.net`) | Bunny → Stream → library → API |
+| `BUNNY_STREAM_API_KEY` | Importscript (STACK → Bunny), geheim, alleen lokaal | Bunny → Stream → library → API |
+| `BUNNY_STREAM_TOKEN_KEY` | Getekende URL's tegen hotlinken, geheim | Bunny → CDN → pull zone van de library → Security → Token authentication |
+| `STACK_SHARE_URL` | Alleen-lezen share van de map Recordings, geheim | STACK → map → Delen |
 
 Waarden staan nooit in git.
 

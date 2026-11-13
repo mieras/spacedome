@@ -26,5 +26,6 @@ Categorieën: **Toegevoegd**, **Gewijzigd**, **Opgelost**, **Verwijderd**, **Bev
 - Video bleef verborgen na de eerste keer afspelen (docken gebeurde voor de bron gekoppeld was).
 
 ### Onderhoud
+- Env-namen voor Bunny Stream (CDN-hostnaam, API-key) en STACK toegevoegd aan `.env.example` en de README.
 - Netlify-site `spacedome` aangemaakt op het MIERAS-team; eerste deploy staat op spacedome.netlify.app (noindex).
 - Node 22.23.5 vastgezet (`.nvmrc`, `netlify.toml`): Astro 7.4 vraagt ≥ 22.23.4.
