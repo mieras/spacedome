@@ -15,6 +15,7 @@ Categorieën: **Toegevoegd**, **Gewijzigd**, **Opgelost**, **Verwijderd**, **Bev
 - Design-tokens met Utopia (type en space) en OKLCH `light-dark()`, light/dark-toggle, `DESIGN.md`.
 - SEO: meta, OG, JSON-LD, sitemap, `robots.txt`, `llms.txt` (site staat op `noindex` tot livegang).
 - Intake-mail met open punten (`docs/mail-intake.md`).
+- Draft-set `stack-test` met een echte opname (mp4, lokaal in `public/media/`, niet in git) om de player te testen.
 
 ### Gewijzigd
 - Video van de uitgelichte set speelt in het hero-podium op de home en zweeft rechtsonder als je wegscrollt.
