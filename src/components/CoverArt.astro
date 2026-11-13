@@ -47,6 +47,7 @@ const style = `${artStyle(seed)};--art-ratio:${ratio}`;
         decoding="async"
         loading={eager ? 'eager' : 'lazy'}
         fetchpriority={eager ? 'high' : 'auto'}
+        onerror="this.remove()"
       />
     )
   }

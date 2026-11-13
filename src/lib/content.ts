@@ -100,10 +100,9 @@ export function suggestionsFor(set: SetEntry, lib: Library, limit = 4) {
       if (set.data.event && s.data.event?.id === set.data.event.id) score += 1;
       return { s, score };
     })
-    .filter(({ score }) => score > 0)
     .sort((a, b) => b.score - a.score || byDateDesc(a.s, b.s))
     .slice(0, limit)
-    .map(({ s }) => s);
+    .map(({ s }) => s); // eerst verwant (zelfde dj, genre, avond), daarna aangevuld met de nieuwste
 }
 
 export const setsByDj = (lib: Library, djId: string) => lib.sets.filter((s) => s.data.djs.some((r) => r.id === djId));

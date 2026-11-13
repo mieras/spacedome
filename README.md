@@ -77,7 +77,7 @@ DESIGN.md       Ontwerpsysteem
 - **Genres:** titel, omschrijving.
 - **Events:** titel, start/eind, locatie, poster, RA-link, line-up, tekst (body).
 - **Pages:** about.
-- Schema: `src/content.config.ts`. De Markdown-content is **dummy** (fictieve dj's), behalve de avond van 30-07-2026 en de about-tekst.
+- Schema: `src/content.config.ts`. De Markdown-content is **dummy** (fictieve dj's), behalve de avonden (Melkweg 2023, De Nachtzuster 2026), hun line-up-dj's, de sets van Drvg Cvltvre en Ono-Sendai Sound en de about-tekst.
 - Overstap naar Sanity volgens `~/Code/_standards/SANITY-MIGRATIE.md`; alle pagina's lezen via `src/lib/content.ts`.
 
 ### Set toevoegen (tot Sanity er is)

@@ -38,7 +38,7 @@ const djs = lib.djs.filter((d) => setsByDj(lib, d.id).length > 0);
           </div>
           <div class="hero__meta">
             <p class="meta">
-              Latest set · <time datetime={featured.data.date.toISOString().slice(0, 10)}>{formatDate(featured.data.date)}</time>
+              {featured.data.featured ? 'Featured set' : 'Latest set'} · <time datetime={featured.data.date.toISOString().slice(0, 10)}>{formatDate(featured.data.date)}</time>
               {featured.data.video.duration && <> · {formatDuration(featured.data.video.duration)}</>}
             </p>
             <h2 id="featured-title" class="hero__set-title">
@@ -46,7 +46,7 @@ const djs = lib.djs.filter((d) => setsByDj(lib, d.id).length > 0);
             </h2>
             <p class="muted">{joinNames(lib.djsOf(featured).map((d) => d.data.name))}</p>
             <div class="hero__actions">
-              <PlayButton item={featuredItem} label={t('set.playSet')} size="sm" />
+              <PlayButton item={featuredItem} label={t('set.play')} size="sm" />
               <QueueButton item={featuredItem} />
             </div>
           </div>

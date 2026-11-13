@@ -1,8 +1,28 @@
 ---
+/*
+ * Footer: merk, Explore (met aantallen), de meest gespeelde genres en socials.
+ * Desktop vier kolommen (merk breder), tablet en mobiel twee kolommen met het merk erboven.
+ */
 import { t } from '../i18n/ui';
+import { genreHref, getLibrary, setsByGenre } from '../lib/content';
 import { settings } from '../settings';
 import Icon from './Icon.astro';
 import Logo from './Logo.astro';
+
+const lib = await getLibrary();
+const explore = [
+  { href: '/sets', label: t('nav.sets'), count: lib.sets.length },
+  { href: '/djs', label: t('nav.djs'), count: lib.djs.length },
+  { href: '/genres', label: t('nav.genres'), count: lib.genres.length },
+  { href: '/events', label: t('nav.events'), count: lib.events.length },
+  { href: '/about', label: t('nav.about') },
+];
+// Genres met de meeste sets eerst; lege genres niet.
+const topGenres = lib.genres
+  .map((genre) => ({ genre, count: setsByGenre(lib, genre.id).length }))
+  .filter((g) => g.count > 0)
+  .sort((a, b) => b.count - a.count || a.genre.data.title.localeCompare(b.genre.data.title))
+  .slice(0, 6);
 ---
 
 <footer class="site-footer">
@@ -11,8 +31,51 @@ import Logo from './Logo.astro';
       <Logo id="footer" />
       <p class="lead">{settings.tagline}</p>
     </div>
-    <nav aria-label={t('footer.follow')} class="site-footer__nav">
-      <h2 class="meta">{t('footer.follow')}</h2>
+
+    <nav aria-labelledby="footer-explore" class="site-footer__nav">
+      <h2 id="footer-explore" class="meta">{t('footer.explore')}</h2>
+      <ul role="list">
+        {
+          explore.map((l) => (
+            <li>
+              <a href={l.href}>
+                {l.label}
+                {l.count !== undefined && <span class="badge">{l.count}</span>}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    {
+      topGenres.length > 0 && (
+        <nav aria-labelledby="footer-genres" class="site-footer__nav">
+          <h2 id="footer-genres" class="meta">{t('nav.genres')}</h2>
+          <ul role="list">
+            {topGenres.map(({ genre, count }) => (
+              <li>
+                <a href={genreHref(genre.id)}>
+                  {genre.data.title}
+                  <span class="badge">
+                    {count}
+                    <span class="visually-hidden"> sets</span>
+                  </span>
+                </a>
+              </li>
+            ))}
+            <li>
+              <a href="/genres" class="site-footer__more">
+                {t('footer.allGenres')} <Icon name="arrow" />
+              </a>
+            </li>
+          </ul>
+        </nav>
+      )
+    }
+
+    <nav aria-labelledby="footer-follow" class="site-footer__nav">
+      <h2 id="footer-follow" class="meta">{t('footer.follow')}</h2>
       <ul role="list">
         {
           settings.socials.map((s) => (
@@ -27,16 +90,7 @@ import Logo from './Logo.astro';
         }
       </ul>
     </nav>
-    <nav aria-label="Footer" class="site-footer__nav">
-      <h2 class="meta">Explore</h2>
-      <ul role="list">
-        <li><a href="/sets">{t('nav.sets')}</a></li>
-        <li><a href="/djs">{t('nav.djs')}</a></li>
-        <li><a href="/genres">{t('nav.genres')}</a></li>
-        <li><a href="/events">{t('nav.events')}</a></li>
-        <li><a href="/about">{t('nav.about')}</a></li>
-      </ul>
-    </nav>
+
     <p class="site-footer__small meta">© {new Date().getFullYear()} {settings.siteName}</p>
   </div>
 </footer>
@@ -50,16 +104,37 @@ import Logo from './Logo.astro';
   }
   .site-footer__inner {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
-    gap: var(--space-l);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-l) var(--space-m);
     align-items: start;
   }
-  .site-footer__brand { display: grid; gap: var(--space-s); --logo-size: clamp(6rem, 12vw, 9rem); }
-  .site-footer__brand .lead { font-size: var(--step-0); color: var(--color-muted); }
-  .site-footer__nav { display: grid; gap: var(--space-2xs); }
-  .site-footer__nav ul { display: grid; gap: var(--space-3xs); }
-  .site-footer__nav a { display: inline-flex; align-items: center; gap: 0.4ch; min-block-size: 2rem; text-decoration: none; }
-  .site-footer__nav a:hover { text-decoration: underline; }
-  .site-footer__nav :global(.icon) { inline-size: 1em; block-size: 1em; }
+  .site-footer__brand,
   .site-footer__small { grid-column: 1 / -1; }
+  @media (min-width: 40rem) {
+    .site-footer__inner { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  @media (min-width: 56rem) {
+    .site-footer__inner { grid-template-columns: minmax(0, 1.6fr) repeat(3, minmax(0, 1fr)); }
+    .site-footer__brand { grid-column: auto; }
+  }
+  .site-footer__brand { display: grid; gap: var(--space-s); align-content: start; --logo-size: clamp(6rem, 12vw, 9rem); }
+  .site-footer__brand .lead { max-inline-size: 28ch; font-size: var(--step-0); color: var(--color-muted); }
+  .site-footer__nav { display: grid; gap: var(--space-2xs); min-inline-size: 0; }
+  .site-footer__nav ul { display: grid; gap: var(--space-3xs); }
+  .site-footer__nav a { display: inline-flex; align-items: center; gap: 0.5ch; min-block-size: 2rem; text-decoration: none; }
+  .site-footer__nav a:hover { text-decoration: underline; }
+  .site-footer__nav :global(.icon) { inline-size: 1em; block-size: 1em; flex: none; }
+  .site-footer__more { color: var(--color-muted); }
+  .badge {
+    min-inline-size: 1.6em;
+    padding: 0.1em 0.5em;
+    border-radius: var(--radius-round);
+    background: color-mix(in oklch, currentColor 10%, transparent);
+    color: var(--color-muted);
+    font-size: var(--step--2);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.4;
+    text-align: center;
+  }
+  .site-footer__nav a:hover .badge { text-decoration: none; }
 </style>

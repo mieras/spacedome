@@ -10,13 +10,18 @@ Categorieën: **Toegevoegd**, **Gewijzigd**, **Opgelost**, **Verwijderd**, **Bev
 ### Toegevoegd
 - Mini-video versleepbaar: loslaten zet hem links of rechts onderin (onthouden). Ook via een wisselknop, zonder slepen.
 - Set van Ono-Sendai Sound (STACK/READY, via Bunny).
+- "You might also like" als horizontale carousel: swipen/scrollen met scroll-snap, pijlknoppen voor muis en toetsenbord. Aangevuld tot 10 sets (eerst verwant, dan nieuwste).
+- Footer: aantallen bij Sets, DJs, Genres en Events, en een eigen kolom met de meest gespeelde genres.
+- De eerste twee Space Dome-avonden in Melkweg (14-07-2023 en 23-12-2023) met line-up; nieuwe dj-pagina's voor Mono/Poly, Kutmah, Cintasoul, Cheyanne Hudson, Odaira en Sunny Saimuns.
 
 ### Gewijzigd
 - Mini-video op telefoon groter (ruim de helft van de schermbreedte).
 - Audiomodus laadt alleen de laagste videokwaliteit (240p): ongeveer 5× minder data. Terug naar video schakelt direct op.
-- Set van Drvg Cvltvre gepubliceerd (was draft).
+- Set van Drvg Cvltvre gepubliceerd (was draft) en featured bovenaan home ("Featured set").
+- Play-knop met tekst: gewoon "Play"/"Pause", even breed (geen verspringen).
 
 ### Opgelost
+- Bunny-still die nog niet klaar is (of geweigerd wordt) gaf een kapot-plaatje-icoon; nu blijft de gegenereerde art staan.
 - Op mobiel kon je na "alleen audio" niet meer terug naar video: de knop in de balk blijft nu staan (als camera-icoon).
 
 ### Onderhoud

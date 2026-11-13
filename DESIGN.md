@@ -68,6 +68,9 @@ Beide self-hosted via Fontsource (geen verzoeken naar Google, AVG). Voorlopige k
 - **Breakout-grid** (`.layout`): `content` (46rem) / `popout` / `feature` / `full`.
 - **Wrapper** (`.wrapper`): breed raster voor header, footer en kaartrasters, max 96rem.
 - Kaartrasters: `.grid` met `--grid-min` (standaard 16rem).
+- Carousel (`SetCarousel`): horizontale rij met `scroll-snap-type: x mandatory`. Telefoon 78% per kaart (stukje van de volgende zichtbaar), tablet 2,5, desktop 4. Pijlknoppen rechts in de sectiekop, uitgeschakeld aan begin/eind, verborgen als alles past.
+- Footer: merk (1,6fr) + Explore, Genres, Follow; tablet drie kolommen onder het merk, telefoon twee. Aantallen als `.badge` (pil, `--step--2`, tabular-nums).
+- Play-knop met tekst: `min-inline-size: 7.25rem`, zodat Play en Pause even breed zijn.
 
 ## 6. Vorm
 

@@ -4,7 +4,6 @@ date: 2026-07-30
 djs: [low-orbit]
 genres: [beats, instrumental-hip-hop, jazz]
 event: 2026-07-30-de-nachtzuster
-featured: true
 video:
   src: https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8
   duration: 5520
