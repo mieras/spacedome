@@ -35,6 +35,9 @@ h1, h2, h3, h4 {
   line-height: var(--leading-tight);
   letter-spacing: var(--tracking-display);
   font-weight: 700;
+  /* Vangnet op smalle schermen: lange woorden afbreken (met koppelteken) i.p.v. de pagina op te rekken. */
+  overflow-wrap: anywhere; /* anywhere telt mee in de min-breedte (break-word niet) */
+  hyphens: auto;
 }
 h1 { font-size: var(--step-5); }
 h2 { font-size: var(--step-3); }

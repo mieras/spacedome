@@ -34,17 +34,17 @@ const { start, end, venue, title, poster, posterAlt } = event.data;
   .event-card {
     position: relative;
     display: grid;
-    grid-template-columns: clamp(5rem, 18vw, 9rem) 1fr;
+    grid-template-columns: clamp(5rem, 18vw, 9rem) minmax(0, 1fr);
     gap: var(--space-s-l);
     align-items: center;
     padding-block: var(--space-s);
     border-block-end: var(--border-width) solid var(--color-line);
   }
-  .event-card__body { display: grid; gap: var(--space-3xs); }
+  .event-card__body { display: grid; gap: var(--space-3xs); container-type: inline-size; }
   .event-card__date {
     font-family: var(--font-display);
     font-weight: 800;
-    font-size: var(--step-4);
+    font-size: min(var(--step-4), 14cqi);
     line-height: 1;
     letter-spacing: -0.03em;
     font-variant-numeric: tabular-nums;

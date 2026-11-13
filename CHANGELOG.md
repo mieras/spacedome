@@ -24,6 +24,7 @@ Categorieën: **Toegevoegd**, **Gewijzigd**, **Opgelost**, **Verwijderd**, **Bev
 - Tagline, hero- en about-tekst neutraal gemaakt (placeholder): "Low End Theory" is inspiratie, geen slogan.
 
 ### Opgelost
+- Horizontaal scrollen op mobiel: te grote datum op de avondpagina, te grote titels (hero, set, dj, genre) en de gloed achter de hero die buiten de pagina viel. Getest op 320–1024px zonder overflow (WCAG 1.4.10).
 - Bij elke paginawissel startte er een extra player met een onzichtbare video die meespeelde; daardoor liepen meerdere sets door elkaar en klopte de balk niet meer. De player start nu echt maar één keer.
 - Video bleef verborgen na de eerste keer afspelen (docken gebeurde voor de bron gekoppeld was).
 
