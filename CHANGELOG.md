@@ -22,7 +22,8 @@ Categorieën: **Toegevoegd**, **Gewijzigd**, **Opgelost**, **Verwijderd**, **Bev
 - De eerste twee Space Dome-avonden in Melkweg (14-07-2023 en 23-12-2023) met line-up; nieuwe dj-pagina's voor Mono/Poly, Kutmah, Cintasoul, Cheyanne Hudson, Odaira en Sunny Saimuns.
 
 ### Gewijzigd
-- Fonts: koppen in Big Shoulders (variabel, met optische maten), tekst in Funnel Sans; beide self-hosted via Fontsource 5.3.0. Unbounded blijft alleen voor het logo (`--font-logo`). Hanken Grotesk eruit.
+- Fonts: Stack Sans-familie, self-hosted via Fontsource 5.3.0. Notch voor de grote titels (`--font-display`), Headline voor koppen (`--font-heading`), Text voor tekst. Unbounded blijft alleen voor het logo (`--font-logo`); Hanken Grotesk eruit.
+- Titels flink groter voor meer contrast met de tekst: hero tot `step-8`, paginakop en dj tot `step-8`, settitel `step-7`, avondtitel `step-5`, h1 `step-6`, h2 `step-4`.
 - Footer-peak: geen schalen meer. Tijdens het scrollen mengt de vorm zelf van een startstand (vlakke band: falloff 0, lage valley, iets gezakt, dof) naar de eindstand (falloff 2,17, valley 0,45, blur 35), per frame herberekend in `src/scripts/peak.ts` (alleen in beeld, rAF). Zonder JS of bij reduced motion: de eindstand. Werkt nu ook in Firefox.
 - Peak-configurator op /brand: Start en End als tabs (preview springt naar de gekozen stand), scrubber en een play-knop van Start naar End.
 - Tab-stijlen (`.tabs__*`) zijn globaal (components.scss); `sd-tabs` stuurt `tabs:change`.

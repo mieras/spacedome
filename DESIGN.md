@@ -47,8 +47,9 @@ Contrast: tekst, muted en accent halen in beide thema's minstens 4,5:1 op `--col
 
 | Rol | Font | Gebruik |
 |---|---|---|
-| Display | **Big Shoulders** (variabel, 100–900, optische maten) | Koppen, titels van sets, data. Smal en strak; groot zet de opsz-as hem automatisch strakker. |
-| Tekst | **Funnel Sans** (variabel, 300–800) | Lopende tekst, interface, metadata. |
+| Display | **Stack Sans Notch** (variabel, 200–700) | De grote titels: hero, paginakop, set, dj, avond (`--font-display`). |
+| Koppen | **Stack Sans Headline** (variabel, 200–700) | Sectiekoppen, kaarttitels, h2–h4 (`--font-heading`). |
+| Tekst | **Stack Sans Text** (variabel, 200–700) | Lopende tekst, interface, metadata. |
 | Logo | **Unbounded** | Alleen het tijdelijke woordmerk (`--font-logo`). |
 
 Beide self-hosted via Fontsource (geen verzoeken naar Google, AVG). Gekozen door Maarten op 13-11-2026 (eerst lokaal getest).
@@ -56,7 +57,7 @@ Beide self-hosted via Fontsource (geen verzoeken naar Google, AVG). Gekozen door
 **Schaal:** Utopia, fluid tussen 360 en 1920 px. Basis 18 → 20 px, ratio 1.2 → 1.25. Tokens `--step--2` t/m `--step-8`.
 
 - `h1` `--step-5`, `h2` `--step-3`, `h3` `--step-1`.
-- Grote display-titels (hero, set, dj, paginakop): `--step-5` op mobiel, `--step-6` vanaf 48–60rem. Big Shoulders is smal, dus hier is ruimte om later groter te gaan.
+- Grote display-titels (hero, set, dj, paginakop): `--step-5` op mobiel, `--step-6` vanaf 48–60rem. Bewust groot met veel contrast tegenover de tekst: hero `min(step-7, 13vw)` → `min(step-8, 7,5vw)`, paginakop/dj `min(step-7, 14vw)` → `step-8`, settitel `min(step-7, 14cqi)`, regelafstand 0,92.
 - Grote datums (avondpagina, eventkaart) schalen mee met hun kolom: `min(--step-x, 11–14cqi)` (avondpagina step-4) met `container-type: inline-size` op de ouder.
 - Koppen hebben `overflow-wrap: anywhere` + `hyphens: auto` als vangnet. Grids met één kolom altijd `minmax(0, 1fr)`, nooit `auto`/`1fr` (anders rekt lange tekst de pagina op).
 - Metadata (`.meta`): `--step--1`, hoofdletters, `letter-spacing: .08em`, tabular nums. Datums zoals op de poster: `30.07.2026`.
@@ -126,7 +127,7 @@ De kern van de site. Eén `<sd-player>` in de layout met `transition:persist`: h
 ## 10. Open punten
 
 - [ ] Logo als vector (SVG/AI/PDF) en het font van het logo
-- [x] Fontkeuze: Big Shoulders + Funnel Sans
+- [x] Fontkeuze: Stack Sans Notch / Headline / Text
 - [ ] Fotografie van avonden en dj's
 - [ ] Stills uit de video (thumbnail-picker via Bunny Stream)
 - [ ] Nederlandse vertaling (interface staat klaar in `src/i18n/ui.ts`)

@@ -108,11 +108,15 @@ const toc = [
       <h2 id="type" class="brand__title">Type</h2>
       <div class="faces">
         <div class="face">
-          <p class="meta">Display · Big Shoulders Variable</p>
+          <p class="meta">Display · Stack Sans Notch</p>
           <p class="face__sample face__sample--display">Space Dome</p>
         </div>
         <div class="face">
-          <p class="meta">Text · Funnel Sans Variable</p>
+          <p class="meta">Heading · Stack Sans Headline</p>
+          <p class="face__sample face__sample--heading">Latest sets</p>
+        </div>
+        <div class="face">
+          <p class="meta">Text · Stack Sans Text</p>
           <p class="face__sample">Beats, trip-hop, deep grooves</p>
         </div>
       </div>
@@ -527,10 +531,11 @@ const toc = [
   .swatch__value { display: grid; color: var(--color-muted); font-size: var(--step--2); font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; }
 
   .faces { display: grid; gap: var(--space-m); }
-  @media (min-width: 48rem) { .faces { grid-template-columns: 1fr 1fr; } }
+  @media (min-width: 48rem) { .faces { grid-template-columns: repeat(3, 1fr); } }
   .face { display: grid; gap: var(--space-2xs); padding: var(--space-m); border-radius: var(--radius-l); background: var(--color-surface); }
   .face__sample { font-size: var(--step-3); line-height: var(--leading-tight); }
-  .face__sample--display { font-family: var(--font-display); font-weight: 800; text-transform: uppercase; letter-spacing: var(--tracking-display); }
+  .face__sample--heading { font-family: var(--font-heading); font-weight: 700; }
+  .face__sample--display { font-family: var(--font-display); font-weight: 700; text-transform: uppercase; letter-spacing: var(--tracking-display); }
 
   .scale { display: grid; gap: var(--space-2xs); }
   .scale__row { display: grid; grid-template-columns: 7rem minmax(0, 1fr); align-items: baseline; gap: var(--space-s); }
