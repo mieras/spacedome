@@ -2,6 +2,7 @@
  * <sd-tabs>: tabs volgens het WAI-ARIA-patroon (pijltjes, Home/End, automatische activatie).
  * Zonder JS (of met één paneel) staan de panelen gewoon onder elkaar met hun koppen.
  * Een custom element koppelt zichzelf ook na een paginawissel van de ClientRouter.
+ * Stuurt 'tabs:change' ({ index, id }) bij elke wissel. Stijlen: components.scss (.tabs__*).
  */
 class SdTabs extends HTMLElement {
   connectedCallback() {
@@ -28,6 +29,7 @@ class SdTabs extends HTMLElement {
         panels[i]!.hidden = !on;
       });
       if (focus) tabs[index]!.focus();
+      this.dispatchEvent(new CustomEvent('tabs:change', { detail: { index, id: tabs[index]!.id } }));
     };
 
     tabs.forEach((tab, i) => tab.addEventListener('click', () => select(i)));

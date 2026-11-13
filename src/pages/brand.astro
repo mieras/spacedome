@@ -22,6 +22,17 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { getLibrary, setHref, setsByEvent, toPlayerItem } from '../lib/content';
 import { PEAK_FOOTER, PEAK_PALETTES } from '../lib/peak';
 
+// Schuifjes voor de peak-configurator, per stand (Start en End).
+const shapeFields = [
+  { key: 'blur', label: 'Blur', min: 0, max: 45, step: 1 },
+  { key: 'peak', label: 'Peak', min: 0.1, max: 1, step: 0.01 },
+  { key: 'valley', label: 'Valley', min: 0, max: 1, step: 0.01 },
+  { key: 'power', label: 'Falloff', min: 0, max: 4, step: 0.01 },
+  { key: 'overlap', label: 'Overlap', min: 1, max: 2, step: 0.01 },
+  { key: 'opacity', label: 'Opacity', min: 0, max: 1, step: 0.01 },
+  { key: 'drop', label: 'Drop', min: 0, max: 0.6, step: 0.01 },
+] as const;
+
 const lib = await getLibrary();
 const featured = lib.sets.find((s) => s.data.featured) ?? lib.sets[0];
 const item = await toPlayerItem(featured, lib);
@@ -210,10 +221,10 @@ const toc = [
       {event && <EventCard event={event} setCount={setsByEvent(lib, event.id).length} />}
       <h3 class="brand__sub">Cover art</h3>
       <div class="covers">
-        <CoverArt seed="brand-a" alt="" ratio="1/1" />
-        <CoverArt seed="brand-b" alt="" ratio="1/1" />
-        <CoverArt seed="brand-c" alt="" ratio="1/1" />
-        <CoverArt seed="brand-d" alt="" ratio="1/1" />
+        <CoverArt seed="brand-a" alt="" ratio="1" />
+        <CoverArt seed="brand-b" alt="" ratio="1" />
+        <CoverArt seed="brand-c" alt="" ratio="1" />
+        <CoverArt seed="brand-d" alt="" ratio="1" />
       </div>
       <p class="brand__note">Generated art per seed when there is no still or poster.</p>
       <SetCarousel sets={lib.sets.slice(0, 10)} lib={lib} title="Carousel" id="brand-carousel" />
@@ -284,10 +295,16 @@ const toc = [
           <h3 class="brand__sub">Peak gradient</h3>
           <button class="button" type="button" data-peak-apply><Icon name="arrow" /> Try in footer</button>
         </div>
-        <p class="brand__note">Blurred columns with one vertical gradient. In the footer it starts calm (low, narrow, dim) when the footer comes into view and blooms into the full shape as you reach the bottom; scrolling back up calms it again. The sliders set the full bloom, the calm group sets the start, and the scroll preview shows the steps in between. Paste the result into <code>PEAK_FOOTER</code> in <code>src/lib/peak.ts</code>.</p>
+        <p class="brand__note">Blurred columns with one vertical gradient. In the footer the shape itself grows as you scroll: every value blends from <em>Start</em> (footer just in view) to <em>End</em> (scrolled to the bottom), and back when you scroll up. Nothing is scaled. Pick a tab to edit that state (the preview jumps to it), press play to run Start → End, then paste the result into <code>PEAK_FOOTER</code> in <code>src/lib/peak.ts</code>.</p>
         <div class="peak-lab">
-          <div class="effect__peak">
-            <PeakGradient id="brand-peak" still />
+          <div class="peak-lab__preview">
+            <div class="effect__peak">
+              <PeakGradient id="brand-peak" still />
+            </div>
+            <div class="peak-lab__scrub">
+              <button class="button" type="button" data-peak-play aria-pressed="false"><Icon name="play" /> <span data-peak-play-label>Play</span></button>
+              <label class="peak-lab__range">Start → End <output data-peak-progress>100%</output><input type="range" min="0" max="1" step="0.005" value="1" data-peak-scroll /></label>
+            </div>
           </div>
           <form class="lab__controls" data-peak-lab>
             <label>Palette
@@ -296,19 +313,31 @@ const toc = [
               </select>
             </label>
             <label>Columns <output data-for="bars"></output><input type="range" name="bars" min="3" max="25" step="1" value={PEAK_FOOTER.bars} /></label>
-            <label>Blur <output data-for="blur"></output><input type="range" name="blur" min="0" max="45" step="1" value={PEAK_FOOTER.blur} /></label>
-            <label>Peak <output data-for="peak"></output><input type="range" name="peak" min="0.3" max="1" step="0.01" value={PEAK_FOOTER.peak} /></label>
-            <label>Valley <output data-for="valley"></output><input type="range" name="valley" min="0" max="1" step="0.01" value={PEAK_FOOTER.valley} /></label>
-            <label>Falloff <output data-for="power"></output><input type="range" name="power" min="0.5" max="4" step="0.01" value={PEAK_FOOTER.power} /></label>
-            <label>Overlap <output data-for="overlap"></output><input type="range" name="overlap" min="1" max="2" step="0.01" value={PEAK_FOOTER.overlap} /></label>
-            <fieldset class="lab__group">
-              <legend>Calm (footer just in view)</legend>
-              <label>Height <output data-for="calmHeight"></output><input type="range" name="calmHeight" min="0" max="1" step="0.01" value={PEAK_FOOTER.calmHeight} /></label>
-              <label>Width <output data-for="calmWidth"></output><input type="range" name="calmWidth" min="0.4" max="1" step="0.01" value={PEAK_FOOTER.calmWidth} /></label>
-              <label>Opacity <output data-for="calmOpacity"></output><input type="range" name="calmOpacity" min="0" max="1" step="0.01" value={PEAK_FOOTER.calmOpacity} /></label>
-              <label>Saturation <output data-for="calmSaturate"></output><input type="range" name="calmSaturate" min="0" max="1" step="0.01" value={PEAK_FOOTER.calmSaturate} /></label>
-            </fieldset>
-            <label class="lab__scroll">Scroll preview: calm → bloom <output data-peak-progress>100%</output><input type="range" min="0" max="1" step="0.01" value="1" data-peak-scroll /></label>
+            <sd-tabs class="peak-tabs" data-peak-tabs>
+              <div class="tabs__list" role="tablist" aria-label="Peak state" data-tabs-list hidden>
+                <button type="button" role="tab" class="tabs__tab" id="peak-tab-start" aria-controls="peak-panel-start" aria-selected="false" tabindex="-1">Start</button>
+                <button type="button" role="tab" class="tabs__tab" id="peak-tab-end" aria-controls="peak-panel-end" aria-selected="true">End</button>
+              </div>
+              {
+                (['start', 'end'] as const).map((stand) => (
+                  <div class="tabs__panel" id={`peak-panel-${stand}`}>
+                    <fieldset class="lab__group">
+                      <legend data-tabs-heading>{stand === 'start' ? 'Start: footer just in view' : 'End: scrolled to the bottom'}</legend>
+                      {shapeFields.map((f) => {
+                        const name = stand === 'start' ? `start.${f.key}` : f.key;
+                        const value = stand === 'start' ? PEAK_FOOTER.start[f.key] : PEAK_FOOTER[f.key];
+                        return (
+                          <label>
+                            {f.label} <output data-for={name} />
+                            <input type="range" name={name} min={f.min} max={f.max} step={f.step} value={value} />
+                          </label>
+                        );
+                      })}
+                    </fieldset>
+                  </div>
+                ))
+              }
+            </sd-tabs>
             <button class="button" type="reset">Reset</button>
           </form>
           <pre class="lab__code"><code data-peak-code></code></pre>
@@ -320,50 +349,96 @@ const toc = [
 
 <script>
   import { smear, SMEAR_DEFAULTS } from '../scripts/smear';
-  import { peakAt, peakCalmStyle, peakSvg, type PeakOptions, type PeakPalette } from '../lib/peak';
+  import '../scripts/tabs';
+  import { peakAt, peakSvg, SHAPE_KEYS, updatePeakSvg, type PeakOptions, type PeakPalette, type PeakShape } from '../lib/peak';
 
-  // Peak-configurator: tekent de preview opnieuw met dezelfde functie als de footer en toont de
-  // instelling om in src/lib/peak.ts te plakken. "Try in footer" past de footer op deze pagina aan
-  // (alleen hier, tot je herlaadt) en scrolt ernaartoe.
+  // Peak-configurator: twee standen (Start, End), tekent de preview met dezelfde functies als de
+  // footer. Scrubben of Play mengt van Start naar End zoals scrollen in de footer doet. "Try in
+  // footer" geeft de instelling aan de footer op deze pagina (tot je herlaadt) en scrolt ernaartoe.
   document.addEventListener('astro:page-load', () => {
     const form = document.querySelector<HTMLFormElement>('[data-peak-lab]');
     if (!form || form.dataset.bound) return;
     form.dataset.bound = '';
     const preview = document.querySelector<SVGSVGElement>('[data-peak-svg="brand-peak"]')!;
     const code = document.querySelector('[data-peak-code]')!;
+    const scrub = document.querySelector<HTMLInputElement>('[data-peak-scroll]')!;
+    const progress = document.querySelector('[data-peak-progress]')!;
+    const play = document.querySelector<HTMLButtonElement>('[data-peak-play]')!;
+    const playLabel = document.querySelector('[data-peak-play-label]')!;
     let current: PeakOptions;
+    let raf = 0;
 
     const read = (): PeakOptions => {
       const d = new FormData(form);
-      const n = (k: string) => Number(d.get(k));
-      return {
-        bars: n('bars'), blur: n('blur'), peak: n('peak'), valley: n('valley'), power: n('power'), overlap: n('overlap'),
-        palette: String(d.get('palette')) as PeakPalette,
-        calmHeight: n('calmHeight'), calmWidth: n('calmWidth'), calmOpacity: n('calmOpacity'), calmSaturate: n('calmSaturate'),
-      };
+      const shape = (prefix: string) =>
+        Object.fromEntries(SHAPE_KEYS.map((k) => [k, Number(d.get(prefix + k))])) as PeakShape;
+      return { bars: Number(d.get('bars')), palette: String(d.get('palette')) as PeakPalette, ...shape(''), start: shape('start.') };
     };
-    const scroll = document.querySelector<HTMLInputElement>('[data-peak-scroll]')!;
-    const progress = document.querySelector('[data-peak-progress]')!;
-    const showProgress = () => {
-      const p = Number(scroll.value);
-      Object.assign(preview.style, peakAt(current, p));
+    const draw = () => {
+      const p = Number(scrub.value);
+      updatePeakSvg(preview, current, peakAt(current, p));
       progress.textContent = `${Math.round(p * 100)}%`;
     };
     const update = () => {
       current = read();
-      preview.innerHTML = peakSvg('brand-peak', current);
-      showProgress();
-      form.querySelectorAll<HTMLOutputElement>('output[data-for]').forEach((o) => (o.textContent = String(current[o.dataset.for as keyof PeakOptions])));
+      preview.innerHTML = peakSvg('brand-peak', current, peakAt(current, Number(scrub.value)));
+      draw();
+      form.querySelectorAll<HTMLOutputElement>('output[data-for]').forEach((o) => {
+        const [a, b] = o.dataset.for!.split('.');
+        o.textContent = String(b ? current.start[b as keyof PeakShape] : current[a as keyof PeakOptions]);
+      });
       code.textContent = `export const PEAK_FOOTER: PeakOptions = ${JSON.stringify(current, null, 2).replace(/"(\w+)":/g, '$1:').replace(/"/g, "'")};`;
     };
-    form.addEventListener('input', update);
+
+    // Play: van Start naar End in 2,4s (lineair; de curve zit in peakAt), daarna even stil op End.
+    const stop = () => {
+      cancelAnimationFrame(raf);
+      raf = 0;
+      play.setAttribute('aria-pressed', 'false');
+      playLabel.textContent = 'Play';
+    };
+    play.addEventListener('click', () => {
+      if (raf) return stop();
+      const t0 = performance.now();
+      play.setAttribute('aria-pressed', 'true');
+      playLabel.textContent = 'Stop';
+      const tick = (t: number) => {
+        const p = Math.min((t - t0) / 2400, 1);
+        scrub.value = String(p);
+        draw();
+        if (p < 1) raf = requestAnimationFrame(tick);
+        else stop();
+      };
+      raf = requestAnimationFrame(tick);
+    });
+
+    // Tab Start of End: preview springt naar die stand, en bewerken laat die stand zien.
+    let active = 1;
+    form.querySelector('[data-peak-tabs]')?.addEventListener('tabs:change', (e) => {
+      active = (e as CustomEvent<{ id: string }>).detail.id === 'peak-tab-start' ? 0 : 1;
+      stop();
+      scrub.value = String(active);
+      if (current) draw();
+    });
+    form.addEventListener('input', (e) => {
+      if ((e.target as HTMLElement).closest('.tabs__panel')) {
+        stop();
+        scrub.value = String(active);
+      }
+      update();
+    });
     form.addEventListener('reset', () => requestAnimationFrame(update));
-    scroll.addEventListener('input', showProgress);
+    scrub.addEventListener('input', () => {
+      stop();
+      draw();
+    });
     document.querySelector('[data-peak-apply]')?.addEventListener('click', () => {
-      const footer = document.querySelector<SVGSVGElement>('.site-footer [data-peak-svg]');
+      const footer = document.querySelector<HTMLElement>('.site-footer .peak[data-peak]');
       if (!footer) return;
-      footer.innerHTML = peakSvg(footer.dataset.peakSvg!, current);
-      footer.parentElement!.setAttribute('style', peakCalmStyle(current));
+      const svg = footer.querySelector<SVGSVGElement>('svg[data-peak-svg]')!;
+      svg.innerHTML = peakSvg(svg.dataset.peakSvg!, current);
+      footer.dataset.peak = JSON.stringify(current);
+      footer.dispatchEvent(new Event('peak:config'));
       footer.closest('.site-footer')?.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'end' });
     });
     update();
@@ -473,12 +548,18 @@ const toc = [
   .lab__controls output { color: var(--color-muted); font-variant-numeric: tabular-nums; }
   .lab__controls .button { justify-self: start; }
   /* Desktop: preview blijft staan terwijl je door de schuifjes gaat. */
+  .peak-lab__preview { display: grid; gap: var(--space-xs); align-content: start; }
   @media (min-width: 64rem) {
-    .peak-lab .effect__peak { position: sticky; inset-block-start: calc(var(--header-h) + 5rem); }
+    .peak-lab__preview { position: sticky; inset-block-start: calc(var(--header-h) + 5rem); }
   }
+  .peak-lab__scrub { display: flex; flex-wrap: wrap; align-items: end; gap: var(--space-s); }
+  .peak-lab__range { flex: 1 1 12rem; display: grid; grid-template-columns: 1fr auto; gap: var(--space-3xs) var(--space-xs); font-size: var(--step--1); font-weight: 600; }
+  .peak-lab__range input { grid-column: 1 / -1; inline-size: 100%; accent-color: var(--color-accent); }
+  .peak-lab__range output { color: var(--color-muted); font-variant-numeric: tabular-nums; }
+  .peak-tabs { display: grid; gap: var(--space-xs); }
+  .peak-tabs .lab__group { border: 0; padding: 0; }
   .lab__group { display: grid; gap: var(--space-xs); margin: 0; padding: var(--space-s); border: var(--border-width) solid var(--color-line); border-radius: var(--radius-m); }
   .lab__group legend { padding-inline: var(--space-3xs); font-size: var(--step--1); font-weight: 700; color: var(--color-muted); }
-  .lab__scroll { padding-block-start: var(--space-2xs); border-block-start: var(--border-width) solid var(--color-line); }
   .lab__code { grid-column: 1 / -1; overflow-x: auto; padding: var(--space-s); border-radius: var(--radius-m); background: var(--color-raised); font-size: var(--step--1); }
   /* Zelfde ondergrond als de footer, zodat de preview klopt. */
   .effect__peak { display: grid; align-self: start; block-size: clamp(12rem, 30vw, 24rem); overflow: hidden; border-radius: var(--radius-l); background: var(--color-bg); box-shadow: inset 0 0 0 var(--border-width) var(--color-line); }
