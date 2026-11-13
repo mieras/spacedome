@@ -31,6 +31,3 @@
 }
 @keyframes reveal-failsafe { to { visibility: visible; } }
 
-/* Smear-effect (src/scripts/smear.ts): het filter staat in BaseLayout. */
-.sd-defs { position: absolute; inline-size: 0; block-size: 0; overflow: hidden; }
-[data-smearing] { filter: url(#sd-smear); }

@@ -20,6 +20,7 @@
     "@fontsource-variable/stack-sans-notch": "5.3.0",
     "@fontsource-variable/stack-sans-text": "5.3.0",
     "@fontsource-variable/unbounded": "^5.3.0",
+    "@krisenstab/dither-dither": "2.2.2",
     "astro": "^7.4.11",
     "gsap": "3.15.0",
     "hls.js": "^1.7.4",

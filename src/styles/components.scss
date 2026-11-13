@@ -49,6 +49,24 @@
   object-fit: cover;
 }
 .art:has(> img)::before { display: none; }
+
+/* Dither over de foto (src/scripts/dither.ts). Kaarten tonen de kleur bij hover/focus. */
+.art {
+  --dither-dark: oklch(16% 0.07 290);
+  --dither-light: oklch(76% 0.18 348);
+}
+.art__dither {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: block;
+  pointer-events: none;
+  transition: opacity var(--dur-slow) var(--ease-out);
+}
+:where(.set-card, .event-card):is(:hover, :focus-within) .art__dither { opacity: 0; }
+@media (prefers-reduced-motion: reduce) {
+  .art__dither { transition: none; }
+}
 .art { container-type: inline-size; }
 
 /* ---------- Playknop ---------- */

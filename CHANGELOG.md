@@ -8,6 +8,9 @@ Categorieën: **Toegevoegd**, **Gewijzigd**, **Opgelost**, **Verwijderd**, **Bev
 ## [Unreleased]
 
 ### Toegevoegd
+- Dither op covers: echte stills en flyers op set- en avondkaarten tonen een tweekleurige dither (indigo/magenta, `@krisenstab/dither-dither` 2.2.2, MIT); bij hover/focus komt de kleurenfoto terug. Alleen client-side, lazy geladen, nooit tijdens de build.
+- Knoppen: position-aware hover (GSAP), een cirkel vult de knop vanaf de muis en rolt eruit waar je weggaat. Naar CodePen OJYywaJ. Niet op touch of bij reduced motion.
+- Home: de intro ("Recorded live in the dome") blijft op desktop staan tot de hero voorbij is.
 - Peak-configurator op `/brand#peak`: palet (pink, sunset, magenta, rainbow), kolommen, blur, piek, dal, afval en overlap met schuifjes, live preview, "Try in footer" op de pagina zelf en de instelling om te plakken. Geometrie en paletten staan nu in `src/lib/peak.ts` (`PEAK_FOOTER` is de footer).
 - `/brand`: interne stijlgids met logo, kleuren (rechtstreeks uit `tokens.scss`), type- en ruimteschaal, radii, iconen, knoppen, player-knoppen, chips, kaarten, carousel, tracklist en de effecten (reveal met replay, smear-speeltuin met schuifjes, peak gradient). Noindex en niet in de sitemap.
 - Smear-effect instelbaar per element: `data-smear-amount`, `-shift`, `-spread`, `-duration`, `-dir`, `-ease`.
@@ -22,6 +25,7 @@ Categorieën: **Toegevoegd**, **Gewijzigd**, **Opgelost**, **Verwijderd**, **Bev
 - De eerste twee Space Dome-avonden in Melkweg (14-07-2023 en 23-12-2023) met line-up; nieuwe dj-pagina's voor Mono/Poly, Kutmah, Cintasoul, Cheyanne Hudson, Odaira en Sunny Saimuns.
 
 ### Gewijzigd
+- Setkaarten: datum/locatie (`--step--2`) en dj's (`--step--1`) een stuk kleiner, zodat de titel de kaart draagt.
 - Fonts: Stack Sans-familie, self-hosted via Fontsource 5.3.0. Notch voor de grote titels (`--font-display`), Headline voor koppen (`--font-heading`), Text voor tekst. Unbounded blijft alleen voor het logo (`--font-logo`); Hanken Grotesk eruit.
 - Titels flink groter voor meer contrast met de tekst: hero tot `step-8`, paginakop en dj tot `step-8`, settitel `step-7`, avondtitel `step-5`, h1 `step-6`, h2 `step-4`.
 - Footer-peak: geen schalen meer. Tijdens het scrollen mengt de vorm zelf van een startstand (vlakke band: falloff 0, lage valley, iets gezakt, dof) naar de eindstand (falloff 2,17, valley 0,45, blur 35), per frame herberekend in `src/scripts/peak.ts` (alleen in beeld, rAF). Zonder JS of bij reduced motion: de eindstand. Werkt nu ook in Firefox.
@@ -49,6 +53,9 @@ Categorieën: **Toegevoegd**, **Gewijzigd**, **Opgelost**, **Verwijderd**, **Bev
 ### Onderhoud
 - Netlify gekoppeld aan GitHub: `main` is productie, `staging` een branch deploy. README bijgewerkt.
 - Branch protection op `staging` en `main` (PR verplicht, geen force-push of verwijderen).
+
+### Verwijderd
+- Smear-effect (titels, footerlinks, `/brand`-speeltuin, `src/scripts/smear.ts`, filter in `BaseLayout`). Footerlinks kleuren nu naar de accentkleur bij hover.
 
 ## [2026-11-13]
 

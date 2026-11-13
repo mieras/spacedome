@@ -24,10 +24,10 @@ const href = setHref(set.id);
 const duration = formatDuration(set.data.video.duration);
 ---
 
-<article class="set-card" data-smear-scope>
+<article class="set-card">
   <div class="set-card__media">
     <a href={href} tabindex="-1" aria-hidden="true" class="set-card__cover">
-      <CoverArt seed={set.id} image={setStill(set)} alt="" eager={eager} />
+      <CoverArt seed={set.id} image={setStill(set)} alt="" eager={eager} dither />
     </a>
     <PlayButton item={item} class="set-card__play" />
     <QueueButton item={item} variant="icon" class="set-card__queue" />
@@ -38,7 +38,7 @@ const duration = formatDuration(set.data.video.duration);
       <time datetime={set.data.date.toISOString().slice(0, 10)}>{formatDate(set.data.date)}</time>
       {event && <span> · {event.data.venue.name}</span>}
     </p>
-    <Heading class="set-card__title"><a href={href} data-smear>{set.data.title}</a></Heading>
+    <Heading class="set-card__title"><a href={href}>{set.data.title}</a></Heading>
     <p class="set-card__djs">
       {
         djs.map((dj, i) => (
@@ -103,7 +103,9 @@ const duration = formatDuration(set.data.video.duration);
   .set-card__body { display: grid; gap: var(--space-3xs); }
   .set-card__title { font-size: var(--step-1); line-height: var(--leading-snug); }
   .set-card__title a { text-decoration: none; }
-  .set-card__djs { color: var(--color-muted); }
+  /* Datum en dj's klein: de titel draagt de kaart. */
+  .set-card__body .meta { font-size: var(--step--2); }
+  .set-card__djs { color: var(--color-muted); font-size: var(--step--1); }
   .set-card__djs a { text-decoration: none; }
   .set-card__djs a:hover { color: var(--color-fg); text-decoration: underline; }
 </style>

@@ -71,7 +71,7 @@ Beide self-hosted via Fontsource (geen verzoeken naar Google, AVG). Gekozen door
 - **Wrapper** (`.wrapper`): breed raster voor header, footer en kaartrasters, max 96rem.
 - Kaartrasters: `.grid` met `--grid-min` (standaard 16rem).
 - Carousel (`SetCarousel`): horizontale rij met `scroll-snap-type: x mandatory`. Telefoon 78% per kaart (stukje van de volgende zichtbaar), tablet 2,5, desktop 4. Pijlknoppen rechts in de sectiekop, uitgeschakeld aan begin/eind, verborgen als alles past.
-- Footer: merk (1,6fr) + Explore, Genres, Follow; tablet drie kolommen onder het merk, telefoon twee. Aantallen als `.badge` (pil, `--step--2`, tabular-nums). Links in systeem-mono, kapitalen, `--step--1`, met smear bij hover/focus. Onderaan een peak gradient (magenta, 10 kolommen; zie `PEAK_FOOTER` in `src/lib/peak.ts`) die tijdens het scrollen van vorm verandert: elke waarde mengt van `start` (vlakke band, gezakt, dof) naar de eindstand helemaal onderaan, met ease-in-out. Geen scale/transform, zodat de randen altijd tot de zijkant lopen; het copyright staat op de donkere vloer en is daarom altijd licht.
+- Footer: merk (1,6fr) + Explore, Genres, Follow; tablet drie kolommen onder het merk, telefoon twee. Aantallen als `.badge` (pil, `--step--2`, tabular-nums). Links in systeem-mono, kapitalen, `--step--1`, accentkleur bij hover. Onderaan een peak gradient (magenta, 10 kolommen; zie `PEAK_FOOTER` in `src/lib/peak.ts`) die tijdens het scrollen van vorm verandert: elke waarde mengt van `start` (vlakke band, gezakt, dof) naar de eindstand helemaal onderaan, met ease-in-out. Geen scale/transform, zodat de randen altijd tot de zijkant lopen; het copyright staat op de donkere vloer en is daarom altijd licht.
 - Setpagina: hero met video en info naast elkaar vanaf 64rem (`1.8fr / 1fr`). Het podium is daar sticky (onder de header) tot het einde van de hero; daarna mini-video. Titel `min(var(--step-6), 12cqi)` op de infokolom. Beschrijving en tracklist als tabs (`<sd-tabs>`, `src/scripts/tabs.ts`): onderstreepte tabs in meta-stijl, actieve tab met accentlijn, aantal tracks als pil.
 - Play-knop met tekst: `min-inline-size: 7.25rem`, zodat Play en Pause even breed zijn.
 
@@ -133,11 +133,13 @@ De kern van de site. Eén `<sd-player>` in de layout met `transition:persist`: h
 - [ ] Nederlandse vertaling (interface staat klaar in `src/i18n/ui.ts`)
 - [ ] OG-afbeelding per set (nu: cover of standaardbeeld)
 
-## Smear
-- Hover/focus-effect op titellinks en footerlinks, in plaats van een underline. Tekst plus een horizontaal geblurde, verschoven kopie (SVG-filter `#sd-smear` in `BaseLayout`), die GSAP terugbrengt naar 0.
-- Standaard: amount 14, shift 10, spread 0,6, 0,7s, rechts, `expo.out`; waarden voor 16px tekst, schalen mee met de lettergrootte (max 4×). Per element aan te passen met `data-smear-*`; uitproberen op `/brand#effects`.
-- `data-smear-scope` op een kaart: hover op de hele kaart laat de titel smeren. Bij een link met een klikbare `::after` smeer je een span erin (een filter maakt een containing block).
-- Uit bij `prefers-reduced-motion`.
+## Knoppen
+- `.button`: pil met rand. Hover met een muis: een cirkel (170% van de knop) vult de knop vanaf het punt waar de pointer binnenkomt, volgt hem (0,4s, power2) en rolt eruit waar hij weggaat (0,3s). Naar "Position Aware Button Hover w/ GSAP" (CodePen OJYywaJ), in `src/scripts/button-flair.ts` met event delegation. Kleur van de vulling: `--_bg-hover`, tekst: `--_fg-hover`.
+- Touch, toetsenbord, geen JS en `prefers-reduced-motion`: gewoon omkleuren.
+
+## Dither
+- Echte stills en flyers op set- en avondkaarten krijgen een tweekleurige dither (blue noise, WebGL) in `--dither-dark` (indigo) en `--dither-light` (magenta): `@krisenstab/dither-dither`, aangezet met `dither` op `CoverArt`. De kleurenfoto ligt eronder en komt terug bij hover/focus op de kaart; dat is ook de hover-feedback van de kaarten (geen underline).
+- Eén canvaspixel per CSS-pixel, zodat de korrel op elk formaat even grof is. Gegenereerde art wordt niet gedithered. Geen WebGL2 of laadfout: de kleurenfoto blijft staan.
 
 ## Stijlgids
-- `/brand` toont tokens, componenten en effecten live uit de code. Smear en peak gradient hebben er een speeltuin; de peak-instelling van de footer staat in `PEAK_FOOTER` (`src/lib/peak.ts`). Nieuw component of token: zet het daar ook bij.
+- `/brand` toont tokens, componenten en effecten live uit de code. De peak gradient heeft er een speeltuin; de peak-instelling van de footer staat in `PEAK_FOOTER` (`src/lib/peak.ts`). Nieuw component of token: zet het daar ook bij.

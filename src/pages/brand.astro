@@ -191,6 +191,7 @@ const toc = [
         <button class="button" type="button" aria-pressed="true">Pressed</button>
         <button class="icon-button" type="button" aria-label="Share"><Icon name="share" /></button>
       </div>
+      <p class="brand__note">Hover with a mouse: a circle fills the button from where the pointer enters, follows it and rolls out where it leaves (GSAP, <code>src/scripts/button-flair.ts</code>). Touch, keyboard and reduced motion get a plain colour swap.</p>
       <h3 class="brand__sub">Player buttons</h3>
       <p class="brand__note">These are live: they play <a href={setHref(featured.id)}>{featured.data.title}</a> in the player.</p>
       <div class="brand__row">
@@ -230,7 +231,7 @@ const toc = [
         <CoverArt seed="brand-c" alt="" ratio="1" />
         <CoverArt seed="brand-d" alt="" ratio="1" />
       </div>
-      <p class="brand__note">Generated art per seed when there is no still or poster.</p>
+      <p class="brand__note">Generated art per seed when there is no still or poster. Real stills and flyers on set and event cards are dithered in two colours (<code>dither</code> on <code>CoverArt</code>, <code>@krisenstab/dither-dither</code>); hover or focus on the card shows the colour photo.</p>
       <SetCarousel sets={lib.sets.slice(0, 10)} lib={lib} title="Carousel" id="brand-carousel" />
       {
         withTracks && (
@@ -256,41 +257,6 @@ const toc = [
           <p class="effect__date" data-reveal="chars">30.07</p>
           <p class="effect__headline" data-reveal="words">Recorded live in the dome</p>
           <p class="lead" data-reveal="up">Content blocks fade in and rise 18px.</p>
-        </div>
-      </div>
-
-      <div class="effect">
-        <div class="effect__head">
-          <h3 class="brand__sub">Smear</h3>
-          <button class="button" type="button" data-smear-play><Icon name="play" /> Smear</button>
-        </div>
-        <p class="brand__note">Hover or focus: text smears sideways like wet ink and dries back. Replaces underlines on titles and footer links. <code>data-smear</code> on the text, <code>data-smear-scope</code> on a card. Tune it below; values are for 16px text and scale with the font size.</p>
-        <div class="smear-lab">
-          <div class="effect__stage">
-            <a class="effect__headline effect__link" href={setHref(featured.id)} data-smear data-smear-demo>{featured.data.title}</a>
-            <a class="effect__mono" href="/sets" data-smear data-smear-demo>Sets <span class="badge">{lib.sets.length}</span></a>
-          </div>
-          <form class="lab__controls" data-smear-lab>
-            <label>Amount <output data-for="amount"></output><input type="range" name="amount" min="0" max="60" step="1" value="14" /></label>
-            <label>Shift <output data-for="shift"></output><input type="range" name="shift" min="0" max="40" step="1" value="10" /></label>
-            <label>Spread <output data-for="spread"></output><input type="range" name="spread" min="0" max="8" step="0.1" value="0.6" /></label>
-            <label>Duration <output data-for="duration"></output><input type="range" name="duration" min="0.2" max="2.5" step="0.05" value="0.7" /></label>
-            <label>Direction
-              <select name="dir"><option value="right">Right</option><option value="left">Left</option></select>
-            </label>
-            <label>Ease
-              <select name="ease">
-                <option>expo.out</option>
-                <option>power3.out</option>
-                <option>power2.inOut</option>
-                <option>back.out(2)</option>
-                <option>elastic.out(1, 0.4)</option>
-                <option>steps(6)</option>
-              </select>
-            </label>
-            <button class="button" type="reset">Reset</button>
-          </form>
-          <pre class="lab__code"><code data-smear-code>data-smear</code></pre>
         </div>
       </div>
 
@@ -355,7 +321,6 @@ const toc = [
 </BaseLayout>
 
 <script>
-  import { smear, SMEAR_DEFAULTS } from '../scripts/smear';
   import '../scripts/tabs';
   import { peakAt, peakSvg, SHAPE_KEYS, updatePeakSvg, type PeakOptions, type PeakPalette, type PeakShape } from '../lib/peak';
 
@@ -451,37 +416,6 @@ const toc = [
     update();
   });
 
-  // Smear-speeltuin: schuifjes zetten de data-smear-* attributen op de voorbeelden en tonen de
-  // markup die je kunt overnemen (alleen wat afwijkt van de standaard).
-  document.addEventListener('astro:page-load', () => {
-    const form = document.querySelector<HTMLFormElement>('[data-smear-lab]');
-    if (!form || form.dataset.bound) return;
-    form.dataset.bound = '';
-    const demos = [...document.querySelectorAll<HTMLElement>('[data-smear-demo]')];
-    const code = document.querySelector('[data-smear-code]')!;
-    const play = document.querySelector<HTMLButtonElement>('[data-smear-play]');
-    const keys = ['amount', 'shift', 'spread', 'duration', 'dir', 'ease'] as const;
-
-    const update = () => {
-      const data = new FormData(form);
-      const attrs: string[] = ['data-smear'];
-      for (const key of keys) {
-        const value = String(data.get(key));
-        const attr = `smear${key[0].toUpperCase()}${key.slice(1)}`;
-        demos.forEach((el) => (el.dataset[attr] = value));
-        const out = form.querySelector(`output[data-for="${key}"]`);
-        if (out) out.textContent = value;
-        if (value !== String(SMEAR_DEFAULTS[key])) attrs.push(`data-smear-${key}="${value}"`);
-      }
-      code.textContent = attrs.join(' ');
-    };
-    form.addEventListener('input', update);
-    form.addEventListener('change', () => smear(demos[0]));
-    form.addEventListener('reset', () => requestAnimationFrame(update));
-    play?.addEventListener('click', () => smear(demos[0]));
-    update();
-  });
-
   // Reveal opnieuw afspelen: markering weghalen en reveal.ts opnieuw laten lopen.
   document.addEventListener('astro:page-load', () => {
     const btn = document.querySelector<HTMLButtonElement>('[data-brand-replay]');
@@ -562,8 +496,8 @@ const toc = [
   .effect__headline { font-family: var(--font-display); font-weight: 800; font-size: var(--step-4); line-height: var(--leading-tight); text-transform: uppercase; letter-spacing: var(--tracking-display); }
   .effect__link { text-decoration: none; }
   .effect__mono { display: inline-flex; align-items: center; gap: 0.75ch; font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; text-transform: uppercase; letter-spacing: 0.04em; text-decoration: none; }
-  .smear-lab, .peak-lab, .peak-lab__main { display: grid; gap: var(--space-s); }
-  @media (min-width: 64rem) { .smear-lab, .peak-lab__main { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); align-items: start; } }
+  .peak-lab, .peak-lab__main { display: grid; gap: var(--space-s); }
+  @media (min-width: 64rem) { .peak-lab__main { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); align-items: start; } }
   .lab__controls { display: grid; gap: var(--space-xs); align-content: start; padding: var(--space-m); border-radius: var(--radius-l); background: var(--color-surface); }
   .lab__controls label { display: grid; grid-template-columns: 1fr auto; gap: var(--space-3xs) var(--space-xs); font-size: var(--step--1); font-weight: 600; }
   .lab__controls input, .lab__controls select { grid-column: 1 / -1; inline-size: 100%; accent-color: var(--color-accent); }

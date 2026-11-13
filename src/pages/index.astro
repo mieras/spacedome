@@ -46,7 +46,7 @@ const djs = lib.djs.filter((d) => setsByDj(lib, d.id).length > 0);
               {featured.data.video.duration && <> · {formatDuration(featured.data.video.duration)}</>}
             </p>
             <h2 id="featured-title" class="hero__set-title">
-              <a href={setHref(featured.id)} data-smear>{featured.data.title}</a>
+              <a href={setHref(featured.id)}>{featured.data.title}</a>
             </h2>
             <p class="muted">{joinNames(lib.djsOf(featured).map((d) => d.data.name))}</p>
             <div class="hero__actions">
@@ -158,6 +158,8 @@ const djs = lib.djs.filter((d) => setsByDj(lib, d.id).length > 0);
   }
   @media (min-width: 60rem) {
     .hero { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); }
+    /* Intro blijft staan terwijl de featured set langsschuift, tot de hero ophoudt. */
+    .hero__intro { position: sticky; inset-block-start: calc(var(--header-h) + var(--space-m)); }
   }
   .hero__intro { display: grid; gap: var(--space-s); align-content: start; }
   .hero__cta { display: flex; flex-wrap: wrap; gap: var(--space-2xs); margin-block-start: var(--space-2xs); }

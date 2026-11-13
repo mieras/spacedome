@@ -16,15 +16,17 @@ interface Props {
   ratio?: '1' | '16/9' | '4/5' | 'auto';
   sizes?: string;
   eager?: boolean;
+  /** Dither-versie over de foto (src/scripts/dither.ts); kleur komt terug bij hover/focus op de kaart. */
+  dither?: boolean;
   class?: string;
 }
 
-const { seed, image, alt = '', ratio = '1', sizes = '(min-width: 60rem) 25vw, 50vw', eager = false, class: className } = Astro.props;
+const { seed, image, alt = '', ratio = '1', sizes = '(min-width: 60rem) 25vw, 50vw', eager = false, dither = false, class: className } = Astro.props;
 const artRatio = ratio === 'auto' ? (image && typeof image !== 'string' ? `${image.width}/${image.height}` : '4/5') : ratio;
 const style = `${artStyle(seed)};--art-ratio:${artRatio}`;
 ---
 
-<div class:list={['art', className]} style={style}>
+<div class:list={['art', className]} style={style} data-dither={dither && image ? '' : undefined}>
   {
     image && typeof image !== 'string' && (
       <Image
@@ -55,3 +57,7 @@ const style = `${artStyle(seed)};--art-ratio:${artRatio}`;
   }
   <slot />
 </div>
+
+<script>
+  import '../scripts/dither';
+</script>
