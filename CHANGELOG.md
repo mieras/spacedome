@@ -39,6 +39,7 @@ Categorieën: **Toegevoegd**, **Gewijzigd**, **Opgelost**, **Verwijderd**, **Bev
 - Play-knop met tekst: gewoon "Play"/"Pause", even breed (geen verspringen).
 
 ### Opgelost
+- /brand#peak: de sticky preview schoof over het codeblok (en de play-knop over de code). Preview en schuifjes zitten nu in een eigen blok, het codeblok eronder.
 - Bunny-still die nog niet klaar is (of geweigerd wordt) gaf een kapot-plaatje-icoon; nu blijft de gegenereerde art staan.
 - Op mobiel kon je na "alleen audio" niet meer terug naar video: de knop in de balk blijft nu staan (als camera-icoon).
 
