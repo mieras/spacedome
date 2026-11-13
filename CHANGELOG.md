@@ -21,6 +21,7 @@ Categorieën: **Toegevoegd**, **Gewijzigd**, **Opgelost**, **Verwijderd**, **Bev
 - De eerste twee Space Dome-avonden in Melkweg (14-07-2023 en 23-12-2023) met line-up; nieuwe dj-pagina's voor Mono/Poly, Kutmah, Cintasoul, Cheyanne Hudson, Odaira en Sunny Saimuns.
 
 ### Gewijzigd
+- Peak gradient in de footer: roze/paars palet (indigo vloer, violet, magenta, zachtroze kern) in plaats van de regenboog, en gekoppeld aan het scrollen (CSS scroll-driven animation, geen JS): rijst op terwijl de footer in beeld schuift, zakt weer weg als je terugscrollt. Zonder ondersteuning (Firefox) of bij reduced motion staat hij er gewoon.
 - Smear-effect ook op titels (uitgelichte set, setkaarten, avondkaarten, dj-kaarten) in plaats van de hover-underline; hover op de hele kaart telt. Filter staat nu globaal in `BaseLayout`, `.badge` is een globale stijl.
 - Home-hero: intro bovenaan uitgelijnd met de video.
 - Avondpagina: datum nog kleiner (step-4), titel step-3. Flyer in eigen verhouding (`ratio="auto"` in CoverArt).
