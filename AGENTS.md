@@ -30,6 +30,7 @@ Lees eerst `README.md` voor context, `CHANGELOG.md` voor recente wijzigingen en 
 - SEO en AI readiness volgens `~/Code/_standards/SEO.md`.
 
 ## Projectspecifiek
+- **Scope**: alleen Space Dome FM (radioshows en sets, dj's, genres). Geen avonden, agenda, RA-links of venue-logo's. Plan en architectuur: `docs/plan.md` (lokaal, niet in git) (SSR op Netlify met CDN-cache en purge via Sanity-webhook, geen rebuild per publicatie).
 - **Player** (`src/scripts/player.ts`): het `<sd-player>`-element is persistent; het script draait één keer. Per pagina alleen opnieuw koppelen via `astro:after-swap` / `astro:page-load`. Niet het element uit het document halen (dan pauzeert de video).
 - Elke knop die iets met de player doet, gebruikt `data-player-play` / `data-player-queue` met `data-item` (JSON van `toPlayerItem()`). Geen eigen click-handlers per knop.
 - Het podium op een setpagina is `[data-player-stage="<set-id>"]`; de video ligt er overheen via CSS anchor positioning (`anchor-name: --sd-stage`), fallback absoluut in documentcoördinaten. Op desktop is het podium sticky.

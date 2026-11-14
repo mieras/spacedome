@@ -7,7 +7,6 @@ const path = Astro.url.pathname;
 const nav = [
   { href: '/sets', label: t('nav.sets') },
   { href: '/djs', label: t('nav.djs') },
-  { href: '/events', label: t('nav.events') },
   { href: '/about', label: t('nav.about') },
 ];
 const isCurrent = (href: string) => path === href || path.startsWith(`${href}/`);

@@ -34,39 +34,3 @@ export function websiteJsonLd(site: URL, s: Settings = settings) {
     publisher: { '@id': new URL('/#entity', site).href },
   };
 }
-
-type EventLd = {
-  name: string;
-  url: string;
-  start: Date;
-  end?: Date;
-  venue: { name: string; city: string; url?: string };
-  performers: string[];
-  description?: string;
-  image?: string;
-  ticketUrl?: string;
-};
-
-export function musicEventJsonLd(e: EventLd, site: URL) {
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'MusicEvent',
-    name: e.name,
-    url: e.url,
-    startDate: e.start.toISOString(),
-    ...(e.end && { endDate: e.end.toISOString() }),
-    eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
-    eventStatus: 'https://schema.org/EventScheduled',
-    location: {
-      '@type': 'Place',
-      name: e.venue.name,
-      ...(e.venue.url && { url: e.venue.url }),
-      address: { '@type': 'PostalAddress', addressLocality: e.venue.city, addressCountry: 'NL' },
-    },
-    organizer: { '@id': new URL('/#entity', site).href },
-    ...(e.performers.length && { performer: e.performers.map((name) => ({ '@type': 'Person', name })) }),
-    ...(e.description && { description: e.description }),
-    ...(e.image && { image: e.image }),
-    ...(e.ticketUrl && { offers: { '@type': 'Offer', url: e.ticketUrl } }),
-  };
-}

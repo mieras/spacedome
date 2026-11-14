@@ -10,7 +10,7 @@ import ShareButton from '../../components/ShareButton.astro';
 import Tracklist from '../../components/Tracklist.astro';
 import { t } from '../../i18n/ui';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { djHref, eventHref, genreHref, getLibrary, setHref, setStill, suggestionsFor, toPlayerItem, type SetEntry } from '../../lib/content';
+import { djHref, genreHref, getLibrary, setHref, setStill, suggestionsFor, toPlayerItem, type SetEntry } from '../../lib/content';
 import { formatDate, formatDuration, joinNames } from '../../lib/format';
 
 export async function getStaticPaths() {
@@ -23,7 +23,6 @@ const lib = await getLibrary();
 const item = await toPlayerItem(set, lib);
 const djs = lib.djsOf(set);
 const genres = lib.genresOf(set);
-const event = lib.eventOf(set);
 const suggestions = suggestionsFor(set, lib, 10);
 const { Content } = await render(set);
 const duration = formatDuration(set.data.video.duration);
@@ -49,8 +48,6 @@ const description = `${set.data.title} by ${joinNames(djs.map((d) => d.data.name
           <p class="meta" data-reveal="up">
             <time datetime={set.data.date.toISOString().slice(0, 10)}>{formatDate(set.data.date)}</time>
             {duration && <> · {duration}</>}
-            {' · '}
-            {event ? <a href={eventHref(event.id)}>{t('set.recordedAt')} {event.data.title} @ {event.data.venue.name}</a> : t('set.standalone')}
           </p>
           <h1 class="set__title" data-reveal="words">{set.data.title}</h1>
           <ul class="set__djs" role="list" data-reveal="up">

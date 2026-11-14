@@ -71,7 +71,7 @@
     animation: art-ring calc(var(--art-dur, 18s) * 0.6) ease-in-out var(--art-delay, 0s) infinite;
     transition: scale var(--dur-slow) var(--ease-out);
   }
-  :is(.set-card, .event-card):hover .art::before,
+  .set-card:hover .art::before,
   a:hover > .art::before { scale: 1.14; }
 }
 @keyframes art-drift {

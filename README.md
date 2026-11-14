@@ -1,6 +1,6 @@
 # spacedome
 
-> Site voor Space Dome: DJ-sets uit de LA beat scene kijken en luisteren, met een player die site-breed doorspeelt, plus dj's, genres en avonden.
+> Site voor Space Dome FM: radioshows en DJ-sets uit de LA beat scene kijken en luisteren, met een player die site-breed doorspeelt, plus dj's en genres. De losse avonden (Melkweg, De Nachtzuster) vallen erbuiten. Plan: `docs/plan.md` (lokaal, niet in git).
 
 | | |
 |---|---|
@@ -59,25 +59,24 @@ Waarden staan nooit in git.
 ```
 src/
   components/   UI (SetCard, PlayButton, Player, CoverArt, …)
-  content/      Markdown: sets, djs, genres, events, pages
+  content/      Markdown: sets, djs, genres, pages
   i18n/         Interfaceteksten (EN, NL in voorbereiding)
   layouts/      BaseLayout (head, header, footer, player)
   lib/          Datalaag (content.ts), art, format, seo
   pages/        Routes
   scripts/      player.ts (site-brede player), share.ts
   styles/       tokens.scss (Utopia + kleur), layout, base, player
-docs/           Intake-mail en notities
+docs/           Plan, mails aan Space Dome en notities (lokaal, in .gitignore: de repo is publiek)
 DESIGN.md       Ontwerpsysteem
 ```
 
 ## Content en CMS
 
-- **Sets:** titel, omschrijving (body), datum, dj's, genres, avond (optioneel, leeg = losse set), video (`src`, `duration`, `bunny`, `stack`, `thumbnail`), eigen still (`poster`, anders de Bunny-thumbnail), tracklist (artiest, titel, label, optioneel tijd).
+- **Sets:** titel, omschrijving (body), datum, dj's, genres, video (`src`, `duration`, `bunny`, `stack`, `thumbnail`), eigen still (`poster`, anders de Bunny-thumbnail), tracklist (artiest, titel, label, optioneel tijd).
 - **DJs:** naam, plaats, resident, foto, links, bio (body).
 - **Genres:** titel, omschrijving.
-- **Events:** titel, start/eind, locatie, poster, RA-link, line-up, tekst (body).
 - **Pages:** about.
-- Schema: `src/content.config.ts`. De Markdown-content is **dummy** (fictieve dj's), behalve de avonden (Melkweg 2023, De Nachtzuster 2026), hun line-up-dj's, de sets van Drvg Cvltvre en Ono-Sendai Sound en de about-tekst.
+- Schema: `src/content.config.ts`. De Markdown-content is **dummy** (fictieve dj's), behalve de sets van Drvg Cvltvre en Ono-Sendai Sound en de about-tekst (die gaat nog over de avonden; nieuwe tekst voor FM komt van Space Dome).
 - Overstap naar Sanity volgens `~/Code/_standards/SANITY-MIGRATIE.md`; alle pagina's lezen via `src/lib/content.ts`.
 
 ### Set toevoegen (tot Sanity er is)
@@ -101,7 +100,7 @@ Het script (`scripts/set-add.mjs`) laat Bunny Stream de video zelf uit STACK oph
 - Geen cookies, geen tracking. `localStorage` alleen voor thema, wachtrij en speelpositie (functioneel).
 - Fonts self-hosted (geen Google-verzoeken). Video komt van een externe streamingdienst (nu Mux-teststreams).
 - WCAG 2.2 AA: skiplink, focus-states, player volledig met toetsenbord, `aria-live` voor de player, `prefers-reduced-motion` en `prefers-contrast` gerespecteerd.
-- SEO volgens `~/Code/_standards/SEO.md`: meta, OG, JSON-LD (Organization, WebSite, MusicEvent), sitemap, `robots.txt`, `llms.txt`. **Staat op `noindex`** tot livegang (`src/settings.ts`).
+- SEO volgens `~/Code/_standards/SEO.md`: meta, OG, JSON-LD (Organization, WebSite), sitemap, `robots.txt`, `llms.txt`. **Staat op `noindex`** tot livegang (`src/settings.ts`).
 
 ## Deploy
 

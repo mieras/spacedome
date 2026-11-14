@@ -1,6 +1,6 @@
 /*
  * Content collections (Markdown). Later één-op-één naar Sanity-documenttypes:
- * set, dj, genre, event en page. Referenties worden Sanity-references.
+ * set, dj, genre en page. Referenties worden Sanity-references.
  */
 import { defineCollection, reference } from 'astro:content';
 import { glob } from 'astro/loaders';
@@ -31,28 +31,6 @@ const djs = defineCollection({
     }),
 });
 
-const events = defineCollection({
-  loader: md('events'),
-  schema: ({ image }) =>
-    z.object({
-      title: z.string(),
-      /** Begin, met tijdzone: 2026-07-30T18:30:00+02:00 */
-      start: z.coerce.date(),
-      end: z.coerce.date().optional(),
-      venue: z.object({
-        name: z.string(),
-        city: z.string(),
-        url: z.url().optional(),
-      }),
-      poster: image().optional(),
-      posterAlt: z.string().optional(),
-      /** Tickets of event op Resident Advisor */
-      ticketUrl: z.url().optional(),
-      /** Line-up voor aangekondigde avonden; bij afgelopen avonden volgt die ook uit de sets. */
-      lineup: z.array(reference('djs')).default([]),
-    }),
-});
-
 const sets = defineCollection({
   loader: md('sets'),
   schema: ({ image }) =>
@@ -61,8 +39,6 @@ const sets = defineCollection({
       date: z.coerce.date(),
       djs: z.array(reference('djs')).min(1),
       genres: z.array(reference('genres')).default([]),
-      /** Leeg = losse set */
-      event: reference('events').optional(),
       video: z.object({
         /** HLS (.m3u8) of MP4. Bunny Stream: https://<cdn-host>/<guid>/playlist.m3u8 */
         src: z.string(),
@@ -103,4 +79,4 @@ const pages = defineCollection({
   }),
 });
 
-export const collections = { genres, djs, events, sets, pages };
+export const collections = { genres, djs, sets, pages };

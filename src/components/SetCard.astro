@@ -19,7 +19,6 @@ interface Props {
 const { set, lib, headingLevel: Heading = 'h3', eager = false } = Astro.props;
 const item = await toPlayerItem(set, lib);
 const djs = lib.djsOf(set);
-const event = lib.eventOf(set);
 const href = setHref(set.id);
 const duration = formatDuration(set.data.video.duration);
 ---
@@ -36,7 +35,6 @@ const duration = formatDuration(set.data.video.duration);
   <div class="set-card__body">
     <p class="meta">
       <time datetime={set.data.date.toISOString().slice(0, 10)}>{formatDate(set.data.date)}</time>
-      {event && <span> · {event.data.venue.name}</span>}
     </p>
     <Heading class="set-card__title"><a href={href}>{set.data.title}</a></Heading>
     <p class="set-card__djs">

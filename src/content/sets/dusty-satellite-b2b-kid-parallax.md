@@ -3,7 +3,6 @@ title: Dusty Satellite b2b Kid Parallax
 date: 2026-07-30
 djs: [dusty-satellite, kid-parallax]
 genres: [trip-hop, downtempo, beats]
-event: 2026-07-30-de-nachtzuster
 video:
   src: https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8
   duration: 6300

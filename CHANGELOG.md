@@ -8,6 +8,7 @@ Categorieën: **Toegevoegd**, **Gewijzigd**, **Opgelost**, **Verwijderd**, **Bev
 ## [Unreleased]
 
 ### Toegevoegd
+- `docs/plan.md`: projectplan met scope, contentmodel, fases en de rendering-aanpak (SSR op Netlify, CDN-cache met cache-tags, purge via Sanity-webhook). Briefingmail aan Space Dome in `docs/mail-briefing.md`. `docs/` staat voortaan in `.gitignore` (de repo is publiek); de map blijft lokaal.
 - Gegenereerde covers bewegen: de lichtbollen drijven, de kleur schuift mee en de ring (dome) zweeft en ademt; tempo en startpunt per seed, ring zet aan bij hover. Alleen CSS (`@property`), niet bij echte stills of `prefers-reduced-motion`.
 - Knoppen: position-aware hover (GSAP), een cirkel vult de knop vanaf de muis en rolt eruit waar je weggaat. Naar CodePen OJYywaJ. Niet op touch of bij reduced motion.
 - Home: de intro ("Recorded live in the dome") blijft op desktop staan tot de hero voorbij is.
@@ -25,6 +26,7 @@ Categorieën: **Toegevoegd**, **Gewijzigd**, **Opgelost**, **Verwijderd**, **Bev
 - De eerste twee Space Dome-avonden in Melkweg (14-07-2023 en 23-12-2023) met line-up; nieuwe dj-pagina's voor Mono/Poly, Kutmah, Cintasoul, Cheyanne Hudson, Odaira en Sunny Saimuns.
 
 ### Gewijzigd
+- Scope: de site is alleen voor Space Dome FM. Tagline, omschrijving en home-intro spreken van radioshows en sets in plaats van avonden. README, DESIGN en AGENTS bijgewerkt.
 - Setkaarten: datum/locatie (`--step--2`) en dj's (`--step--1`) een stuk kleiner, zodat de titel de kaart draagt.
 - Fonts: Stack Sans-familie, self-hosted via Fontsource 5.3.0. Notch voor de grote titels (`--font-display`), Headline voor koppen (`--font-heading`), Text voor tekst. Unbounded blijft alleen voor het logo (`--font-logo`); Hanken Grotesk eruit.
 - Titels flink groter voor meer contrast met de tekst: hero tot `step-8`, paginakop en dj tot `step-8`, settitel `step-7`, avondtitel `step-5`, h1 `step-6`, h2 `step-4`.
@@ -55,6 +57,7 @@ Categorieën: **Toegevoegd**, **Gewijzigd**, **Opgelost**, **Verwijderd**, **Bev
 - Branch protection op `staging` en `main` (PR verplicht, geen force-push of verwijderen).
 
 ### Verwijderd
+- Avonden: `/events`, `EventCard`, de collectie `events`, flyers, het veld `event` op sets, venue in setkaarten en op de setpagina, MusicEvent-JSON-LD, de Events-sectie op home, in header, footer, `/brand` en `llms.txt`. De zes dj's die alleen in line-ups stonden (zonder sets) zijn ook weg.
 - Smear-effect (titels, footerlinks, `/brand`-speeltuin, `src/scripts/smear.ts`, filter in `BaseLayout`). Footerlinks kleuren nu naar de accentkleur bij hover.
 
 ## [2026-11-13]

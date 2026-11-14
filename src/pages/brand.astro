@@ -7,7 +7,6 @@
 import tokens from '../styles/tokens.scss?raw';
 import CoverArt from '../components/CoverArt.astro';
 import DjAvatar from '../components/DjAvatar.astro';
-import EventCard from '../components/EventCard.astro';
 import Icon from '../components/Icon.astro';
 import Logo from '../components/Logo.astro';
 import PageHeader from '../components/PageHeader.astro';
@@ -19,7 +18,7 @@ import SetGrid from '../components/SetGrid.astro';
 import ShareButton from '../components/ShareButton.astro';
 import Tracklist from '../components/Tracklist.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { getLibrary, setHref, setsByEvent, toPlayerItem } from '../lib/content';
+import { getLibrary, setHref, toPlayerItem } from '../lib/content';
 import { PEAK_FOOTER, PEAK_PALETTES } from '../lib/peak';
 
 // Schuifjes voor de peak-configurator, per stand (Start en End).
@@ -37,7 +36,6 @@ const lib = await getLibrary();
 const featured = lib.sets.find((s) => s.data.featured) ?? lib.sets[0];
 const item = await toPlayerItem(featured, lib);
 const withTracks = lib.sets.find((s) => s.data.tracklist.length > 0);
-const event = lib.events[0];
 
 // Kleuren: elke --color-* uit tokens.scss, met de licht- en donkerwaarde uit light-dark().
 const colors = [...tokens.matchAll(/--color-([\w-]+):\s*(.+?);/g)].map(([, name, value]) => {
@@ -222,8 +220,6 @@ const toc = [
       <h2 id="cards" class="brand__title">Cards</h2>
       <h3 class="brand__sub">Set grid</h3>
       <SetGrid sets={lib.sets.slice(0, 4)} lib={lib} />
-      <h3 class="brand__sub">Event</h3>
-      {event && <EventCard event={event} setCount={setsByEvent(lib, event.id).length} />}
       <h3 class="brand__sub">Cover art</h3>
       <div class="covers">
         <CoverArt seed="brand-a" alt="" ratio="1" />

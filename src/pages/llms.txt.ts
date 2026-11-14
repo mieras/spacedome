@@ -1,6 +1,6 @@
 // Zie ~/Code/_standards/SEO.md §6. Samenvatting en index voor AI-assistenten.
 import type { APIRoute } from 'astro';
-import { djHref, eventHref, getLibrary, setHref } from '../lib/content';
+import { djHref, getLibrary, setHref } from '../lib/content';
 import { formatDate, joinNames } from '../lib/format';
 import { settings } from '../settings';
 
@@ -21,10 +21,6 @@ export const GET: APIRoute = async ({ site }) => {
     '## DJs',
     '',
     ...lib.djs.map((d) => `- [${d.data.name}](${url(djHref(d.id))})`),
-    '',
-    '## Events',
-    '',
-    ...lib.events.map((e) => `- [${e.data.title} @ ${e.data.venue.name}](${url(eventHref(e.id))}): ${formatDate(e.data.start)}, ${e.data.venue.city}`),
     '',
     '## About',
     '',

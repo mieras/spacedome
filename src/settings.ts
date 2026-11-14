@@ -3,10 +3,10 @@
  */
 export const settings = {
   siteName: 'Space Dome',
-  /** TODO: placeholder, definitieve tekst komt van Space Dome. */
-  tagline: 'DJ sets recorded live at Space Dome. Watch, listen, repeat.',
+  /** TODO: placeholder, definitieve tekst en naam (Space Dome FM of Space Dome Radio) komen van Space Dome. */
+  tagline: 'Radio shows and DJ sets from Space Dome. Watch, listen, repeat.',
   description:
-    'Watch and listen to DJ sets recorded live at Space Dome nights: beats, trip-hop, deep grooves and experimental rhythms.',
+    'Watch and listen to radio shows and DJ sets from Space Dome: beats, trip-hop, deep grooves and experimental rhythms.',
   titleTemplate: '%s · Space Dome',
   lang: 'en',
   locale: 'en_GB',
