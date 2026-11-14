@@ -1,6 +1,5 @@
 ---
-import { getImage } from 'astro:assets';
-import { render } from 'astro:content';
+import { PortableText } from 'astro-portabletext';
 import CoverArt from '../../components/CoverArt.astro';
 import DjAvatar from '../../components/DjAvatar.astro';
 import PlayButton from '../../components/PlayButton.astro';
@@ -10,26 +9,20 @@ import ShareButton from '../../components/ShareButton.astro';
 import Tracklist from '../../components/Tracklist.astro';
 import { t } from '../../i18n/ui';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { djHref, eventHref, genreHref, getLibrary, setHref, setStill, suggestionsFor, toPlayerItem, type SetEntry } from '../../lib/content';
+import { djHref, genreHref, getLibrary, setHref, setOgImage, setStill, suggestionsFor, toPlayerItem } from '../../lib/content';
 import { formatDate, formatDuration, joinNames } from '../../lib/format';
 
-export async function getStaticPaths() {
-  const { sets } = await getLibrary();
-  return sets.map((set) => ({ params: { id: set.id }, props: { set } }));
-}
-
-const { set } = Astro.props as { set: SetEntry };
 const lib = await getLibrary();
+const set = lib.sets.find((s) => s.id === Astro.params.id);
+if (!set) return Astro.rewrite('/404');
 const item = await toPlayerItem(set, lib);
 const djs = lib.djsOf(set);
 const genres = lib.genresOf(set);
-const event = lib.eventOf(set);
 const suggestions = suggestionsFor(set, lib, 10);
-const { Content } = await render(set);
 const duration = formatDuration(set.data.video.duration);
 const still = setStill(set);
-// Alleen een eigen poster als OG-beeld: crawlers sturen geen Referer, dus Bunny zou ze weigeren.
-const ogImage = set.data.poster ? (await getImage({ src: set.data.poster, width: 1200, height: 630, fit: 'cover', format: 'jpg' })).src : undefined;
+// Alleen een eigen still als OG-beeld: crawlers sturen geen Referer, dus Bunny zou ze weigeren.
+const ogImage = setOgImage(set);
 const hasText = !!set.body?.trim();
 const hasTracks = set.data.tracklist.length > 0;
 const description = `${set.data.title} by ${joinNames(djs.map((d) => d.data.name))}. ${set.body?.split('\n').find(Boolean) ?? ''}`;
@@ -49,8 +42,6 @@ const description = `${set.data.title} by ${joinNames(djs.map((d) => d.data.name
           <p class="meta" data-reveal="up">
             <time datetime={set.data.date.toISOString().slice(0, 10)}>{formatDate(set.data.date)}</time>
             {duration && <> · {duration}</>}
-            {' · '}
-            {event ? <a href={eventHref(event.id)}>{t('set.recordedAt')} {event.data.title} @ {event.data.venue.name}</a> : t('set.standalone')}
           </p>
           <h1 class="set__title" data-reveal="words">{set.data.title}</h1>
           <ul class="set__djs" role="list" data-reveal="up">
@@ -103,7 +94,7 @@ const description = `${set.data.title} by ${joinNames(djs.map((d) => d.data.name
                 <section class="tabs__panel" id="panel-about" aria-labelledby="about-title">
                   <h2 id="about-title" class="set__subtitle" data-tabs-heading>{t('set.about')}</h2>
                   <div class="prose set__text">
-                    <Content />
+                    <PortableText value={set.content ?? []} />
                   </div>
                 </section>
               )}

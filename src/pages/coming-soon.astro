@@ -1,0 +1,205 @@
+---
+/*
+ * Statuspagina: coming soon of onderhoud. Staat de site in Sanity (Site-instellingen → Status) niet op
+ * Live, dan toont src/middleware.ts deze pagina op elke URL. Altijd zelf te openen op /coming-soon;
+ * ?mode=maintenance of ?mode=comingSoon om de andere variant te bekijken.
+ *
+ * Onderhoud geeft 503 met Retry-After (zoekmachines komen later terug); coming soon gewoon 200 + noindex.
+ */
+import Logo from '../components/Logo.astro';
+import PeakGradient from '../components/PeakGradient.astro';
+import { t } from '../i18n/ui';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getSettings, type SiteMode } from '../lib/content';
+import { settings as defaults } from '../settings';
+
+const settings = await getSettings();
+const { status } = settings;
+const asked = new URL(Astro.request.url).searchParams.get('mode');
+const mode: Exclude<SiteMode, 'live'> = asked === 'maintenance' || asked === 'comingSoon' ? asked : status.mode === 'maintenance' ? 'maintenance' : 'comingSoon';
+const isMaintenance = mode === 'maintenance';
+
+const title = status.title || t(isMaintenance ? 'status.maintenance' : 'status.comingSoon');
+const text = status.text || (isMaintenance ? t('status.maintenanceText') : settings.tagline);
+const countdown = status.countdown && status.countdown.valueOf() > Date.now() ? status.countdown : undefined;
+
+if (isMaintenance) {
+  Astro.response.status = 503;
+  const retry = countdown ? Math.ceil((countdown.valueOf() - Date.now()) / 1000) : 3600;
+  Astro.response.headers.set('Retry-After', String(Math.max(60, retry)));
+  Astro.response.headers.set('Cache-Control', 'no-store');
+}
+
+const when = countdown
+  ? new Intl.DateTimeFormat('en-GB', { dateStyle: 'long', timeStyle: 'short', timeZone: defaults.timeZone }).format(countdown)
+  : undefined;
+const units = [
+  { key: 'days', label: t('countdown.days') },
+  { key: 'hours', label: t('countdown.hours') },
+  { key: 'minutes', label: t('countdown.minutes') },
+  { key: 'seconds', label: t('countdown.seconds') },
+] as const;
+---
+
+<BaseLayout title={title} description={text} noindex bare>
+  <main id="main" class="status">
+    <div class="status__content wrapper">
+      <Logo id="status" class="status__logo" />
+      <h1 class="status__title">{title}</h1>
+      {text && <p class="lead status__text">{text}</p>}
+
+      {
+        countdown && (
+          <div class="countdown" data-countdown={countdown.toISOString()}>
+            <p class="meta">
+              {t(isMaintenance ? 'status.backAt' : 'status.launch')} <time datetime={countdown.toISOString()}>{when}</time>
+            </p>
+            {/* Cijfers alleen visueel: een tikkende teller voorlezen is onrustig. De datum hierboven is de tekst. */}
+            <ol class="countdown__units" role="list" aria-hidden="true">
+              {units.map((u) => (
+                <li class="countdown__unit">
+                  <span class="countdown__value" data-unit={u.key}>
+                    --
+                  </span>
+                  <span class="countdown__label meta">{u.label}</span>
+                </li>
+              ))}
+            </ol>
+            <p class="countdown__done lead" hidden>
+              {t('status.now')}
+            </p>
+          </div>
+        )
+      }
+
+      {
+        settings.socials.length > 0 && (
+          <ul class="status__socials" role="list">
+            {settings.socials.map((s) => (
+              <li>
+                <a class="button" href={s.url} rel="noopener" target="_blank">
+                  {s.label}
+                  <span class="visually-hidden"> (opens in a new tab)</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </div>
+
+    <PeakGradient id="status-peak" class="status__peak" still />
+  </main>
+</BaseLayout>
+
+<script>
+  // Countdown: elke seconde bijwerken, ook na een ClientRouter-navigatie. Stopt bij nul.
+  let timer: ReturnType<typeof setInterval> | undefined;
+
+  function start() {
+    clearInterval(timer);
+    const el = document.querySelector<HTMLElement>('[data-countdown]');
+    if (!el) return;
+    const target = Date.parse(el.dataset.countdown!);
+    const out = Object.fromEntries([...el.querySelectorAll<HTMLElement>('[data-unit]')].map((n) => [n.dataset.unit, n]));
+    const pad = (n: number) => String(n).padStart(2, '0');
+
+    const tick = () => {
+      const left = Math.max(0, Math.floor((target - Date.now()) / 1000));
+      out.days.textContent = String(Math.floor(left / 86400));
+      out.hours.textContent = pad(Math.floor((left % 86400) / 3600));
+      out.minutes.textContent = pad(Math.floor((left % 3600) / 60));
+      out.seconds.textContent = pad(left % 60);
+      if (left === 0) {
+        clearInterval(timer);
+        el.querySelector<HTMLElement>('.countdown__units')!.hidden = true;
+        el.querySelector<HTMLElement>('.countdown__done')!.hidden = false;
+      }
+    };
+    tick();
+    timer = setInterval(tick, 1000);
+  }
+
+  document.addEventListener('astro:page-load', start);
+</script>
+
+<style>
+  .status {
+    position: relative;
+    display: grid;
+    grid-template-rows: 1fr auto;
+    min-block-size: 100svh;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .status__content {
+    display: grid;
+    justify-items: center;
+    align-content: center;
+    gap: var(--space-s);
+    padding-block: var(--space-xl) var(--space-l);
+    text-align: center;
+  }
+  .status__content > :global(.status__logo) {
+    --logo-size: clamp(5rem, 18vw, 8rem);
+    margin-block-end: var(--space-s);
+  }
+  .status__title {
+    font-size: min(var(--step-7), 15vw);
+    text-transform: uppercase;
+    line-height: 0.92;
+    overflow-wrap: break-word;
+    hyphens: manual;
+  }
+  .status__text { max-inline-size: 36ch; }
+
+  .countdown {
+    display: grid;
+    justify-items: center;
+    gap: var(--space-xs);
+    margin-block-start: var(--space-s);
+  }
+  .countdown__units {
+    display: flex;
+    gap: var(--space-s);
+    padding: 0;
+    margin: 0;
+  }
+  .countdown__unit {
+    display: grid;
+    justify-items: center;
+    gap: var(--space-3xs);
+    min-inline-size: 3ch;
+  }
+  .countdown__value {
+    font-family: var(--font-display);
+    font-size: var(--step-4);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+
+  .status__socials {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-2xs);
+    padding: 0;
+    margin-block-start: var(--space-s);
+  }
+  /* Effen achtergrond: de knop kan boven de roze gradient vallen (contrast). */
+  .status__socials :global(.button) { background-color: var(--color-bg); }
+
+  /* Gradient onderin, achter de inhoud. Eindstand van de footer, zonder scrollkoppeling. */
+  .status > :global(.status__peak) {
+    position: absolute;
+    inset: auto 0 0;
+    block-size: clamp(12rem, 42svh, 28rem);
+    z-index: -1;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .status > :global(.status__peak) { animation: peak-rise 1.6s var(--ease-out) both; }
+    .status__content { animation: fade-up 0.9s 0.2s var(--ease-out) both; }
+  }
+  @keyframes peak-rise { from { opacity: 0; translate: 0 30%; } }
+  @keyframes fade-up { from { opacity: 0; translate: 0 1rem; } }
+</style>

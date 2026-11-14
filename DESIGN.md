@@ -9,7 +9,7 @@ Het ontwerp van de Space Dome-site in één document: merk, kleur, typografie, r
 
 ## 1. Merk in het kort
 
-Space Dome is een avond (en straks een archief) rond de **LA beat scene**: beats, trip-hop, instrumentale hiphop, jazz en experimentele ritmes. Van J Dilla tot Flying Lotus, van Massive Attack tot DJ Shadow. *No rush, just hypnotic bass.*
+Space Dome FM is het radio- en videoarchief van Space Dome, rond de **LA beat scene**: beats, trip-hop, instrumentale hiphop, jazz en experimentele ritmes. Van J Dilla tot Flying Lotus, van Massive Attack tot DJ Shadow. *No rush, just hypnotic bass.*
 
 De beeldtaal komt van de eerste poster: **LA bij nacht**. Paars en magenta lucht, palmsilhouetten, lensflares als zwevende bollen, filmkorrel en een gestempeld logo in een cirkel.
 
@@ -47,7 +47,7 @@ Contrast: tekst, muted en accent halen in beide thema's minstens 4,5:1 op `--col
 
 | Rol | Font | Gebruik |
 |---|---|---|
-| Display | **Stack Sans Notch** (variabel, 200–700) | De grote titels: hero, paginakop, set, dj, avond (`--font-display`). |
+| Display | **Stack Sans Notch** (variabel, 200–700) | De grote titels: hero, paginakop, set, dj (`--font-display`). |
 | Koppen | **Stack Sans Headline** (variabel, 200–700) | Sectiekoppen, kaarttitels, h2–h4 (`--font-heading`). |
 | Tekst | **Stack Sans Text** (variabel, 200–700) | Lopende tekst, interface, metadata. |
 | Logo | **Unbounded** | Alleen het tijdelijke woordmerk (`--font-logo`). |
@@ -57,8 +57,7 @@ Beide self-hosted via Fontsource (geen verzoeken naar Google, AVG). Gekozen door
 **Schaal:** Utopia, fluid tussen 360 en 1920 px. Basis 18 → 20 px, ratio 1.2 → 1.25. Tokens `--step--2` t/m `--step-8`.
 
 - `h1` `--step-5`, `h2` `--step-3`, `h3` `--step-1`.
-- Grote display-titels (hero, set, dj, paginakop): `--step-5` op mobiel, `--step-6` vanaf 48–60rem. Bewust groot met veel contrast tegenover de tekst: hero `min(step-7, 13vw)` → `min(step-8, 7,5vw)`, paginakop/dj `min(step-7, 14vw)` → `step-8`, settitel `min(step-7, 14cqi)`, regelafstand 0,92.
-- Grote datums (avondpagina, eventkaart) schalen mee met hun kolom: `min(--step-x, 11–14cqi)` (avondpagina step-4) met `container-type: inline-size` op de ouder.
+- Grote display-titels (hero, set, dj, paginakop): `--step-5` op mobiel, `--step-6` vanaf 48–60rem. Bewust groot met veel contrast tegenover de tekst: hero `min(step-7, 100cqi / (langste woord × 0,7))` → `step-8` als plafond (cqi = de intro-kolom; het langste woord van de kop past altijd op één regel, ook als Space Dome de tekst in Sanity wijzigt), paginakop/dj `min(step-7, 14vw)` → `step-8`, settitel `min(step-7, 14cqi)`, regelafstand 0,92.
 - Koppen hebben `overflow-wrap: anywhere` + `hyphens: auto` als vangnet. Grids met één kolom altijd `minmax(0, 1fr)`, nooit `auto`/`1fr` (anders rekt lange tekst de pagina op).
 - Metadata (`.meta`): `--step--1`, hoofdletters, `letter-spacing: .08em`, tabular nums. Datums zoals op de poster: `30.07.2026`.
 
@@ -92,7 +91,7 @@ Beide self-hosted via Fontsource (geen verzoeken naar Google, AVG). Gekozen door
 
 - **Paginatransities:** `<ClientRouter />`. De oude pagina fadet weg, de nieuwe fadet in en schuift 0,75rem omhoog. Header en player hebben een eigen `view-transition-name` en blijven dus staan.
 - **Player:** de video schuift met een FLIP-animatie tussen gedockt (op de setpagina) en mini (onderin, rechts of links). Tussen pagina's "morpht" hij via de view transition.
-- **Reveal bij laden** (`data-reveal`, GSAP SplitText): `chars` (datum, per teken uit een masker), `words` (titels, per woord), `up` (blokken: 18px omhoog + fade, stagger 0,07s), `media` (flyer: clip-path van onder naar boven + zoom 1,04 → 1). Easing `expo.out` voor tekst en beeld, `power3.out` voor blokken, ±1s. Gebruikt op home (titel, intro, knoppen), de avondpagina en de setpagina (niet op het podium: de gedockte video moet er exact op blijven liggen).
+- **Reveal bij laden** (`data-reveal`, GSAP SplitText): `chars` (datum, per teken uit een masker), `words` (titels, per woord), `up` (blokken: 18px omhoog + fade, stagger 0,07s), `media` (flyer: clip-path van onder naar boven + zoom 1,04 → 1). Easing `expo.out` voor tekst en beeld, `power3.out` voor blokken, ±1s. Gebruikt op home (titel, intro, knoppen) en de setpagina (niet op het podium: de gedockte video moet er exact op blijven liggen).
 - **Reduced motion:** alle duurtokens worden 0,01 ms en de view-transition-animaties staan uit.
 
 ## 8. De player
@@ -122,13 +121,12 @@ De kern van de site. Eén `<sd-player>` in de layout met `transition:persist`: h
 | `PlayButton`, `QueueButton`, `ShareButton` | Acties op een set, overal gelijk |
 | `Tracklist` | Genummerde lijst; tijdcodes optioneel (later: naar een track springen) |
 | `DjAvatar` | Rond, foto of initialen op cover-art |
-| `EventCard` | Avond met datum zoals op de poster |
 
 ## 10. Open punten
 
 - [ ] Logo als vector (SVG/AI/PDF) en het font van het logo
 - [x] Fontkeuze: Stack Sans Notch / Headline / Text
-- [ ] Fotografie van avonden en dj's
+- [ ] Fotografie van dj's en shows
 - [ ] Stills uit de video (thumbnail-picker via Bunny Stream)
 - [ ] Nederlandse vertaling (interface staat klaar in `src/i18n/ui.ts`)
 - [ ] OG-afbeelding per set (nu: cover of standaardbeeld)

@@ -5,15 +5,11 @@ import PageHeader from '../../components/PageHeader.astro';
 import SetGrid from '../../components/SetGrid.astro';
 import { t } from '../../i18n/ui';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { djHref, getLibrary, setsByGenre, type DjEntry, type GenreEntry } from '../../lib/content';
+import { djHref, getLibrary, setsByGenre, type DjEntry } from '../../lib/content';
 
-export async function getStaticPaths() {
-  const { genres } = await getLibrary();
-  return genres.map((genre) => ({ params: { id: genre.id }, props: { genre } }));
-}
-
-const { genre } = Astro.props as { genre: GenreEntry };
 const lib = await getLibrary();
+const genre = lib.genreMap.get(Astro.params.id ?? '');
+if (!genre) return Astro.rewrite('/404');
 const sets = setsByGenre(lib, genre.id);
 const djs = [...new Map(sets.flatMap((s) => lib.djsOf(s)).map((d) => [d.id, d] as [string, DjEntry])).values()];
 ---

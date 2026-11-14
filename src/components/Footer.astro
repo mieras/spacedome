@@ -4,18 +4,16 @@
  * Desktop vier kolommen (merk breder), tablet en mobiel twee kolommen met het merk erboven.
  */
 import { t } from '../i18n/ui';
-import { genreHref, getLibrary, setsByGenre } from '../lib/content';
-import { settings } from '../settings';
+import { genreHref, getLibrary, getSettings, setsByGenre } from '../lib/content';
 import Icon from './Icon.astro';
 import Logo from './Logo.astro';
 import PeakGradient from './PeakGradient.astro';
 
-const lib = await getLibrary();
+const [lib, settings] = await Promise.all([getLibrary(), getSettings()]);
 const explore = [
   { href: '/sets', label: t('nav.sets'), count: lib.sets.length },
   { href: '/djs', label: t('nav.djs'), count: lib.djs.length },
   { href: '/genres', label: t('nav.genres'), count: lib.genres.length },
-  { href: '/events', label: t('nav.events'), count: lib.events.length },
   { href: '/about', label: t('nav.about') },
 ];
 // Genres met de meeste sets eerst; lege genres niet.

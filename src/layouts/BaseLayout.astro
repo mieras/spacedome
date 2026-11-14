@@ -14,6 +14,7 @@ import Player from '../components/Player.astro';
 import SiteMeta from '../components/SiteMeta.astro';
 import ThemeScript from '../components/ThemeScript.astro';
 import { t } from '../i18n/ui';
+import VisualEditing from '../lib/sanity/VisualEditing';
 import { settings } from '../settings';
 
 interface Props {
@@ -24,9 +25,12 @@ interface Props {
   isHome?: boolean;
   noindex?: boolean;
   jsonLd?: object[];
+  /** Zonder header, footer en player (statuspagina). */
+  bare?: boolean;
 }
 
-const props = Astro.props;
+const { bare = false, ...props } = Astro.props;
+const visualEditing = Astro.locals.visualEditing;
 ---
 
 <!doctype html>
@@ -44,14 +48,36 @@ const props = Astro.props;
     <ClientRouter />
   </head>
   <body>
-    <a class="skip-link" href="#main">{t('skip')}</a>
-    <PageProgress />
-    <Header />
-    <main id="main" data-page tabindex="-1">
-      <slot />
-    </main>
-    <Footer />
-    <Player />
+    {
+      bare ? (
+        <slot />
+      ) : (
+        <>
+          <a class="skip-link" href="#main">{t('skip')}</a>
+          <PageProgress />
+          <Header />
+          <main id="main" data-page tabindex="-1">
+            <slot />
+          </main>
+          <Footer />
+          <Player />
+        </>
+      )
+    }
+    {visualEditing && <VisualEditing client:only="react" />}
+    {
+      visualEditing && (
+        <script is:inline>
+          // Alleen in de Presentation tool: elke klik een volledige page load i.p.v. een ClientRouter-swap.
+          // De router haalt pagina's op via fetch (Sec-Fetch-Dest: empty), dus zonder Visual Editing.
+          // Capture-fase: dit draait vóór de click-handler van de router.
+          document.addEventListener('click', (event) => {
+            const link = event.target instanceof Element && event.target.closest('a[href]');
+            if (link) link.setAttribute('data-astro-reload', '');
+          }, true);
+        </script>
+      )
+    }
     <div class="toast" role="status" aria-live="polite" data-toast transition:persist="toast"></div>
     <script>
       import '../scripts/share';

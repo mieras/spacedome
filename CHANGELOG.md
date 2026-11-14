@@ -8,6 +8,15 @@ Categorieën: **Toegevoegd**, **Gewijzigd**, **Opgelost**, **Verwijderd**, **Bev
 ## [Unreleased]
 
 ### Toegevoegd
+- Statuspagina `/coming-soon` (logo, peak gradient, optionele countdown) voor coming soon en onderhoud. Aan en uit in Site-instellingen → Status, apart voor de live site (main) en staging/previews; elke URL toont dan de statuspagina (onderhoud: 503 + `Retry-After`). Beheerders met preview-cookie zien de hele site. Noodknop `SITE_STATUS` (env). Main staat in Sanity op Coming soon, staging op Live. Ook op `/brand`.
+- Home in Sanity (vast document `home`, NL/EN): titel en intro van de hero zijn bewerkbaar, ook via de preview. Bovenaan in de Studio; teksten uit de code als terugval.
+- Content live uit Sanity: alle pagina's lezen via `loadQuery()` met GROQ-queries en TypeGen-types (`src/lib/sanity/`). De site draait server-rendered op Netlify (`output: 'server'`, `@astrojs/netlify`); `getStaticPaths` en content collections zijn weg, onbekende slugs geven de 404.
+- Presentation tool in de Studio (*Preview*): drafts met klikbare overlays, volgens `_standards/SANITY.md` §3. Ondertekende preview-cookie via `/api/preview`, alleen actief in de iframe van de Studio; eigen `VisualEditing` met history-adapter; volledige page loads in de preview (ClientRouter). Documenten gekoppeld aan URL's (`src/lib/sanity/resolve.ts`).
+- CDN-cache: HTML blijft in de Netlify-CDN (tag `sanity`) tot een publicatie; `/api/revalidate` controleert de Sanity-webhook (`SANITY_WEBHOOK_SECRET`) en leegt de cache (`@netlify/cache`). Met preview-cookie `private, no-store`.
+- Eigen `sitemap-index.xml` uit Sanity (leeg zolang `noindex` aan staat); `@astrojs/sitemap` eruit.
+- Site-instellingen (naam, tagline, omschrijving, socials, noindex) uit Sanity, met `src/settings.ts` als terugval.
+- Sanity (project `6fcexd1b`, dataset `production`): Studio ingebouwd op `/admin` (`@sanity/astro`, hash-router, geen adapter nodig), schema's voor set, dj, genre, page en site-instellingen, Studio-indeling Sets · DJ's · Genres · Pagina's · Site-instellingen. NL/EN per veld met `sanity-plugin-internationalized-array` (Engels verplicht). TypeGen (`npm run typegen`) en een herhaalbaar migratiescript (`npm run sanity:migrate`) dat alle Markdown-content overzet: 26 documenten, alle geldig.
+- `docs/plan.md`: projectplan met scope, contentmodel, fases en de rendering-aanpak (SSR op Netlify, CDN-cache met cache-tags, purge via Sanity-webhook). Briefingmail aan Space Dome in `docs/mail-briefing.md`. `docs/` staat voortaan in `.gitignore` (de repo is publiek); de map blijft lokaal.
 - Gegenereerde covers bewegen: de lichtbollen drijven, de kleur schuift mee en de ring (dome) zweeft en ademt; tempo en startpunt per seed, ring zet aan bij hover. Alleen CSS (`@property`), niet bij echte stills of `prefers-reduced-motion`.
 - Knoppen: position-aware hover (GSAP), een cirkel vult de knop vanaf de muis en rolt eruit waar je weggaat. Naar CodePen OJYywaJ. Niet op touch of bij reduced motion.
 - Home: de intro ("Recorded live in the dome") blijft op desktop staan tot de hero voorbij is.
@@ -25,6 +34,13 @@ Categorieën: **Toegevoegd**, **Gewijzigd**, **Opgelost**, **Verwijderd**, **Bev
 - De eerste twee Space Dome-avonden in Melkweg (14-07-2023 en 23-12-2023) met line-up; nieuwe dj-pagina's voor Mono/Poly, Kutmah, Cintasoul, Cheyanne Hudson, Odaira en Sunny Saimuns.
 
 ### Gewijzigd
+- Studio, set → Video en beeld: korte uitleg onder elk veld. Bunny-guid en STACK-id ingeklapt onder *Technisch*; *Moment voor de still* is alleen-lezen (het bepaalde bij het importeren welke still Bunny pakte; aanpassen deed niets).
+- Hero-kop breekt niet meer midden in een woord ("RECORDE/D"): de grootte volgt de breedte van de intro-kolom (`cqi`) en het langste woord, in plaats van de schermbreedte.
+- Migratiescript meldt welke documenten nieuw zijn (de teller telde alles mee).
+- Migratiescript maakt standaard alleen ontbrekende documenten aan (`createIfNotExists`), zodat Studio-wijzigingen blijven staan; `--force` overschrijft.
+- Security-headers ook op server-pagina's (middleware); `netlify.toml` start geen build meer bij wijzigingen in het Markdown-archief.
+- Footer: peak gradient met hoger dal (0.76) en een lagere, vlakkere start.
+- Scope: de site is alleen voor Space Dome FM. Tagline, omschrijving en home-intro spreken van radioshows en sets in plaats van avonden. README, DESIGN en AGENTS bijgewerkt.
 - Setkaarten: datum/locatie (`--step--2`) en dj's (`--step--1`) een stuk kleiner, zodat de titel de kaart draagt.
 - Fonts: Stack Sans-familie, self-hosted via Fontsource 5.3.0. Notch voor de grote titels (`--font-display`), Headline voor koppen (`--font-heading`), Text voor tekst. Unbounded blijft alleen voor het logo (`--font-logo`); Hanken Grotesk eruit.
 - Titels flink groter voor meer contrast met de tekst: hero tot `step-8`, paginakop en dj tot `step-8`, settitel `step-7`, avondtitel `step-5`, h1 `step-6`, h2 `step-4`.
@@ -55,6 +71,7 @@ Categorieën: **Toegevoegd**, **Gewijzigd**, **Opgelost**, **Verwijderd**, **Bev
 - Branch protection op `staging` en `main` (PR verplicht, geen force-push of verwijderen).
 
 ### Verwijderd
+- Avonden: `/events`, `EventCard`, de collectie `events`, flyers, het veld `event` op sets, venue in setkaarten en op de setpagina, MusicEvent-JSON-LD, de Events-sectie op home, in header, footer, `/brand` en `llms.txt`. De zes dj's die alleen in line-ups stonden (zonder sets) zijn ook weg.
 - Smear-effect (titels, footerlinks, `/brand`-speeltuin, `src/scripts/smear.ts`, filter in `BaseLayout`). Footerlinks kleuren nu naar de accentkleur bij hover.
 
 ## [2026-11-13]

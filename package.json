@@ -12,23 +12,47 @@
     "preview": "astro preview",
     "check": "astro check",
     "astro": "astro",
-    "set:add": "node --env-file=.env scripts/set-add.mjs"
+    "set:add": "node --env-file=.env scripts/set-add.mjs",
+    "typegen": "sanity schemas extract --force --enforce-required-fields --path ./sanity.schema.json && sanity typegen generate",
+    "sanity:migrate": "node --env-file=.env scripts/migrate-to-sanity.ts"
   },
   "dependencies": {
-    "@astrojs/sitemap": "^3.7.4",
+    "@astrojs/netlify": "^8.2.14",
+    "@astrojs/react": "^7.1.9",
     "@fontsource-variable/stack-sans-headline": "5.3.0",
     "@fontsource-variable/stack-sans-notch": "5.3.0",
     "@fontsource-variable/stack-sans-text": "5.3.0",
     "@fontsource-variable/unbounded": "^5.3.0",
+    "@netlify/cache": "^4.2.1",
+    "@sanity/astro": "^3.6.2",
+    "@sanity/client": "^8.16.0",
+    "@sanity/icons": "^5.3.0",
+    "@sanity/image-url": "^2.1.1",
+    "@sanity/preview-url-secret": "^4.1.5",
+    "@sanity/vision": "^6.23.0",
+    "@sanity/visual-editing": "^6.2.1",
+    "@sanity/webhook": "^4.0.4",
     "astro": "^7.4.11",
+    "astro-portabletext": "^1.0.1",
+    "groq": "^6.23.0",
     "gsap": "3.15.0",
     "hls.js": "^1.7.4",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-is": "^19.3.1",
+    "sanity": "^6.23.0",
+    "sanity-plugin-internationalized-array": "^5.3.10",
     "sass": "^1.108.2",
     "sharp": "^0.35.5",
+    "styled-components": "^6.6.0",
     "utopia-core-scss": "^1.3.1"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.12",
-    "typescript": "^6.0.3"
+    "@portabletext/markdown": "^2.9.4",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "typescript": "^6.0.3",
+    "yaml": "^2.9.1"
   }
 }
