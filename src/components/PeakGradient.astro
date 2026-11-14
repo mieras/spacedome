@@ -1,0 +1,51 @@
+---
+/*
+ * Peak gradient: een zachte regenboog van geblurde kolommen die uit de vloer oprijst, het hoogst
+ * in het midden. Naar het idee van design.how/vault#peak-gradient (MIT), in Space Dome-kleuren.
+ *
+ * Instellingen en paletten: src/lib/peak.ts (de footer gebruikt PEAK_FOOTER; uitproberen op /brand#peak).
+ *
+ * Hoe het werkt: BARS rechthoeken naast elkaar in één SVG, elk 1.23× zo breed als de stap zodat ze
+ * overlappen. Allemaal dezelfde verticale gradient (objectBoundingBox: elke kolom draagt de hele
+ * regenboog over zijn eigen hoogte) en een gaussian blur, zodat ze samensmelten tot één vlak. De
+ * laatste stop is transparant, dus de toppen lossen op. Hoogte valt vanuit het midden af met
+ * 1 - t^1.24 (vlakker dan een cosinus, meer piramide).
+ *
+ * Bloei: src/scripts/peak.ts mengt tijdens het scrollen elke waarde van `start` naar de eindstand
+ * (de vorm zelf wordt heftiger: falloff, valley, blur, overlap). De build rendert de eindstand,
+ * dus zonder JS of met prefers-reduced-motion staat hij er gewoon vol.
+ */
+import { PEAK_FOOTER, PEAK_H, PEAK_W, peakSvg, type PeakOptions } from '../lib/peak';
+
+interface Props extends Partial<PeakOptions> {
+  /** Uniek per instantie op een pagina (gradient- en filter-id's). */
+  id?: string;
+  class?: string;
+  /** Niet aan het scrollen koppelen (preview op /brand, die stuurt hij zelf aan). */
+  still?: boolean;
+}
+
+const { id = 'peak', class: className, still = false, ...overrides } = Astro.props;
+const options = { ...PEAK_FOOTER, ...overrides };
+---
+
+<div class:list={['peak', className]} aria-hidden="true" data-peak={still ? undefined : JSON.stringify(options)}>
+  <svg viewBox={`0 0 ${PEAK_W} ${PEAK_H}`} preserveAspectRatio="none" focusable="false" data-peak-svg={id} set:html={peakSvg(id, options)} />
+</div>
+
+<script>
+  import '../scripts/peak';
+</script>
+
+<style>
+  .peak {
+    position: relative;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .peak svg {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+  }
+</style>

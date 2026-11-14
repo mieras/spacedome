@@ -1,0 +1,534 @@
+---
+/*
+ * /brand: interne stijlgids. Tokens, UI-componenten en effecten op één pagina, met echte content.
+ * Niet in de navigatie of sitemap, altijd noindex. Kleuren komen rechtstreeks uit tokens.scss
+ * (die is leidend), dus deze pagina loopt nooit achter.
+ */
+import tokens from '../styles/tokens.scss?raw';
+import CoverArt from '../components/CoverArt.astro';
+import DjAvatar from '../components/DjAvatar.astro';
+import Icon from '../components/Icon.astro';
+import Logo from '../components/Logo.astro';
+import PageHeader from '../components/PageHeader.astro';
+import PeakGradient from '../components/PeakGradient.astro';
+import PlayButton from '../components/PlayButton.astro';
+import QueueButton from '../components/QueueButton.astro';
+import SetCarousel from '../components/SetCarousel.astro';
+import SetGrid from '../components/SetGrid.astro';
+import ShareButton from '../components/ShareButton.astro';
+import Tracklist from '../components/Tracklist.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getLibrary, setHref, toPlayerItem } from '../lib/content';
+import { PEAK_FOOTER, PEAK_PALETTES } from '../lib/peak';
+
+// Schuifjes voor de peak-configurator, per stand (Start en End).
+const shapeFields = [
+  { key: 'blur', label: 'Blur', min: 0, max: 45, step: 1 },
+  { key: 'peak', label: 'Peak', min: 0.1, max: 1, step: 0.01 },
+  { key: 'valley', label: 'Valley', min: 0, max: 1, step: 0.01 },
+  { key: 'power', label: 'Falloff', min: 0, max: 4, step: 0.01 },
+  { key: 'overlap', label: 'Overlap', min: 1, max: 2, step: 0.01 },
+  { key: 'opacity', label: 'Opacity', min: 0, max: 1, step: 0.01 },
+  { key: 'drop', label: 'Drop', min: 0, max: 0.6, step: 0.01 },
+] as const;
+
+const lib = await getLibrary();
+const featured = lib.sets.find((s) => s.data.featured) ?? lib.sets[0];
+const item = await toPlayerItem(featured, lib);
+const withTracks = lib.sets.find((s) => s.data.tracklist.length > 0);
+
+// Kleuren: elke --color-* uit tokens.scss, met de licht- en donkerwaarde uit light-dark().
+const colors = [...tokens.matchAll(/--color-([\w-]+):\s*(.+?);/g)].map(([, name, value]) => {
+  const pair = value.match(/^light-dark\((oklch\([^)]*\)),\s*(oklch\([^)]*\))\)$/);
+  return { name, light: pair?.[1] ?? value, dark: pair?.[2] ?? value };
+});
+
+const steps = [8, 7, 6, 5, 4, 3, 2, 1, 0, -1, -2];
+const spaces = ['3xs', '2xs', 'xs', 's', 'm', 'l', 'xl', '2xl', '3xl'];
+const radii = ['s', 'm', 'l', 'round'];
+const icons = ['play', 'pause', 'plus', 'check', 'share', 'queue', 'back', 'forward', 'volume', 'mute', 'headphones', 'video', 'swap', 'expand', 'arrow', 'external', 'close', 'sun', 'moon', 'auto'] as const;
+
+const toc = [
+  ['logo', 'Logo'],
+  ['colour', 'Colour'],
+  ['type', 'Type'],
+  ['space', 'Space & shape'],
+  ['icons', 'Icons'],
+  ['controls', 'Controls'],
+  ['cards', 'Cards'],
+  ['effects', 'Effects'],
+];
+---
+
+<BaseLayout title="Brand" description="Space Dome design tokens, UI components and effects." noindex>
+  <PageHeader eyebrow="Style guide" title="Brand" lead="Tokens, components and effects of the Space Dome site, rendered live from the code." />
+
+  <div class="wrapper brand">
+    <nav class="brand__toc" aria-label="Sections">
+      <ul role="list" class="chips">
+        {toc.map(([id, label]) => <li><a class="chip" href={`#${id}`}>{label}</a></li>)}
+      </ul>
+    </nav>
+
+    <!-- Logo -->
+    <section class="brand__section" aria-labelledby="logo">
+      <h2 id="logo" class="brand__title">Logo</h2>
+      <div class="brand__row">
+        <div class="brand__tile" style="--logo-size: 9rem"><Logo id="brand-logo" /></div>
+        <div class="brand__tile brand__tile--accent" style="--logo-size: 9rem"><Logo id="brand-logo-accent" /></div>
+        <div class="brand__tile" style="--logo-size: 4rem"><Logo id="brand-logo-sm" /></div>
+      </div>
+      <p class="brand__note">SVG with a grain filter; each instance needs its own <code>id</code>. Minimum size about 2.5rem (header).</p>
+    </section>
+
+    <!-- Kleur -->
+    <section class="brand__section" aria-labelledby="colour">
+      <h2 id="colour" class="brand__title">Colour</h2>
+      <p class="brand__note">OKLCH with <code>light-dark()</code>. Night: deep indigo. Day: lilac flyer paper. Accent: the poster magenta. Swatches follow the current theme.</p>
+      <ul role="list" class="swatches">
+        {
+          colors.map((c) => (
+            <li class="swatch">
+              <span class="swatch__chip" style={`background: var(--color-${c.name})`} />
+              <code class="swatch__name">--color-{c.name}</code>
+              <span class="swatch__value">
+                <span>Light {c.light}</span>
+                <span>Dark {c.dark}</span>
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <!-- Type -->
+    <section class="brand__section" aria-labelledby="type">
+      <h2 id="type" class="brand__title">Type</h2>
+      <div class="faces">
+        <div class="face">
+          <p class="meta">Display · Stack Sans Notch</p>
+          <p class="face__sample face__sample--display">Space Dome</p>
+        </div>
+        <div class="face">
+          <p class="meta">Heading · Stack Sans Headline</p>
+          <p class="face__sample face__sample--heading">Latest sets</p>
+        </div>
+        <div class="face">
+          <p class="meta">Text · Stack Sans Text</p>
+          <p class="face__sample">Beats, trip-hop, deep grooves</p>
+        </div>
+      </div>
+      <p class="brand__note">Fluid Utopia scale, 18→20px base, ratio 1.2→1.25 (360→1920px). Only use <code>--step-*</code>.</p>
+      <ul role="list" class="scale">
+        {
+          steps.map((n) => (
+            <li class="scale__row">
+              <code>--step-{n}</code>
+              <span class="scale__sample" style={`font-size: var(--step-${n})`}>
+                Recorded live
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="brand__row brand__row--text">
+        <p class="meta">Meta · 01.03.2026 · 25m</p>
+        <p class="lead">Lead text for intros, a little larger and tighter.</p>
+        <a class="more-link" href="/sets">More link →</a>
+      </div>
+    </section>
+
+    <!-- Ruimte en vorm -->
+    <section class="brand__section" aria-labelledby="space">
+      <h2 id="space" class="brand__title">Space & shape</h2>
+      <ul role="list" class="spaces">
+        {
+          spaces.map((s) => (
+            <li class="spaces__row">
+              <code>--space-{s}</code>
+              <span class="spaces__bar" style={`inline-size: var(--space-${s})`} />
+            </li>
+          ))
+        }
+      </ul>
+      <ul role="list" class="brand__row">
+        {
+          radii.map((r) => (
+            <li class="radius" style={`border-radius: var(--radius-${r})`}>
+              <code>--radius-{r}</code>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="brand__note">Motion: <code>--ease-out</code> for almost everything, <code>--dur-fast</code> 150ms, <code>--dur</code> 300ms, <code>--dur-slow</code> 600ms. All collapse to near zero under reduced motion.</p>
+    </section>
+
+    <!-- Iconen -->
+    <section class="brand__section" aria-labelledby="icons">
+      <h2 id="icons" class="brand__title">Icons</h2>
+      <ul role="list" class="icons">
+        {
+          icons.map((name) => (
+            <li>
+              <Icon name={name} />
+              <code>{name}</code>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="brand__note">24×24, stroke 1.75, round caps. Always <code>aria-hidden</code>; the button carries the label.</p>
+    </section>
+
+    <!-- Controls -->
+    <section class="brand__section" aria-labelledby="controls">
+      <h2 id="controls" class="brand__title">Controls</h2>
+      <h3 class="brand__sub">Buttons</h3>
+      <div class="brand__row">
+        <a class="button button--primary" href="/sets">Primary</a>
+        <a class="button" href="/about">Secondary</a>
+        <button class="button" type="button" aria-pressed="true">Pressed</button>
+        <button class="icon-button" type="button" aria-label="Share"><Icon name="share" /></button>
+      </div>
+      <p class="brand__note">Hover with a mouse: a circle fills the button from where the pointer enters, follows it and rolls out where it leaves (GSAP, <code>src/scripts/button-flair.ts</code>). Touch, keyboard and reduced motion get a plain colour swap.</p>
+      <h3 class="brand__sub">Player buttons</h3>
+      <p class="brand__note">These are live: they play <a href={setHref(featured.id)}>{featured.data.title}</a> in the player.</p>
+      <div class="brand__row">
+        <PlayButton item={item} size="sm" />
+        <PlayButton item={item} />
+        <PlayButton item={item} size="lg" />
+        <PlayButton item={item} label="Play" size="sm" />
+        <QueueButton item={item} />
+        <QueueButton item={item} variant="icon" />
+        <ShareButton url={setHref(featured.id)} title={featured.data.title} />
+      </div>
+      <h3 class="brand__sub">Chips and badges</h3>
+      <div class="brand__row">
+        <ul role="list" class="chips">
+          {lib.genres.slice(0, 4).map((g, i) => <li><a class="chip" href={`/genres/${g.id}`} aria-current={i === 0 ? 'page' : undefined}>{g.data.title}</a></li>)}
+        </ul>
+        <span class="badge">7</span>
+        <span class="badge">12</span>
+      </div>
+      <h3 class="brand__sub">Avatars</h3>
+      <div class="brand__row">
+        {lib.djs.slice(0, 5).map((dj) => <DjAvatar dj={dj} size="4rem" />)}
+      </div>
+    </section>
+
+    <!-- Kaarten -->
+    <section class="brand__section" aria-labelledby="cards">
+      <h2 id="cards" class="brand__title">Cards</h2>
+      <h3 class="brand__sub">Set grid</h3>
+      <SetGrid sets={lib.sets.slice(0, 4)} lib={lib} />
+      <h3 class="brand__sub">Cover art</h3>
+      <div class="covers">
+        <CoverArt seed="brand-a" alt="" ratio="1" />
+        <CoverArt seed="brand-b" alt="" ratio="1" />
+        <CoverArt seed="brand-c" alt="" ratio="1" />
+        <CoverArt seed="brand-d" alt="" ratio="1" />
+      </div>
+      <p class="brand__note">Generated art per seed when there is no still or poster. It drifts slowly (orbs, hue, a breathing ring), each cover at its own pace; hover a card to lift the ring. Off under reduced motion.</p>
+      <SetCarousel sets={lib.sets.slice(0, 10)} lib={lib} title="Carousel" id="brand-carousel" />
+      {
+        withTracks && (
+          <>
+            <h3 class="brand__sub">Tracklist</h3>
+            <Tracklist tracks={withTracks.data.tracklist.slice(0, 6)} />
+          </>
+        )
+      }
+    </section>
+
+    <!-- Statuspagina -->
+    <section class="brand__section" aria-labelledby="status">
+      <h2 id="status" class="brand__title">Status page</h2>
+      <p class="brand__note">
+        Shown on every URL when the site is not live (Sanity → Site-instellingen → Status, separate for main and staging). Logo, peak gradient
+        (end state), optional countdown. Maintenance returns 503 with <code>Retry-After</code>. Anyone with a preview cookie (Studio → Preview) sees the full site.
+      </p>
+      <p class="brand__links">
+        <a class="button" href="/coming-soon">Coming soon</a>
+        <a class="button" href="/coming-soon?mode=maintenance">Maintenance</a>
+      </p>
+    </section>
+
+    <!-- Effecten -->
+    <section class="brand__section" aria-labelledby="effects">
+      <h2 id="effects" class="brand__title">Effects</h2>
+
+      <div class="effect">
+        <div class="effect__head">
+          <h3 class="brand__sub">Reveal</h3>
+          <button class="button" type="button" data-brand-replay><Icon name="back" /> Replay</button>
+        </div>
+        <p class="brand__note">GSAP + SplitText on page load. <code>data-reveal</code> = <code>chars</code> | <code>words</code> | <code>up</code> | <code>media</code>. Expo.out for text, power3.out for blocks. Off under reduced motion.</p>
+        <div class="effect__stage" data-brand-reveal>
+          <p class="effect__date" data-reveal="chars">30.07</p>
+          <p class="effect__headline" data-reveal="words">Recorded live in the dome</p>
+          <p class="lead" data-reveal="up">Content blocks fade in and rise 18px.</p>
+        </div>
+      </div>
+
+      <div class="effect" id="peak">
+        <div class="effect__head">
+          <h3 class="brand__sub">Peak gradient</h3>
+          <button class="button" type="button" data-peak-apply><Icon name="arrow" /> Try in footer</button>
+        </div>
+        <p class="brand__note">Blurred columns with one vertical gradient. In the footer the shape itself grows as you scroll: every value blends from <em>Start</em> (footer just in view) to <em>End</em> (scrolled to the bottom), and back when you scroll up. Nothing is scaled. Pick a tab to edit that state (the preview jumps to it), press play to run Start → End, then paste the result into <code>PEAK_FOOTER</code> in <code>src/lib/peak.ts</code>.</p>
+        <div class="peak-lab">
+          <!-- Preview en schuifjes in een eigen blok: de sticky preview mag niet over het codeblok schuiven. -->
+          <div class="peak-lab__main">
+          <div class="peak-lab__preview">
+            <div class="effect__peak">
+              <PeakGradient id="brand-peak" still />
+            </div>
+            <div class="peak-lab__scrub">
+              <button class="button" type="button" data-peak-play aria-pressed="false"><Icon name="play" /> <span data-peak-play-label>Play</span></button>
+              <label class="peak-lab__range">Start → End <output data-peak-progress>100%</output><input type="range" min="0" max="1" step="0.005" value="1" data-peak-scroll /></label>
+            </div>
+          </div>
+          <form class="lab__controls" data-peak-lab>
+            <label>Palette
+              <select name="palette">
+                {Object.keys(PEAK_PALETTES).map((p) => <option selected={p === PEAK_FOOTER.palette}>{p}</option>)}
+              </select>
+            </label>
+            <label>Columns <output data-for="bars"></output><input type="range" name="bars" min="3" max="25" step="1" value={PEAK_FOOTER.bars} /></label>
+            <sd-tabs class="peak-tabs" data-peak-tabs>
+              <div class="tabs__list" role="tablist" aria-label="Peak state" data-tabs-list hidden>
+                <button type="button" role="tab" class="tabs__tab" id="peak-tab-start" aria-controls="peak-panel-start" aria-selected="false" tabindex="-1">Start</button>
+                <button type="button" role="tab" class="tabs__tab" id="peak-tab-end" aria-controls="peak-panel-end" aria-selected="true">End</button>
+              </div>
+              {
+                (['start', 'end'] as const).map((stand) => (
+                  <div class="tabs__panel" id={`peak-panel-${stand}`}>
+                    <fieldset class="lab__group">
+                      <legend data-tabs-heading>{stand === 'start' ? 'Start: footer just in view' : 'End: scrolled to the bottom'}</legend>
+                      {shapeFields.map((f) => {
+                        const name = stand === 'start' ? `start.${f.key}` : f.key;
+                        const value = stand === 'start' ? PEAK_FOOTER.start[f.key] : PEAK_FOOTER[f.key];
+                        return (
+                          <label>
+                            {f.label} <output data-for={name} />
+                            <input type="range" name={name} min={f.min} max={f.max} step={f.step} value={value} />
+                          </label>
+                        );
+                      })}
+                    </fieldset>
+                  </div>
+                ))
+              }
+            </sd-tabs>
+            <button class="button" type="reset">Reset</button>
+          </form>
+          </div>
+          <pre class="lab__code"><code data-peak-code></code></pre>
+        </div>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<script>
+  import '../scripts/tabs';
+  import { peakAt, peakSvg, SHAPE_KEYS, updatePeakSvg, type PeakOptions, type PeakPalette, type PeakShape } from '../lib/peak';
+
+  // Peak-configurator: twee standen (Start, End), tekent de preview met dezelfde functies als de
+  // footer. Scrubben of Play mengt van Start naar End zoals scrollen in de footer doet. "Try in
+  // footer" geeft de instelling aan de footer op deze pagina (tot je herlaadt) en scrolt ernaartoe.
+  document.addEventListener('astro:page-load', () => {
+    const form = document.querySelector<HTMLFormElement>('[data-peak-lab]');
+    if (!form || form.dataset.bound) return;
+    form.dataset.bound = '';
+    const preview = document.querySelector<SVGSVGElement>('[data-peak-svg="brand-peak"]')!;
+    const code = document.querySelector('[data-peak-code]')!;
+    const scrub = document.querySelector<HTMLInputElement>('[data-peak-scroll]')!;
+    const progress = document.querySelector('[data-peak-progress]')!;
+    const play = document.querySelector<HTMLButtonElement>('[data-peak-play]')!;
+    const playLabel = document.querySelector('[data-peak-play-label]')!;
+    let current: PeakOptions;
+    let raf = 0;
+
+    const read = (): PeakOptions => {
+      const d = new FormData(form);
+      const shape = (prefix: string) =>
+        Object.fromEntries(SHAPE_KEYS.map((k) => [k, Number(d.get(prefix + k))])) as PeakShape;
+      return { bars: Number(d.get('bars')), palette: String(d.get('palette')) as PeakPalette, ...shape(''), start: shape('start.') };
+    };
+    const draw = () => {
+      const p = Number(scrub.value);
+      updatePeakSvg(preview, current, peakAt(current, p));
+      progress.textContent = `${Math.round(p * 100)}%`;
+    };
+    const update = () => {
+      current = read();
+      preview.innerHTML = peakSvg('brand-peak', current, peakAt(current, Number(scrub.value)));
+      draw();
+      form.querySelectorAll<HTMLOutputElement>('output[data-for]').forEach((o) => {
+        const [a, b] = o.dataset.for!.split('.');
+        o.textContent = String(b ? current.start[b as keyof PeakShape] : current[a as keyof PeakOptions]);
+      });
+      code.textContent = `export const PEAK_FOOTER: PeakOptions = ${JSON.stringify(current, null, 2).replace(/"(\w+)":/g, '$1:').replace(/"/g, "'")};`;
+    };
+
+    // Play: van Start naar End in 2,4s (lineair; de curve zit in peakAt), daarna even stil op End.
+    const stop = () => {
+      cancelAnimationFrame(raf);
+      raf = 0;
+      play.setAttribute('aria-pressed', 'false');
+      playLabel.textContent = 'Play';
+    };
+    play.addEventListener('click', () => {
+      if (raf) return stop();
+      const t0 = performance.now();
+      play.setAttribute('aria-pressed', 'true');
+      playLabel.textContent = 'Stop';
+      const tick = (t: number) => {
+        const p = Math.min((t - t0) / 2400, 1);
+        scrub.value = String(p);
+        draw();
+        if (p < 1) raf = requestAnimationFrame(tick);
+        else stop();
+      };
+      raf = requestAnimationFrame(tick);
+    });
+
+    // Tab Start of End: preview springt naar die stand, en bewerken laat die stand zien.
+    let active = 1;
+    form.querySelector('[data-peak-tabs]')?.addEventListener('tabs:change', (e) => {
+      active = (e as CustomEvent<{ id: string }>).detail.id === 'peak-tab-start' ? 0 : 1;
+      stop();
+      scrub.value = String(active);
+      if (current) draw();
+    });
+    form.addEventListener('input', (e) => {
+      if ((e.target as HTMLElement).closest('.tabs__panel')) {
+        stop();
+        scrub.value = String(active);
+      }
+      update();
+    });
+    form.addEventListener('reset', () => requestAnimationFrame(update));
+    scrub.addEventListener('input', () => {
+      stop();
+      draw();
+    });
+    document.querySelector('[data-peak-apply]')?.addEventListener('click', () => {
+      const footer = document.querySelector<HTMLElement>('.site-footer .peak[data-peak]');
+      if (!footer) return;
+      const svg = footer.querySelector<SVGSVGElement>('svg[data-peak-svg]')!;
+      svg.innerHTML = peakSvg(svg.dataset.peakSvg!, current);
+      footer.dataset.peak = JSON.stringify(current);
+      footer.dispatchEvent(new Event('peak:config'));
+      footer.closest('.site-footer')?.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'end' });
+    });
+    update();
+  });
+
+  // Reveal opnieuw afspelen: markering weghalen en reveal.ts opnieuw laten lopen.
+  document.addEventListener('astro:page-load', () => {
+    const btn = document.querySelector<HTMLButtonElement>('[data-brand-replay]');
+    if (!btn || btn.dataset.bound) return;
+    btn.dataset.bound = '';
+    btn.addEventListener('click', () => {
+      document.querySelectorAll<HTMLElement>('[data-brand-reveal] [data-reveal]').forEach((el) => delete el.dataset.revealed);
+      document.dispatchEvent(new Event('astro:page-load'));
+    });
+  });
+</script>
+
+<style>
+  .brand__links { display: flex; flex-wrap: wrap; gap: var(--space-2xs); }
+  .brand { display: grid; gap: var(--space-3xl); padding-block-end: var(--space-2xl); }
+  /* Sticky direct onder de header, zonder kier: zelfde glasachtergrond als de header, over de
+     volle breedte (border-image-truc), zodat er niets tussendoor schijnt. */
+  .brand__toc {
+    --_bg: color-mix(in oklch, var(--color-bg) 82%, transparent);
+    position: sticky;
+    inset-block-start: var(--header-h);
+    z-index: 5;
+    padding-block: var(--space-2xs);
+    border-image: conic-gradient(var(--_bg) 0 0) fill 0 // 0 100vw;
+    backdrop-filter: blur(14px) saturate(1.2);
+  }
+  /* Eén rij die horizontaal scrolt, anders neemt hij op mobiel drie regels in beslag. */
+  .brand__toc .chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .brand__toc .chips li { flex: none; }
+  .brand__section { display: grid; gap: var(--space-m); }
+  /* Ankers (de h2's en #peak): html heeft al scroll-padding voor de header; hier komt de sticky
+     sectiebalk (~3,5rem) en wat lucht bij, zodat de titel er net onder staat. */
+  .brand__title, .effect[id] { scroll-margin-block-start: calc(3.5rem + var(--space-m)); }
+  .brand__title { font-size: var(--step-4); text-transform: uppercase; padding-block-end: var(--space-xs); border-block-end: var(--border-width) solid var(--color-line); }
+  .brand__sub { font-size: var(--step-1); font-family: var(--font-sans); letter-spacing: 0; margin-block-start: var(--space-s); }
+  .brand__note { max-inline-size: var(--measure); color: var(--color-muted); font-size: var(--step--1); }
+  .brand code { font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; font-size: 0.9em; }
+  .brand__row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-s); }
+  .brand__row--text { display: grid; gap: var(--space-xs); justify-items: start; }
+
+  .brand__tile { display: grid; place-items: center; padding: var(--space-m); border-radius: var(--radius-l); background: var(--color-surface); }
+  .brand__tile--accent { background: var(--color-accent); color: var(--color-on-accent); }
+
+  .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); gap: var(--space-s); }
+  .swatch { display: grid; gap: var(--space-3xs); }
+  .swatch__chip { block-size: 5rem; border-radius: var(--radius-m); box-shadow: inset 0 0 0 var(--border-width) var(--color-line); }
+  .swatch__name { font-weight: 600; }
+  .swatch__value { display: grid; color: var(--color-muted); font-size: var(--step--2); font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; }
+
+  .faces { display: grid; gap: var(--space-m); }
+  @media (min-width: 48rem) { .faces { grid-template-columns: repeat(3, 1fr); } }
+  .face { display: grid; gap: var(--space-2xs); padding: var(--space-m); border-radius: var(--radius-l); background: var(--color-surface); }
+  .face__sample { font-size: var(--step-3); line-height: var(--leading-tight); }
+  .face__sample--heading { font-family: var(--font-heading); font-weight: 700; }
+  .face__sample--display { font-family: var(--font-display); font-weight: 700; text-transform: uppercase; letter-spacing: var(--tracking-display); }
+
+  .scale { display: grid; gap: var(--space-2xs); }
+  .scale__row { display: grid; grid-template-columns: 7rem minmax(0, 1fr); align-items: baseline; gap: var(--space-s); }
+  .scale__row code { color: var(--color-muted); font-size: var(--step--2); }
+  .scale__sample { font-family: var(--font-display); font-weight: 700; line-height: 1.1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  .spaces { display: grid; gap: var(--space-2xs); }
+  .spaces__row { display: grid; grid-template-columns: 7rem minmax(0, 1fr); align-items: center; gap: var(--space-s); }
+  .spaces__row code { color: var(--color-muted); font-size: var(--step--2); }
+  .spaces__bar { block-size: 0.75rem; border-radius: var(--radius-s); background: var(--color-accent); }
+  .radius { display: grid; place-items: center; inline-size: 7rem; aspect-ratio: 1; background: var(--color-surface); box-shadow: inset 0 0 0 var(--border-width) var(--color-line); font-size: var(--step--2); }
+
+  .icons { display: grid; grid-template-columns: repeat(auto-fill, minmax(6rem, 1fr)); gap: var(--space-xs); }
+  .icons li { display: grid; justify-items: center; gap: var(--space-3xs); padding: var(--space-s) var(--space-2xs); border-radius: var(--radius-m); background: var(--color-surface); }
+  .icons :global(.icon) { inline-size: 1.5rem; block-size: 1.5rem; }
+  .icons code { color: var(--color-muted); font-size: var(--step--2); }
+
+  .covers { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-s); max-inline-size: 36rem; }
+
+  .effect { display: grid; gap: var(--space-xs); }
+  .effect__head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: var(--space-s); }
+  .effect__stage { display: grid; gap: var(--space-s); justify-items: start; padding: var(--space-l); border-radius: var(--radius-l); background: var(--color-surface); }
+  .effect__date { font-family: var(--font-display); font-weight: 800; font-size: var(--step-5); line-height: 1; font-variant-numeric: tabular-nums; }
+  .effect__headline { font-family: var(--font-display); font-weight: 800; font-size: var(--step-4); line-height: var(--leading-tight); text-transform: uppercase; letter-spacing: var(--tracking-display); }
+  .effect__link { text-decoration: none; }
+  .effect__mono { display: inline-flex; align-items: center; gap: 0.75ch; font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; text-transform: uppercase; letter-spacing: 0.04em; text-decoration: none; }
+  .peak-lab, .peak-lab__main { display: grid; gap: var(--space-s); }
+  @media (min-width: 64rem) { .peak-lab__main { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); align-items: start; } }
+  .lab__controls { display: grid; gap: var(--space-xs); align-content: start; padding: var(--space-m); border-radius: var(--radius-l); background: var(--color-surface); }
+  .lab__controls label { display: grid; grid-template-columns: 1fr auto; gap: var(--space-3xs) var(--space-xs); font-size: var(--step--1); font-weight: 600; }
+  .lab__controls input, .lab__controls select { grid-column: 1 / -1; inline-size: 100%; accent-color: var(--color-accent); }
+  .lab__controls select { min-block-size: 2.5rem; padding-inline: var(--space-2xs); border: var(--border-width) solid var(--color-line); border-radius: var(--radius-s); background: var(--color-bg); color: inherit; font: inherit; }
+  .lab__controls output { color: var(--color-muted); font-variant-numeric: tabular-nums; }
+  .lab__controls .button { justify-self: start; }
+  /* Desktop: preview blijft staan terwijl je door de schuifjes gaat. */
+  .peak-lab__preview { display: grid; gap: var(--space-xs); align-content: start; }
+  @media (min-width: 64rem) {
+    .peak-lab__preview { position: sticky; inset-block-start: calc(var(--header-h) + 5rem); z-index: 1; padding-block-end: var(--space-2xs); background: var(--color-bg); }
+  }
+  .peak-lab__scrub { display: flex; flex-wrap: wrap; align-items: end; gap: var(--space-s); }
+  .peak-lab__range { flex: 1 1 12rem; display: grid; grid-template-columns: 1fr auto; gap: var(--space-3xs) var(--space-xs); font-size: var(--step--1); font-weight: 600; }
+  .peak-lab__range input { grid-column: 1 / -1; inline-size: 100%; accent-color: var(--color-accent); }
+  .peak-lab__range output { color: var(--color-muted); font-variant-numeric: tabular-nums; }
+  .peak-tabs { display: grid; gap: var(--space-xs); }
+  .peak-tabs .lab__group { border: 0; padding: 0; }
+  .lab__group { display: grid; gap: var(--space-xs); margin: 0; padding: var(--space-s); border: var(--border-width) solid var(--color-line); border-radius: var(--radius-m); }
+  .lab__group legend { padding-inline: var(--space-3xs); font-size: var(--step--1); font-weight: 700; color: var(--color-muted); }
+  .lab__code { grid-column: 1 / -1; overflow-x: auto; padding: var(--space-s); border-radius: var(--radius-m); background: var(--color-raised); font-size: var(--step--1); }
+  /* Zelfde ondergrond als de footer, zodat de preview klopt. */
+  .effect__peak { display: grid; align-self: start; block-size: clamp(12rem, 30vw, 24rem); overflow: hidden; border-radius: var(--radius-l); background: var(--color-bg); box-shadow: inset 0 0 0 var(--border-width) var(--color-line); }
+  .effect__peak :global(.peak) { block-size: 100%; }
+</style>

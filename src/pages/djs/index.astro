@@ -36,7 +36,6 @@ const djs = lib.djs.map((dj) => ({ dj, count: setsByDj(lib, dj.id).length }));
   .dj-card :global(.avatar) { inline-size: 100%; margin-block-end: var(--space-2xs); transition: scale var(--dur-slow) var(--ease-out); }
   .dj-card :global(.avatar__initials) { font-size: clamp(1.5rem, 4vw, 3rem); }
   .dj-card__name { font-family: var(--font-display); font-weight: 700; font-size: var(--step-1); }
-  .dj-card:hover .dj-card__name { text-decoration: underline; }
   @media (hover: hover) {
     .dj-card:hover :global(.avatar) { scale: 1.04; }
   }

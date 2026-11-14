@@ -29,7 +29,8 @@ const hasTimes = tracks.some((t) => t.time);
 </ol>
 
 <style>
-  .tracklist { counter-reset: track; }
+  /* Container: in de smalle infokolom naast de video blijft het label onder de titel. */
+  .tracklist { counter-reset: track; container-type: inline-size; }
   .track {
     display: grid;
     grid-template-columns: 2.5ch 1fr;
@@ -43,7 +44,7 @@ const hasTimes = tracks.some((t) => t.time);
     grid-template-columns: 2.5ch 6ch 1fr;
     grid-template-areas: 'num time main' '. . label';
   }
-  @media (min-width: 40rem) {
+  @container (min-width: 34rem) {
     .track { grid-template-columns: 2.5ch 1fr auto; grid-template-areas: 'num main label'; }
     .tracklist--times .track { grid-template-columns: 2.5ch 6ch 1fr auto; grid-template-areas: 'num time main label'; }
   }

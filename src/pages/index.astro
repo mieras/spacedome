@@ -1,30 +1,34 @@
 ---
 import CoverArt from '../components/CoverArt.astro';
 import DjAvatar from '../components/DjAvatar.astro';
-import EventCard from '../components/EventCard.astro';
 import PlayButton from '../components/PlayButton.astro';
 import QueueButton from '../components/QueueButton.astro';
 import SetGrid from '../components/SetGrid.astro';
 import { t } from '../i18n/ui';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { djHref, eventHref, genreHref, getLibrary, isUpcoming, setHref, setsByDj, setsByEvent, setStill, toPlayerItem } from '../lib/content';
-import { formatDate, formatDateLong, formatDuration, joinNames } from '../lib/format';
-import { settings } from '../settings';
+import { djHref, genreHref, getHome, getLibrary, getSettings, setHref, setsByDj, setStill, toPlayerItem } from '../lib/content';
+import { formatDate, formatDuration, joinNames } from '../lib/format';
+import { stripStega } from '../lib/sanity/visual-editing';
 
-const lib = await getLibrary();
+const [lib, settings, home] = await Promise.all([getLibrary(), getSettings(), getHome()]);
 const featured = lib.sets.find((s) => s.data.featured) ?? lib.sets[0];
 const featuredItem = featured && (await toPlayerItem(featured, lib));
 const latest = lib.sets.filter((s) => s.id !== featured?.id).slice(0, 8);
-const upcoming = lib.events.filter((e) => isUpcoming(e)).at(-1);
-const past = lib.events.filter((e) => !isUpcoming(e)).slice(0, 3);
 const djs = lib.djs.filter((d) => setsByDj(lib, d.id).length > 0);
+// Langste woord van de kop (zonder stega-tekens): bepaalt hoe groot de kop mag op een smal scherm.
+// Op de intro-div, niet op de h1: reveal.ts wist na de animatie alle inline styles van de h1.
+const longestWord = Math.max(6, ...stripStega(home.title).split(/\s+/).map((w) => w.length));
 ---
 
 <BaseLayout title={settings.siteName} isHome>
   <section class="hero wrapper" aria-labelledby="hero-title">
-    <div class="hero__intro">
-      <h1 id="hero-title" class="hero__title">Recorded live in the dome</h1>
-      <p class="lead">DJ sets from our nights: beats, trip-hop, deep grooves and experimental rhythms. Watch, listen, repeat.</p>
+    <div class="hero__intro" style={`--longest-word: ${longestWord}`}>
+      <h1 id="hero-title" class="hero__title" data-reveal="words">{home.title}</h1>
+      <p class="lead" data-reveal="up">{home.intro}</p>
+      <p class="hero__cta" data-reveal="up">
+        <a class="button button--primary" href="/sets">{t('home.browseSets')}</a>
+        <a class="button" href="/about">{t('nav.about')}</a>
+      </p>
     </div>
 
     {
@@ -38,7 +42,7 @@ const djs = lib.djs.filter((d) => setsByDj(lib, d.id).length > 0);
           </div>
           <div class="hero__meta">
             <p class="meta">
-              Latest set · <time datetime={featured.data.date.toISOString().slice(0, 10)}>{formatDate(featured.data.date)}</time>
+              {featured.data.featured ? 'Featured set' : 'Latest set'} · <time datetime={featured.data.date.toISOString().slice(0, 10)}>{formatDate(featured.data.date)}</time>
               {featured.data.video.duration && <> · {formatDuration(featured.data.video.duration)}</>}
             </p>
             <h2 id="featured-title" class="hero__set-title">
@@ -46,7 +50,7 @@ const djs = lib.djs.filter((d) => setsByDj(lib, d.id).length > 0);
             </h2>
             <p class="muted">{joinNames(lib.djsOf(featured).map((d) => d.data.name))}</p>
             <div class="hero__actions">
-              <PlayButton item={featuredItem} label={t('set.playSet')} size="sm" />
+              <PlayButton item={featuredItem} label={t('set.play')} size="sm" />
               <QueueButton item={featuredItem} />
             </div>
           </div>
@@ -61,42 +65,6 @@ const djs = lib.djs.filter((d) => setsByDj(lib, d.id).length > 0);
       <a class="more-link" href="/sets">{t('sets.all')} ({lib.sets.length}) →</a>
     </div>
     <SetGrid sets={latest} lib={lib} />
-  </section>
-
-  <section class="section wrapper" aria-labelledby="events-title">
-    <div class="section-head">
-      <h2 id="events-title">{t('events.title')}</h2>
-      <a class="more-link" href="/events">{t('events.past')} →</a>
-    </div>
-    <div class="next-night">
-      <p class="meta">{t('events.next')}</p>
-      {
-        upcoming ? (
-          <p class="next-night__text">
-            <a href={eventHref(upcoming.id)}>
-              {formatDateLong(upcoming.data.start)}, {upcoming.data.venue.name}, {upcoming.data.venue.city}
-            </a>
-          </p>
-        ) : (
-          <p class="next-night__text">
-            {t('events.tba')}{' '}
-            <a href={settings.socials[0]?.url} rel="noopener" target="_blank">
-              {settings.socials[0]?.handle}
-              <span class="visually-hidden">(opens in a new tab)</span>
-            </a>
-          </p>
-        )
-      }
-    </div>
-    <ul role="list">
-      {
-        past.map((event) => (
-          <li>
-            <EventCard event={event} setCount={setsByEvent(lib, event.id).length} />
-          </li>
-        ))
-      }
-    </ul>
   </section>
 
   <section class="section wrapper split" aria-label="Browse">
@@ -140,7 +108,7 @@ const djs = lib.djs.filter((d) => setsByDj(lib, d.id).length > 0);
     gap: var(--space-l);
     grid-template-columns: minmax(0, 1fr);
     padding-block: var(--space-xl) var(--space-2xl);
-    align-items: end;
+    align-items: start; /* intro en video bovenaan gelijk */
   }
   /* Eén zachte gloed per scherm (DESIGN.md §2.4) */
   .hero::before {
@@ -154,17 +122,26 @@ const djs = lib.djs.filter((d) => setsByDj(lib, d.id).length > 0);
   }
   @media (min-width: 60rem) {
     .hero { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); }
+    /* Intro blijft staan terwijl de featured set langsschuift, tot de hero ophoudt. */
+    .hero__intro { position: sticky; inset-block-start: calc(var(--header-h) + var(--space-m)); }
   }
-  .hero__intro { display: grid; gap: var(--space-s); align-content: end; }
+  .hero__intro { display: grid; gap: var(--space-s); align-content: start; container-type: inline-size; }
+  .hero__cta { display: flex; flex-wrap: wrap; gap: var(--space-2xs); margin-block-start: var(--space-2xs); }
+  /*
+   * Zo groot als het past, maar het langste woord (--longest-word, uit de titel) moet op één regel:
+   * niet midden in een woord afbreken. Gemeten in Notch: hoofdletter gemiddeld 0.64em, M/W 0.91em;
+   * 0.7 geeft marge. cqi = breedte van de intro-kolom (op desktop 5/12), niet van het scherm.
+   * Alleen een woord vol M's en W's breekt nog (break-word: vangnet tegen horizontaal scrollen).
+   */
   .hero__title {
-    font-size: var(--step-5);
+    --char: 0.7;
+    font-size: min(var(--step-7), 100cqi / (var(--longest-word, 8) * var(--char)));
+    overflow-wrap: break-word;
+    hyphens: manual;
     text-transform: uppercase;
-    letter-spacing: -0.035em;
-    line-height: 0.98;
+    line-height: 0.92;
   }
   @media (prefers-reduced-motion: no-preference) {
-    .hero__title { animation: rise var(--dur-slow) var(--ease-out) both; }
-    .hero__intro .lead { animation: rise var(--dur-slow) 120ms var(--ease-out) both; }
     .hero__feature { animation: rise var(--dur-slow) 220ms var(--ease-out) both; }
   }
   @keyframes rise { from { opacity: 0; translate: 0 1rem; } }
@@ -175,20 +152,10 @@ const djs = lib.djs.filter((d) => setsByDj(lib, d.id).length > 0);
   .hero__stage[data-player-docked] > :global(*) { visibility: hidden; }
   .hero__stage :global(.hero__play) { position: absolute; inset: 50% auto auto 50%; translate: -50% -50%; z-index: 3; }
   .hero__meta { display: grid; gap: var(--space-3xs); }
-  .hero__set-title { font-size: var(--step-3); }
+  .hero__set-title { font-family: var(--font-display); font-size: var(--step-5); line-height: 0.95; }
   .hero__set-title a { text-decoration: none; }
-  .hero__set-title a:hover { text-decoration: underline; }
   .hero__actions { display: flex; flex-wrap: wrap; gap: var(--space-2xs); margin-block-start: var(--space-2xs); }
 
-  .next-night {
-    display: grid;
-    gap: var(--space-3xs);
-    padding: var(--space-s) var(--space-m);
-    margin-block-end: var(--space-s);
-    border-radius: var(--radius-l);
-    background: var(--color-surface);
-  }
-  .next-night__text { font-size: var(--step-1); line-height: var(--leading-snug); }
 
   .split { display: grid; gap: var(--space-xl); }
   @media (min-width: 56rem) {
@@ -210,8 +177,8 @@ const djs = lib.djs.filter((d) => setsByDj(lib, d.id).length > 0);
   .dj-row__item:hover span { text-decoration: underline; }
   .dj-row__item :global(.avatar) { transition: scale var(--dur) var(--ease-out); }
   .dj-row__item:hover :global(.avatar) { scale: 1.06; }
-  /* Grote titel pas als er ruimte is (op mobiel past een lang woord anders niet). */
+  /* Op desktop mag de kop groter (step-8), nog steeds begrensd door het langste woord. */
   @media (min-width: 60rem) {
-    .hero__title { font-size: var(--step-6); }
+    .hero__title { font-size: min(var(--step-8), 100cqi / (var(--longest-word, 8) * var(--char))); }
   }
 </style>

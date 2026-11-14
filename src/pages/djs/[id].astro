@@ -1,21 +1,16 @@
 ---
-import { render } from 'astro:content';
+import { PortableText } from 'astro-portabletext';
 import DjAvatar from '../../components/DjAvatar.astro';
 import Icon from '../../components/Icon.astro';
 import SetGrid from '../../components/SetGrid.astro';
 import { t } from '../../i18n/ui';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { genreHref, getLibrary, setsByDj, type DjEntry, type GenreEntry } from '../../lib/content';
+import { genreHref, getLibrary, setsByDj, type GenreEntry } from '../../lib/content';
 
-export async function getStaticPaths() {
-  const { djs } = await getLibrary();
-  return djs.map((dj) => ({ params: { id: dj.id }, props: { dj } }));
-}
-
-const { dj } = Astro.props as { dj: DjEntry };
 const lib = await getLibrary();
+const dj = lib.djMap.get(Astro.params.id ?? '');
+if (!dj) return Astro.rewrite('/404');
 const sets = setsByDj(lib, dj.id);
-const { Content } = await render(dj);
 
 // Genres die deze dj speelt, meest gespeeld eerst.
 const counts = new Map<string, { genre: GenreEntry; n: number }>();
@@ -29,7 +24,7 @@ const genres = [...counts.values()].sort((a, b) => b.n - a.n).map((x) => x.genre
     <div class="dj-head__text">
       <p class="meta">{[dj.data.resident && t('djs.resident'), dj.data.location].filter(Boolean).join(' · ') || 'DJ'}</p>
       <h1>{dj.data.name}</h1>
-      <div class="prose lead"><Content /></div>
+      <div class="prose lead"><PortableText value={dj.content ?? []} /></div>
       {
         dj.data.links.length > 0 && (
           <ul class="dj-links" role="list">
@@ -84,11 +79,11 @@ const genres = [...counts.values()].sort((a, b) => b.n - a.n).map((x) => x.genre
     .dj-head { grid-template-columns: auto minmax(0, 1fr); }
   }
   .dj-head__text { display: grid; gap: var(--space-s); }
-  .dj-head h1 { font-size: var(--step-5); text-transform: uppercase; letter-spacing: -0.035em; line-height: 0.98; }
+  .dj-head h1 { font-size: min(var(--step-7), 14vw); text-transform: uppercase; line-height: 0.92; }
   .dj-links { display: flex; flex-wrap: wrap; gap: var(--space-2xs); }
   .dj-genres { display: grid; gap: var(--space-2xs); }
   /* Grote titel pas als er ruimte is (op mobiel past een lang woord anders niet). */
   @media (min-width: 48rem) {
-    .dj-head h1 { font-size: var(--step-6); }
+    .dj-head h1 { font-size: var(--step-8); }
   }
 </style>

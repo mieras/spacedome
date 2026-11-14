@@ -24,23 +24,48 @@ sd-player[hidden] { display: none; }
 .player-media[data-mode='off'],
 .player-media[data-mode='hidden'] { display: none; }
 
-/* Gedockt: exact over het podium van de setpagina (positie via JS, in documentcoördinaten). */
+/* Gedockt: exact over het podium ([data-player-stage]). Fallback: JS zet de positie in
+   documentcoördinaten (en volgt bij scrollen een sticky podium). */
 .player-media[data-mode='docked'] {
   position: absolute;
   z-index: 10;
   border-radius: var(--radius-m);
 }
+/* Met anchor positioning plakt de browser de video zelf aan het podium, ook als dat sticky is,
+   zonder scroll-listener of haperen. */
+@supports (anchor-name: --a) {
+  [data-player-docked] { anchor-name: --sd-stage; }
+  .player-media[data-mode='docked'] {
+    position: fixed;
+    position-anchor: --sd-stage;
+    inset: anchor(top) auto auto anchor(left);
+    inline-size: anchor-size(width);
+    block-size: anchor-size(height);
+  }
+}
 
-/* Mini: zwevend rechtsonder, boven de balk. */
+/* Mini: zwevend onderin boven de balk, rechts of links (versleepbaar, zie player.ts). */
 .player-media[data-mode='mini'] {
   position: fixed;
   z-index: 60;
   inset-block-end: calc(var(--player-h) + var(--space-s));
   inset-inline-end: var(--gutter);
-  inline-size: clamp(9rem, 28vw, 22rem);
+  inline-size: clamp(12rem, 28vw, 22rem);
   aspect-ratio: 16 / 9;
   border-radius: var(--radius-m);
   box-shadow: 0 1.5rem 3rem -1rem oklch(5% 0.03 292 / 0.7), 0 0 0 1px oklch(100% 0 0 / 0.08);
+  touch-action: none; /* slepen met de vinger scrolt de pagina niet */
+  cursor: grab;
+}
+.player-media[data-mode='mini'][data-side='left'] {
+  inset-inline: var(--gutter) auto;
+}
+.player-media[data-mode='mini'] video { cursor: inherit; }
+.player-media[data-dragging] { cursor: grabbing; }
+/* Telefoon: ruim de helft van het scherm, anders is het een postzegel. */
+@media (max-width: 40rem) {
+  .player-media[data-mode='mini'] { inline-size: clamp(12rem, 58vw, 16rem); }
+  .player-media[data-mode='mini'] .player-media__tool { inline-size: 2.25rem; block-size: 2.25rem; }
 }
 
 .player-media__tools {
@@ -69,7 +94,8 @@ sd-player[hidden] { display: none; }
 }
 .player-media__tool:hover { background: oklch(10% 0.03 292 / 0.9); }
 .player-media__tool .icon { inline-size: 1.15rem; block-size: 1.15rem; }
-.player-media[data-mode='docked'] [data-player-open] { display: none; }
+.player-media[data-mode='docked'] [data-player-open],
+.player-media:not([data-mode='mini']) [data-player-move] { display: none; }
 
 /* ---------- Balk ---------- */
 .player-bar {
@@ -150,8 +176,12 @@ sd-player[hidden] { display: none; }
   .player-bar__skip, .player-bar__time { display: none; }
 }
 @media (max-width: 40rem) {
-  .player-bar__optional { display: none; }
+  /* Audio-knop blijft in audiomodus staan: anders is er geen weg terug naar video. */
+  .player-bar__optional:not([data-view='audio']) { display: none; }
 }
+.player-bar__view .player-bar__to-video,
+.player-bar__view[data-view='audio'] .player-bar__to-audio { display: none; }
+.player-bar__view[data-view='audio'] .player-bar__to-video { display: block; }
 
 /* ---------- Voortgang ---------- */
 .player-bar__seek { position: absolute; inset: -0.6rem 0 auto; block-size: 1.2rem; }

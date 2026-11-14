@@ -3,7 +3,6 @@ title: Astral Plane
 date: 2026-07-30
 djs: [mara-nox]
 genres: [experimental, beats, bass]
-event: 2026-07-30-de-nachtzuster
 video:
   src: https://test-streams.mux.dev/tos_ismc/main.m3u8
   duration: 4380

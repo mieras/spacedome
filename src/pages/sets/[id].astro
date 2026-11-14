@@ -1,119 +1,145 @@
 ---
-import { getImage } from 'astro:assets';
-import { render } from 'astro:content';
+import { PortableText } from 'astro-portabletext';
 import CoverArt from '../../components/CoverArt.astro';
 import DjAvatar from '../../components/DjAvatar.astro';
 import PlayButton from '../../components/PlayButton.astro';
 import QueueButton from '../../components/QueueButton.astro';
-import SetGrid from '../../components/SetGrid.astro';
+import SetCarousel from '../../components/SetCarousel.astro';
 import ShareButton from '../../components/ShareButton.astro';
 import Tracklist from '../../components/Tracklist.astro';
 import { t } from '../../i18n/ui';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { djHref, eventHref, genreHref, getLibrary, setHref, setStill, suggestionsFor, toPlayerItem, type SetEntry } from '../../lib/content';
+import { djHref, genreHref, getLibrary, setHref, setOgImage, setStill, suggestionsFor, toPlayerItem } from '../../lib/content';
 import { formatDate, formatDuration, joinNames } from '../../lib/format';
 
-export async function getStaticPaths() {
-  const { sets } = await getLibrary();
-  return sets.map((set) => ({ params: { id: set.id }, props: { set } }));
-}
-
-const { set } = Astro.props as { set: SetEntry };
 const lib = await getLibrary();
+const set = lib.sets.find((s) => s.id === Astro.params.id);
+if (!set) return Astro.rewrite('/404');
 const item = await toPlayerItem(set, lib);
 const djs = lib.djsOf(set);
 const genres = lib.genresOf(set);
-const event = lib.eventOf(set);
-const suggestions = suggestionsFor(set, lib);
-const { Content } = await render(set);
+const suggestions = suggestionsFor(set, lib, 10);
 const duration = formatDuration(set.data.video.duration);
 const still = setStill(set);
-// Alleen een eigen poster als OG-beeld: crawlers sturen geen Referer, dus Bunny zou ze weigeren.
-const ogImage = set.data.poster ? (await getImage({ src: set.data.poster, width: 1200, height: 630, fit: 'cover', format: 'jpg' })).src : undefined;
+// Alleen een eigen still als OG-beeld: crawlers sturen geen Referer, dus Bunny zou ze weigeren.
+const ogImage = setOgImage(set);
+const hasText = !!set.body?.trim();
+const hasTracks = set.data.tracklist.length > 0;
 const description = `${set.data.title} by ${joinNames(djs.map((d) => d.data.name))}. ${set.body?.split('\n').find(Boolean) ?? ''}`;
 ---
 
 <BaseLayout title={`${set.data.title} – ${joinNames(djs.map((d) => d.data.name))}`} description={description} image={ogImage} type="video.other">
   <article class="set">
-    <div class="set__stage-wrap wrapper">
+    <!-- Hero: video en info naast elkaar op desktop, onder elkaar op mobiel. -->
+    <div class="set__hero wrapper">
       <div class="stage" data-player-stage={set.id}>
-        <CoverArt seed={set.id} image={still} alt={set.data.posterAlt ?? ''} ratio="16/9" eager sizes="(min-width: 96rem) 96rem, 100vw" />
+        <CoverArt seed={set.id} image={still} alt={set.data.posterAlt ?? ''} ratio="16/9" eager sizes="(min-width: 64rem) 62vw, 100vw" />
         <PlayButton item={item} size="lg" useUrlTime class="stage__play" />
       </div>
-    </div>
 
-    <div class="set__grid wrapper">
-      <header class="set__head">
-        <p class="meta">
-          <time datetime={set.data.date.toISOString().slice(0, 10)}>{formatDate(set.data.date)}</time>
-          {duration && <> · {duration}</>}
-          {' · '}
-          {event ? <a href={eventHref(event.id)}>{t('set.recordedAt')} {event.data.title} @ {event.data.venue.name}</a> : t('set.standalone')}
-        </p>
-        <h1 class="set__title">{set.data.title}</h1>
-        <ul class="set__djs" role="list">
-          {
-            djs.map((dj) => (
-              <li>
-                <a href={djHref(dj.id)}>
-                  <DjAvatar dj={dj} size="2.5rem" />
-                  <span>{dj.data.name}</span>
-                </a>
-              </li>
-            ))
-          }
-        </ul>
-        <div class="set__actions">
-          <PlayButton item={item} label={t('set.playSet')} size="sm" useUrlTime />
-          <QueueButton item={item} />
-          <ShareButton url={setHref(set.id)} title={set.data.title} />
-        </div>
-        {
-          genres.length > 0 && (
-            <ul class="chips" role="list" aria-label={t('nav.genres')}>
-              {genres.map((g) => (
+      <div class="set__info">
+        <header class="set__head">
+          <p class="meta" data-reveal="up">
+            <time datetime={set.data.date.toISOString().slice(0, 10)}>{formatDate(set.data.date)}</time>
+            {duration && <> · {duration}</>}
+          </p>
+          <h1 class="set__title" data-reveal="words">{set.data.title}</h1>
+          <ul class="set__djs" role="list" data-reveal="up">
+            {
+              djs.map((dj) => (
                 <li>
-                  <a class="chip" href={genreHref(g.id)}>
-                    {g.data.title}
+                  <a href={djHref(dj.id)}>
+                    <DjAvatar dj={dj} size="2.5rem" />
+                    <span>{dj.data.name}</span>
                   </a>
                 </li>
-              ))}
-            </ul>
+              ))
+            }
+          </ul>
+          <div class="set__actions" data-reveal="up">
+            <PlayButton item={item} label={t('set.play')} size="sm" useUrlTime />
+            <QueueButton item={item} />
+            <ShareButton url={setHref(set.id)} title={set.data.title} />
+          </div>
+          {
+            genres.length > 0 && (
+              <ul class="chips" role="list" aria-label={t('nav.genres')} data-reveal="up">
+                {genres.map((g) => (
+                  <li>
+                    <a class="chip" href={genreHref(g.id)}>
+                      {g.data.title}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )
+          }
+        </header>
+
+        {
+          /* Beschrijving en tracklist. Met JS (sd-tabs) als tabs; zonder JS gewoon onder elkaar met koppen. */
+          (hasText || hasTracks) && (
+            <sd-tabs class="set__tabs" data-reveal="up">
+              {hasText && hasTracks && (
+                <div class="tabs__list" role="tablist" aria-label={set.data.title} data-tabs-list hidden>
+                  <button type="button" role="tab" class="tabs__tab" id="tab-about" aria-controls="panel-about" aria-selected="true">
+                    {t('set.about')}
+                  </button>
+                  <button type="button" role="tab" class="tabs__tab" id="tab-tracklist" aria-controls="panel-tracklist" aria-selected="false" tabindex="-1">
+                    {t('set.tracklist')} <span class="tabs__count">{set.data.tracklist.length}</span>
+                  </button>
+                </div>
+              )}
+              {hasText && (
+                <section class="tabs__panel" id="panel-about" aria-labelledby="about-title">
+                  <h2 id="about-title" class="set__subtitle" data-tabs-heading>{t('set.about')}</h2>
+                  <div class="prose set__text">
+                    <PortableText value={set.content ?? []} />
+                  </div>
+                </section>
+              )}
+              {hasTracks && (
+                <section class="tabs__panel" id="panel-tracklist" aria-labelledby="tracklist-title">
+                  <h2 id="tracklist-title" class="set__subtitle" data-tabs-heading>{t('set.tracklist')}</h2>
+                  <Tracklist tracks={set.data.tracklist} />
+                </section>
+              )}
+            </sd-tabs>
           )
         }
-        <div class="prose set__text">
-          <Content />
-        </div>
-      </header>
-
-      {
-        set.data.tracklist.length > 0 && (
-          <section class="set__tracklist" aria-labelledby="tracklist-title">
-            <h2 id="tracklist-title" class="set__subtitle">{t('set.tracklist')}</h2>
-            <Tracklist tracks={set.data.tracklist} />
-          </section>
-        )
-      }
+      </div>
     </div>
 
     {
       suggestions.length > 0 && (
         <section class="section wrapper" aria-labelledby="more-title">
-          <div class="section-head">
-            <h2 id="more-title">{t('set.more')}</h2>
-          </div>
-          <SetGrid sets={suggestions} lib={lib} />
+          <SetCarousel sets={suggestions} lib={lib} title={t('set.more')} id="more-title" />
         </section>
       )
     }
   </article>
 </BaseLayout>
 
+<script>
+  import '../../scripts/tabs';
+</script>
+
 <style>
-  .set__stage-wrap { padding-block-start: var(--space-m); }
+  .set__hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-l);
+    padding-block: var(--space-m) var(--space-xl);
+  }
+  /* Desktop: video links (ruim), info rechts. */
+  @media (min-width: 64rem) {
+    .set__hero { grid-template-columns: minmax(0, 1.8fr) minmax(0, 1fr); align-items: start; gap: var(--space-l-xl); }
+  }
+
   /* 16:9, maar nooit hoger dan het scherm min header en playerbalk. */
   .stage {
     position: relative;
+    inline-size: 100%;
     max-inline-size: calc((100svh - var(--header-h) - var(--player-h) - var(--space-l)) * 16 / 9);
     margin-inline: auto;
   }
@@ -126,30 +152,27 @@ const description = `${set.data.title} by ${joinNames(djs.map((d) => d.data.name
     filter: blur(20px);
   }
   :global(.stage__play) { position: absolute; inset: 50% auto auto 50%; translate: -50% -50%; z-index: 3; }
+  /* Desktop: video blijft staan terwijl je door beschrijving/tracklist scrolt. Aan het eind van
+     de hero scrolt hij mee weg; de player maakt er dan een mini-video van (IntersectionObserver). */
+  @media (min-width: 64rem) {
+    .stage { position: sticky; inset-block-start: calc(var(--header-h) + var(--space-s)); }
+  }
   /* Speelt deze set en ligt de video eroverheen: cover en knop onzichtbaar, ruimte blijft. */
   .stage[data-player-docked] > :global(*) { visibility: hidden; }
 
-  .set__grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--space-xl);
-    padding-block: var(--space-l) var(--space-xl);
-  }
-  @media (min-width: 60rem) {
-    .set__grid { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); align-items: start; }
-    .set__tracklist { position: sticky; inset-block-start: calc(var(--header-h) + var(--space-s)); }
-  }
+  .set__info { display: grid; gap: var(--space-l); align-content: start; container-type: inline-size; min-inline-size: 0; }
   .set__head { display: grid; gap: var(--space-s); align-content: start; }
   .set__head .meta a { color: inherit; }
-  .set__title { font-size: var(--step-5); text-transform: uppercase; letter-spacing: -0.035em; line-height: 0.98; }
+  /* Schaalt met de kolom: groot op mobiel en in de brede kolom, kleiner naast de video. */
+  .set__title { font-size: min(var(--step-7), 14cqi); text-transform: uppercase; line-height: 0.92; }
   .set__djs { display: flex; flex-wrap: wrap; gap: var(--space-2xs) var(--space-s); }
   .set__djs a { display: inline-flex; align-items: center; gap: var(--space-2xs); font-size: var(--step-1); font-weight: 600; text-decoration: none; }
   .set__djs a:hover span { text-decoration: underline; }
   .set__actions { display: flex; flex-wrap: wrap; gap: var(--space-2xs); }
-  .set__text { margin-block-start: var(--space-xs); font-size: var(--step-1); line-height: var(--leading-snug); }
+  .set__text { font-size: var(--step-0); line-height: var(--leading-snug); }
   .set__subtitle { font-size: var(--step-1); text-transform: uppercase; letter-spacing: 0; margin-block-end: var(--space-2xs); }
-  /* Grote titel pas als er ruimte is (op mobiel past een lang woord anders niet). */
-  @media (min-width: 60rem) {
-    .set__title { font-size: var(--step-6); }
-  }
+
+  /* Tabs (zie src/scripts/tabs.ts). Zonder JS: panelen onder elkaar met koppen. */
+  .set__tabs { display: grid; gap: var(--space-l); }
+  .set__tabs[data-ready] { gap: var(--space-s); }
 </style>

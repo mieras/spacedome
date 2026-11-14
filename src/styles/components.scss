@@ -4,7 +4,15 @@
  */
 
 /* ---------- Cover-art (zie src/lib/art.ts) ---------- */
+/* Animatie van gegenereerde art: verschuivingen bovenop de vaste compositie per seed. Geregistreerd
+   (@property), anders kan de browser ze niet tweenen; inherits: false houdt het goedkoop. */
+@property --art-dx1 { syntax: '<percentage>'; inherits: false; initial-value: 0%; }
+@property --art-dy1 { syntax: '<percentage>'; inherits: false; initial-value: 0%; }
+@property --art-dx2 { syntax: '<percentage>'; inherits: false; initial-value: 0%; }
+@property --art-dy2 { syntax: '<percentage>'; inherits: false; initial-value: 0%; }
+@property --art-dh { syntax: '<number>'; inherits: false; initial-value: 0; }
 .art {
+  --_h1: calc(var(--art-h1, 330) + var(--art-dh));
   position: relative;
   overflow: hidden;
   isolation: isolate;
@@ -12,9 +20,9 @@
   border-radius: var(--radius-m);
   color-scheme: dark;
   background:
-    radial-gradient(circle at var(--art-x1, 30%) var(--art-y1, 30%), oklch(80% 0.16 var(--art-h1, 330) / 0.95) 0 5%, oklch(66% 0.22 var(--art-h1, 330) / 0.55) 11%, transparent 30%),
-    radial-gradient(circle at var(--art-x2, 70%) var(--art-y2, 75%), oklch(58% 0.24 var(--art-h1, 330) / 0.9) 0, transparent 58%),
-    linear-gradient(var(--art-angle, 160deg), oklch(15% 0.06 var(--art-h2, 285)), oklch(28% 0.14 var(--art-h2, 285)) 55%, oklch(44% 0.2 var(--art-h1, 330)));
+    radial-gradient(circle at calc(var(--art-x1, 30%) + var(--art-dx1)) calc(var(--art-y1, 30%) + var(--art-dy1)), oklch(80% 0.16 var(--_h1) / 0.95) 0 5%, oklch(66% 0.22 var(--_h1) / 0.55) 11%, transparent 30%),
+    radial-gradient(circle at calc(var(--art-x2, 70%) + var(--art-dx2)) calc(var(--art-y2, 75%) + var(--art-dy2)), oklch(58% 0.24 var(--_h1) / 0.9) 0, transparent 58%),
+    linear-gradient(var(--art-angle, 160deg), oklch(15% 0.06 var(--art-h2, 285)), oklch(28% 0.14 var(--art-h2, 285)) 55%, oklch(44% 0.2 var(--_h1)));
 }
 /* De dome: een ring met een zachte gloed */
 .art::before {
@@ -49,6 +57,33 @@
   object-fit: cover;
 }
 .art:has(> img)::before { display: none; }
+
+/*
+ * Gegenereerde covers leven: de twee lichtbollen drijven langzaam rond (elk een andere kant op),
+ * de kleur schuift ±12° mee en de ring (de dome) zweeft en ademt. Duur en startpunt komen uit de
+ * seed (--art-dur, --art-delay in art.ts), dus geen twee covers lopen gelijk. Bij hover op een
+ * kaart zet de ring wat aan (scale staat los van de transform-animatie).
+ * Alleen zonder echte afbeelding en zonder prefers-reduced-motion.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .art:not(:has(> img)) { animation: art-drift var(--art-dur, 18s) ease-in-out var(--art-delay, 0s) infinite; }
+  .art:not(:has(> img))::before {
+    animation: art-ring calc(var(--art-dur, 18s) * 0.6) ease-in-out var(--art-delay, 0s) infinite;
+    transition: scale var(--dur-slow) var(--ease-out);
+  }
+  .set-card:hover .art::before,
+  a:hover > .art::before { scale: 1.14; }
+}
+@keyframes art-drift {
+  0%, 100% { --art-dx1: 0%; --art-dy1: 0%; --art-dx2: 0%; --art-dy2: 0%; --art-dh: 0; }
+  33% { --art-dx1: 9%; --art-dy1: -7%; --art-dx2: -11%; --art-dy2: 6%; --art-dh: 12; }
+  66% { --art-dx1: -7%; --art-dy1: 8%; --art-dx2: 8%; --art-dy2: -9%; --art-dh: -10; }
+}
+@keyframes art-ring {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(5%, -4%) scale(1.07); }
+}
+
 .art { container-type: inline-size; }
 
 /* ---------- Playknop ---------- */
@@ -73,7 +108,7 @@
 .play-button .icon { inline-size: 45%; block-size: 45%; }
 .play-button--sm { --_size: 2.75rem; }
 .play-button--lg { --_size: clamp(4rem, 3rem + 3vw, 6rem); }
-.play-button--label { padding-inline: 1.1rem 1.4rem; font-weight: 700; font-size: var(--step--1); letter-spacing: 0.02em; }
+.play-button--label { min-inline-size: 7.25rem; padding-inline: 1.1rem 1.4rem; font-weight: 700; font-size: var(--step--1); letter-spacing: 0.02em; }
 .play-button--label .icon { inline-size: 1.35rem; block-size: 1.35rem; }
 .play-button .icon-pause { display: none; }
 .play-button[data-state='playing'] .icon-play { display: none; }
@@ -111,3 +146,43 @@
 }
 :root[data-player='on'] .toast { --_player: var(--player-h); }
 .toast[data-visible] { opacity: 1; translate: 0 0; }
+
+/* Tabs (sd-tabs, src/scripts/tabs.ts): setpagina en /brand. */
+.tabs__list {
+  display: flex;
+  gap: var(--space-s);
+  border-block-end: var(--border-width) solid var(--color-line);
+}
+.tabs__list[hidden] { display: none; }
+.tabs__tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5ch;
+  min-block-size: 2.75rem;
+  margin-block-end: calc(var(--border-width) * -1);
+  padding: 0 var(--space-3xs);
+  border: 0;
+  border-block-end: 2px solid transparent;
+  background: none;
+  color: var(--color-muted);
+  font: inherit;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-meta);
+  font-size: var(--step--1);
+  cursor: pointer;
+}
+.tabs__tab:hover { color: var(--color-fg); }
+.tabs__tab[aria-selected='true'] { color: var(--color-fg); border-block-end-color: var(--color-accent); }
+.tabs__tab:focus-visible { outline-offset: -2px; }
+.tabs__count {
+  min-inline-size: 1.6em;
+  padding: 0.05em 0.45em;
+  border-radius: var(--radius-round);
+  background: color-mix(in oklch, currentColor 12%, transparent);
+  font-size: var(--step--2);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+  text-align: center;
+}
+.tabs__panel:focus-visible { outline-offset: var(--space-2xs); }

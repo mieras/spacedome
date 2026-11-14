@@ -21,8 +21,8 @@ const { title, eyebrow, lead } = Astro.props;
     gap: var(--space-xs);
     padding-block: var(--space-xl) var(--space-l);
   }
-  .page-header h1 { font-size: var(--step-5); text-transform: uppercase; letter-spacing: -0.03em; }
+  .page-header h1 { font-size: min(var(--step-7), 14vw); text-transform: uppercase; line-height: 0.92; }
   @media (min-width: 48rem) {
-    .page-header h1 { font-size: var(--step-6); }
+    .page-header h1 { font-size: var(--step-8); }
   }
 </style>

@@ -9,7 +9,7 @@ Het ontwerp van de Space Dome-site in één document: merk, kleur, typografie, r
 
 ## 1. Merk in het kort
 
-Space Dome is een avond (en straks een archief) rond de **LA beat scene**: beats, trip-hop, instrumentale hiphop, jazz en experimentele ritmes. Van J Dilla tot Flying Lotus, van Massive Attack tot DJ Shadow. *No rush, just hypnotic bass.*
+Space Dome FM is het radio- en videoarchief van Space Dome, rond de **LA beat scene**: beats, trip-hop, instrumentale hiphop, jazz en experimentele ritmes. Van J Dilla tot Flying Lotus, van Massive Attack tot DJ Shadow. *No rush, just hypnotic bass.*
 
 De beeldtaal komt van de eerste poster: **LA bij nacht**. Paars en magenta lucht, palmsilhouetten, lensflares als zwevende bollen, filmkorrel en een gestempeld logo in een cirkel.
 
@@ -47,16 +47,17 @@ Contrast: tekst, muted en accent halen in beide thema's minstens 4,5:1 op `--col
 
 | Rol | Font | Gebruik |
 |---|---|---|
-| Display | **Unbounded** (variabel, 200–900) | Koppen, titels van sets, het woordmerk. Rond en breed, zoals de letters in het logo. |
-| Tekst | **Hanken Grotesk** (variabel) | Lopende tekst, interface, metadata. |
+| Display | **Stack Sans Notch** (variabel, 200–700) | De grote titels: hero, paginakop, set, dj (`--font-display`). |
+| Koppen | **Stack Sans Headline** (variabel, 200–700) | Sectiekoppen, kaarttitels, h2–h4 (`--font-heading`). |
+| Tekst | **Stack Sans Text** (variabel, 200–700) | Lopende tekst, interface, metadata. |
+| Logo | **Unbounded** | Alleen het tijdelijke woordmerk (`--font-logo`). |
 
-Beide self-hosted via Fontsource (geen verzoeken naar Google, AVG). Voorlopige keuze: als het logo-font bekend is, kijken we of Unbounded blijft.
+Beide self-hosted via Fontsource (geen verzoeken naar Google, AVG). Gekozen door Maarten op 13-11-2026 (eerst lokaal getest).
 
 **Schaal:** Utopia, fluid tussen 360 en 1920 px. Basis 18 → 20 px, ratio 1.2 → 1.25. Tokens `--step--2` t/m `--step-8`.
 
 - `h1` `--step-5`, `h2` `--step-3`, `h3` `--step-1`.
-- Grote display-titels (hero, set, dj, paginakop): `--step-5` op mobiel, `--step-6` vanaf 48–60rem. Unbounded in kapitalen is breed; een lang woord past anders niet op 320px.
-- Grote datums (avondpagina, eventkaart) schalen mee met hun kolom: `min(--step-x, 14cqi)` met `container-type: inline-size` op de ouder.
+- Grote display-titels (hero, set, dj, paginakop): `--step-5` op mobiel, `--step-6` vanaf 48–60rem. Bewust groot met veel contrast tegenover de tekst: hero `min(step-7, 100cqi / (langste woord × 0,7))` → `step-8` als plafond (cqi = de intro-kolom; het langste woord van de kop past altijd op één regel, ook als Space Dome de tekst in Sanity wijzigt), paginakop/dj `min(step-7, 14vw)` → `step-8`, settitel `min(step-7, 14cqi)`, regelafstand 0,92.
 - Koppen hebben `overflow-wrap: anywhere` + `hyphens: auto` als vangnet. Grids met één kolom altijd `minmax(0, 1fr)`, nooit `auto`/`1fr` (anders rekt lange tekst de pagina op).
 - Metadata (`.meta`): `--step--1`, hoofdletters, `letter-spacing: .08em`, tabular nums. Datums zoals op de poster: `30.07.2026`.
 
@@ -68,6 +69,10 @@ Beide self-hosted via Fontsource (geen verzoeken naar Google, AVG). Voorlopige k
 - **Breakout-grid** (`.layout`): `content` (46rem) / `popout` / `feature` / `full`.
 - **Wrapper** (`.wrapper`): breed raster voor header, footer en kaartrasters, max 96rem.
 - Kaartrasters: `.grid` met `--grid-min` (standaard 16rem).
+- Carousel (`SetCarousel`): horizontale rij met `scroll-snap-type: x mandatory`. Telefoon 78% per kaart (stukje van de volgende zichtbaar), tablet 2,5, desktop 4. Pijlknoppen rechts in de sectiekop, uitgeschakeld aan begin/eind, verborgen als alles past.
+- Footer: merk (1,6fr) + Explore, Genres, Follow; tablet drie kolommen onder het merk, telefoon twee. Aantallen als `.badge` (pil, `--step--2`, tabular-nums). Links in systeem-mono, kapitalen, `--step--1`, accentkleur bij hover. Onderaan een peak gradient (magenta, 10 kolommen; zie `PEAK_FOOTER` in `src/lib/peak.ts`) die tijdens het scrollen van vorm verandert: elke waarde mengt van `start` (vlakke band, gezakt, dof) naar de eindstand helemaal onderaan, met ease-in-out. Geen scale/transform, zodat de randen altijd tot de zijkant lopen; het copyright staat op de donkere vloer en is daarom altijd licht.
+- Setpagina: hero met video en info naast elkaar vanaf 64rem (`1.8fr / 1fr`). Het podium is daar sticky (onder de header) tot het einde van de hero; daarna mini-video. Titel `min(var(--step-6), 12cqi)` op de infokolom. Beschrijving en tracklist als tabs (`<sd-tabs>`, `src/scripts/tabs.ts`): onderstreepte tabs in meta-stijl, actieve tab met accentlijn, aantal tracks als pil.
+- Play-knop met tekst: `min-inline-size: 7.25rem`, zodat Play en Pause even breed zijn.
 
 ## 6. Vorm
 
@@ -85,7 +90,8 @@ Beide self-hosted via Fontsource (geen verzoeken naar Google, AVG). Voorlopige k
 | `--ease-out` | `cubic-bezier(.22, 1, .36, 1)` | Bijna alles |
 
 - **Paginatransities:** `<ClientRouter />`. De oude pagina fadet weg, de nieuwe fadet in en schuift 0,75rem omhoog. Header en player hebben een eigen `view-transition-name` en blijven dus staan.
-- **Player:** de video schuift met een FLIP-animatie tussen gedockt (op de setpagina) en mini (rechtsonder). Tussen pagina's "morpht" hij via de view transition.
+- **Player:** de video schuift met een FLIP-animatie tussen gedockt (op de setpagina) en mini (onderin, rechts of links). Tussen pagina's "morpht" hij via de view transition.
+- **Reveal bij laden** (`data-reveal`, GSAP SplitText): `chars` (datum, per teken uit een masker), `words` (titels, per woord), `up` (blokken: 18px omhoog + fade, stagger 0,07s), `media` (flyer: clip-path van onder naar boven + zoom 1,04 → 1). Easing `expo.out` voor tekst en beeld, `power3.out` voor blokken, ±1s. Gebruikt op home (titel, intro, knoppen) en de setpagina (niet op het podium: de gedockte video moet er exact op blijven liggen).
 - **Reduced motion:** alle duurtokens worden 0,01 ms en de view-transition-animaties staan uit.
 
 ## 8. De player
@@ -97,8 +103,8 @@ De kern van de site. Eén `<sd-player>` in de layout met `transition:persist`: h
 | Uit | Niets geladen | Niet zichtbaar |
 | Balk | Er is een set geladen | Vaste balk onderin: cover, titel, dj's, play, ±15/30 s, tijd, wachtrij, delen, sluiten. De voortgang is een dunne balk bovenaan. |
 | Gedockt | Op de pagina van de spelende set, podium in beeld | De video ligt precies over het podium (`[data-player-stage]`) |
-| Mini | Elders, of het podium is uit beeld gescrold | Video zwevend rechtsonder, boven de balk |
-| Alleen audio | Bezoeker kiest "luisteren" | Geen video, alleen de balk |
+| Mini | Elders, of het podium is uit beeld gescrold | Video zwevend onderin boven de balk, rechts of links. Versleepbaar (snapt naar de dichtste kant) of via de wisselknop (WCAG 2.5.7). Breedte `clamp(12rem, 28vw, 22rem)`, op telefoon `clamp(12rem, 58vw, 16rem)` |
+| Alleen audio | Bezoeker kiest "luisteren" | Geen video, alleen de balk; stream op de laagste kwaliteit (240p). De knop in de balk wordt een camera en blijft ook op mobiel staan als weg terug |
 
 - **Wachtrij:** sets toevoegen vanaf elke kaart. Opgeslagen in `localStorage`, dus geen account nodig. De speelpositie wordt bewaard: wie terugkomt, gaat verder waar hij was.
 - **Delen:** de link naar de set, of vanuit de player de link op het huidige moment (`?t=123`).
@@ -115,13 +121,23 @@ De kern van de site. Eén `<sd-player>` in de layout met `transition:persist`: h
 | `PlayButton`, `QueueButton`, `ShareButton` | Acties op een set, overal gelijk |
 | `Tracklist` | Genummerde lijst; tijdcodes optioneel (later: naar een track springen) |
 | `DjAvatar` | Rond, foto of initialen op cover-art |
-| `EventCard` | Avond met datum zoals op de poster |
 
 ## 10. Open punten
 
 - [ ] Logo als vector (SVG/AI/PDF) en het font van het logo
-- [ ] Definitieve fontkeuze (Unbounded is een voorstel)
-- [ ] Fotografie van avonden en dj's
+- [x] Fontkeuze: Stack Sans Notch / Headline / Text
+- [ ] Fotografie van dj's en shows
 - [ ] Stills uit de video (thumbnail-picker via Bunny Stream)
 - [ ] Nederlandse vertaling (interface staat klaar in `src/i18n/ui.ts`)
 - [ ] OG-afbeelding per set (nu: cover of standaardbeeld)
+
+## Knoppen
+- `.button`: pil met rand. Hover met een muis: een cirkel (170% van de knop) vult de knop vanaf het punt waar de pointer binnenkomt, volgt hem (0,4s, power2) en rolt eruit waar hij weggaat (0,3s). Naar "Position Aware Button Hover w/ GSAP" (CodePen OJYywaJ), in `src/scripts/button-flair.ts` met event delegation. Kleur van de vulling: `--_bg-hover`, tekst: `--_fg-hover`.
+- Touch, toetsenbord, geen JS en `prefers-reduced-motion`: gewoon omkleuren.
+
+## Cover-art
+- Zonder still of flyer: gegenereerde art per seed (`src/lib/art.ts`). Die leeft: de twee lichtbollen drijven rond, de tint schuift ±12° en de ring zweeft en ademt (`art-drift`, `art-ring` in `components.scss`, via `@property`). Duur 14–24s en startpunt uit de seed, zodat covers niet gelijk lopen. Hover op een kaart: ring schaalt naar 1,14.
+- Niet bij `prefers-reduced-motion` en niet zodra er een echte afbeelding is.
+
+## Stijlgids
+- `/brand` toont tokens, componenten en effecten live uit de code. De peak gradient heeft er een speeltuin; de peak-instelling van de footer staat in `PEAK_FOOTER` (`src/lib/peak.ts`). Nieuw component of token: zet het daar ook bij.

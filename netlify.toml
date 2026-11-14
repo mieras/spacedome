@@ -1,12 +1,14 @@
 [build]
   command = "npm run build"
   publish = "dist"
-  # Alleen docs of README/CHANGELOG e.d. in de root gewijzigd? (content-.md in src/ telt wél) Dan geen build (scheelt credits).
-  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- . ':(exclude)docs' ':(exclude,glob)*.md'"
+  # Alleen docs, README/CHANGELOG of het Markdown-archief (src/content, bron voor sanity:migrate) gewijzigd? Dan geen build.
+  # Content komt live uit Sanity; een publicatie start geen build.
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- . ':(exclude)docs' ':(exclude)src/content' ':(exclude,glob)*.md'"
 
 [build.environment]
   NODE_VERSION = "22.23.5"
 
+# Geldt voor statische bestanden. Server-pagina's krijgen deze headers uit src/middleware.ts.
 [[headers]]
   for = "/*"
   [headers.values]
