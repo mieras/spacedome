@@ -6,21 +6,25 @@ import QueueButton from '../components/QueueButton.astro';
 import SetGrid from '../components/SetGrid.astro';
 import { t } from '../i18n/ui';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { djHref, genreHref, getLibrary, getSettings, setHref, setsByDj, setStill, toPlayerItem } from '../lib/content';
+import { djHref, genreHref, getHome, getLibrary, getSettings, setHref, setsByDj, setStill, toPlayerItem } from '../lib/content';
 import { formatDate, formatDuration, joinNames } from '../lib/format';
+import { stripStega } from '../lib/sanity/visual-editing';
 
-const [lib, settings] = await Promise.all([getLibrary(), getSettings()]);
+const [lib, settings, home] = await Promise.all([getLibrary(), getSettings(), getHome()]);
 const featured = lib.sets.find((s) => s.data.featured) ?? lib.sets[0];
 const featuredItem = featured && (await toPlayerItem(featured, lib));
 const latest = lib.sets.filter((s) => s.id !== featured?.id).slice(0, 8);
 const djs = lib.djs.filter((d) => setsByDj(lib, d.id).length > 0);
+// Langste woord van de kop (zonder stega-tekens): bepaalt hoe groot de kop mag op een smal scherm.
+// Op de intro-div, niet op de h1: reveal.ts wist na de animatie alle inline styles van de h1.
+const longestWord = Math.max(6, ...stripStega(home.title).split(/\s+/).map((w) => w.length));
 ---
 
 <BaseLayout title={settings.siteName} isHome>
   <section class="hero wrapper" aria-labelledby="hero-title">
-    <div class="hero__intro">
-      <h1 id="hero-title" class="hero__title" data-reveal="words">Recorded live in the dome</h1>
-      <p class="lead" data-reveal="up">Radio shows and DJ sets: beats, trip-hop, deep grooves and experimental rhythms. Watch, listen, repeat.</p>
+    <div class="hero__intro" style={`--longest-word: ${longestWord}`}>
+      <h1 id="hero-title" class="hero__title" data-reveal="words">{home.title}</h1>
+      <p class="lead" data-reveal="up">{home.intro}</p>
       <p class="hero__cta" data-reveal="up">
         <a class="button button--primary" href="/sets">{t('home.browseSets')}</a>
         <a class="button" href="/about">{t('nav.about')}</a>
@@ -121,11 +125,19 @@ const djs = lib.djs.filter((d) => setsByDj(lib, d.id).length > 0);
     /* Intro blijft staan terwijl de featured set langsschuift, tot de hero ophoudt. */
     .hero__intro { position: sticky; inset-block-start: calc(var(--header-h) + var(--space-m)); }
   }
-  .hero__intro { display: grid; gap: var(--space-s); align-content: start; }
+  .hero__intro { display: grid; gap: var(--space-s); align-content: start; container-type: inline-size; }
   .hero__cta { display: flex; flex-wrap: wrap; gap: var(--space-2xs); margin-block-start: var(--space-2xs); }
-  /* Zo groot als het past: nooit breder dan ~12 tekens per regel op een telefoon. */
+  /*
+   * Zo groot als het past, maar het langste woord (--longest-word, uit de titel) moet op één regel:
+   * niet midden in een woord afbreken. Gemeten in Notch: hoofdletter gemiddeld 0.64em, M/W 0.91em;
+   * 0.7 geeft marge. cqi = breedte van de intro-kolom (op desktop 5/12), niet van het scherm.
+   * Alleen een woord vol M's en W's breekt nog (break-word: vangnet tegen horizontaal scrollen).
+   */
   .hero__title {
-    font-size: min(var(--step-7), 13vw);
+    --char: 0.7;
+    font-size: min(var(--step-7), 100cqi / (var(--longest-word, 8) * var(--char)));
+    overflow-wrap: break-word;
+    hyphens: manual;
     text-transform: uppercase;
     line-height: 0.92;
   }
@@ -165,8 +177,8 @@ const djs = lib.djs.filter((d) => setsByDj(lib, d.id).length > 0);
   .dj-row__item:hover span { text-decoration: underline; }
   .dj-row__item :global(.avatar) { transition: scale var(--dur) var(--ease-out); }
   .dj-row__item:hover :global(.avatar) { scale: 1.06; }
-  /* Grote titel pas als er ruimte is (op mobiel past een lang woord anders niet). */
+  /* Op desktop mag de kop groter (step-8), nog steeds begrensd door het langste woord. */
   @media (min-width: 60rem) {
-    .hero__title { font-size: min(var(--step-8), 7.5vw); }
+    .hero__title { font-size: min(var(--step-8), 100cqi / (var(--longest-word, 8) * var(--char))); }
   }
 </style>

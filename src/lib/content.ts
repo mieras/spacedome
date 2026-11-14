@@ -5,14 +5,14 @@
  */
 import { stegaClean } from '@sanity/client/stega';
 import type { PortableTextBlock } from '@portabletext/types';
-import type { DJS_QUERY_RESULT, GENRES_QUERY_RESULT, PAGE_QUERY_RESULT, SETS_QUERY_RESULT, SETTINGS_QUERY_RESULT } from '../../sanity.types';
+import type { DJS_QUERY_RESULT, GENRES_QUERY_RESULT, HOME_QUERY_RESULT, PAGE_QUERY_RESULT, SETS_QUERY_RESULT, SETTINGS_QUERY_RESULT } from '../../sanity.types';
 import { settings as defaults } from '../settings';
 import { artStyle } from './art';
 import { joinNames } from './format';
 import { urlFor } from './sanity/image';
 import { loadQuery } from './sanity/load-query';
 import { stripStega } from './sanity/visual-editing';
-import { DJS_QUERY, GENRES_QUERY, PAGE_QUERY, PAGES_QUERY, SETS_QUERY, SETTINGS_QUERY } from './sanity/queries';
+import { DJS_QUERY, GENRES_QUERY, HOME_QUERY, PAGE_QUERY, PAGES_QUERY, SETS_QUERY, SETTINGS_QUERY } from './sanity/queries';
 import { standaardTaal } from './talen';
 
 /* ---------- Normaliseren ---------- */
@@ -21,7 +21,7 @@ import { standaardTaal } from './talen';
  * Strings die op het scherm komen houden hun stega-tekens (klikbare overlays in de Presentation tool).
  * Al het andere (slugs, URL's, datums, getallen, keuzes) wordt schoongemaakt, anders breken links en logica.
  */
-const SHOWN = new Set(['title', 'name', 'location', 'description', 'text', 'label', 'artist', 'siteName', 'tagline', 'alt']);
+const SHOWN = new Set(['title', 'name', 'location', 'description', 'text', 'label', 'artist', 'siteName', 'tagline', 'intro', 'alt']);
 
 /** Type na normalize(): `null` wordt `undefined`. */
 type Clean<T> = T extends null ? undefined : T extends (infer U)[] ? Clean<U>[] : T extends object ? { [K in keyof T]: Clean<T[K]> } : T;
@@ -191,6 +191,18 @@ export async function getSettings(): Promise<SiteSettings> {
     socials: s.socials?.length ? s.socials.map((x) => ({ label: x.label, handle: x.handle ?? '', url: x.url })) : defaults.socials,
     noindex: s.noindex ?? defaults.noindex,
   };
+}
+
+/** Teksten op de homepage. Terugval als het document (nog) leeg is. */
+const HOME_DEFAULTS = {
+  title: 'Recorded live in the dome',
+  intro: 'Radio shows and DJ sets: beats, trip-hop, deep grooves and experimental rhythms. Watch, listen, repeat.',
+};
+
+export async function getHome() {
+  const { data } = await loadQuery<HOME_QUERY_RESULT>({ query: HOME_QUERY, params: { lang } });
+  const h = normalize(data ?? {}) as Partial<{ title: string; intro: string }>;
+  return { title: h.title || HOME_DEFAULTS.title, intro: h.intro || HOME_DEFAULTS.intro };
 }
 
 /** Alles in één keer, met snelle opzoektabellen. Collecties zijn klein (tientallen items). */

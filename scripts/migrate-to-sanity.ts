@@ -173,6 +173,14 @@ for (const p of pages) {
   );
 }
 
+// Homepage-teksten stonden in src/pages/index.astro.
+docs.push({
+  _id: 'home',
+  _type: 'home',
+  title: i18n('String', 'Recorded live in the dome'),
+  intro: i18n('Text', 'Radio shows and DJ sets: beats, trip-hop, deep grooves and experimental rhythms. Watch, listen, repeat.'),
+});
+
 docs.push(
   compact({
     _id: 'siteSettings',
@@ -195,10 +203,12 @@ if (DRY) {
   console.log(JSON.stringify(docs.find((d) => d._type === 'set'), null, 2));
 } else {
   const client = createClient({ projectId, dataset, token, apiVersion: '2025-01-01', useCdn: false });
-  const tx = client.transaction();
   // Sanity is nu de bron: standaard alleen ontbrekende documenten aanmaken.
-  for (const doc of docs) (FORCE ? tx.createOrReplace(doc) : tx.createIfNotExists(doc));
-  const res = await tx.commit({ visibility: 'sync' });
-  const written = res.results.filter((r) => r.operation !== 'none').length;
-  console.log(`Klaar (${FORCE ? 'overschreven' : 'alleen nieuw'}): ${written} van ${docs.length} documenten geschreven naar ${projectId}/${dataset}.`);
+  const existing = new Set(await client.fetch<string[]>('*[_id in $ids]._id', { ids: docs.map((d) => d._id) }));
+  const todo = FORCE ? docs : docs.filter((d) => !existing.has(d._id));
+  const tx = client.transaction();
+  for (const doc of todo) (FORCE ? tx.createOrReplace(doc) : tx.createIfNotExists(doc));
+  if (todo.length) await tx.commit({ visibility: 'sync' });
+  console.log(`Klaar (${FORCE ? 'alles overschreven' : 'alleen nieuw'}): ${todo.length} van ${docs.length} documenten geschreven naar ${projectId}/${dataset}.`);
+  if (!FORCE) for (const d of todo) console.log(`  + ${d._id}`);
 }

@@ -52,6 +52,11 @@ export const PAGE_QUERY = defineQuery(`*[_type == "page" && slug.current == $slu
 
 export const PAGES_QUERY = defineQuery(`*[_type == "page" && defined(slug.current)] { "id": slug.current, _updatedAt }`);
 
+export const HOME_QUERY = defineQuery(`*[_type == "home" && _id == "home"][0] {
+  "title": coalesce(title[language == $lang][0].value, title[language == "en"][0].value),
+  "intro": coalesce(intro[language == $lang][0].value, intro[language == "en"][0].value)
+}`);
+
 export const SETTINGS_QUERY = defineQuery(`*[_type == "siteSettings" && _id == "siteSettings"][0] {
   siteName,
   "tagline": coalesce(tagline[language == $lang][0].value, tagline[language == "en"][0].value),

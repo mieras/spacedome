@@ -69,6 +69,16 @@ export type InternationalizedArrayString = Array<
   } & InternationalizedArrayStringValue
 >;
 
+export type Home = {
+  _id: string;
+  _type: "home";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: InternationalizedArrayString;
+  intro?: InternationalizedArrayText;
+};
+
 export type Page = {
   _id: string;
   _type: "page";
@@ -375,6 +385,7 @@ export type AllSanitySchemaTypes =
   | SiteSettings
   | InternationalizedArrayText
   | InternationalizedArrayString
+  | Home
   | Page
   | InternationalizedArrayBlockContent
   | Slug
@@ -542,6 +553,14 @@ export type PAGES_QUERY_RESULT = Array<{
 }>;
 
 // Source: src/lib/sanity/queries.ts
+// Variable: HOME_QUERY
+// Query: *[_type == "home" && _id == "home"][0] {  "title": coalesce(title[language == $lang][0].value, title[language == "en"][0].value),  "intro": coalesce(intro[language == $lang][0].value, intro[language == "en"][0].value)}
+export type HOME_QUERY_RESULT = {
+  title: string | null;
+  intro: string | null;
+} | null;
+
+// Source: src/lib/sanity/queries.ts
 // Variable: SETTINGS_QUERY
 // Query: *[_type == "siteSettings" && _id == "siteSettings"][0] {  siteName,  "tagline": coalesce(tagline[language == $lang][0].value, tagline[language == "en"][0].value),  "description": coalesce(description[language == $lang][0].value, description[language == "en"][0].value),  socials[] { _key, label, handle, url },  noindex}
 export type SETTINGS_QUERY_RESULT = {
@@ -565,6 +584,7 @@ declare global {
     '*[_type == "genre" && defined(slug.current)] | order(title asc) {\n  _id,\n  "id": slug.current,\n  title,\n  "description": coalesce(description[language == $lang][0].value, description[language == "en"][0].value)\n}': GENRES_QUERY_RESULT;
     '*[_type == "page" && slug.current == $slug][0] {\n  _id,\n  "id": slug.current,\n  "title": coalesce(title[language == $lang][0].value, title[language == "en"][0].value),\n  "description": coalesce(description[language == $lang][0].value, description[language == "en"][0].value),\n  "content": coalesce(body[language == $lang][0].value, body[language == "en"][0].value)\n}': PAGE_QUERY_RESULT;
     '*[_type == "page" && defined(slug.current)] { "id": slug.current, _updatedAt }': PAGES_QUERY_RESULT;
+    '*[_type == "home" && _id == "home"][0] {\n  "title": coalesce(title[language == $lang][0].value, title[language == "en"][0].value),\n  "intro": coalesce(intro[language == $lang][0].value, intro[language == "en"][0].value)\n}': HOME_QUERY_RESULT;
     '*[_type == "siteSettings" && _id == "siteSettings"][0] {\n  siteName,\n  "tagline": coalesce(tagline[language == $lang][0].value, tagline[language == "en"][0].value),\n  "description": coalesce(description[language == $lang][0].value, description[language == "en"][0].value),\n  socials[] { _key, label, handle, url },\n  noindex\n}': SETTINGS_QUERY_RESULT;
   }
 }

@@ -8,6 +8,7 @@ Categorieën: **Toegevoegd**, **Gewijzigd**, **Opgelost**, **Verwijderd**, **Bev
 ## [Unreleased]
 
 ### Toegevoegd
+- Home in Sanity (vast document `home`, NL/EN): titel en intro van de hero zijn bewerkbaar, ook via de preview. Bovenaan in de Studio; teksten uit de code als terugval.
 - Content live uit Sanity: alle pagina's lezen via `loadQuery()` met GROQ-queries en TypeGen-types (`src/lib/sanity/`). De site draait server-rendered op Netlify (`output: 'server'`, `@astrojs/netlify`); `getStaticPaths` en content collections zijn weg, onbekende slugs geven de 404.
 - Presentation tool in de Studio (*Preview*): drafts met klikbare overlays, volgens `_standards/SANITY.md` §3. Ondertekende preview-cookie via `/api/preview`, alleen actief in de iframe van de Studio; eigen `VisualEditing` met history-adapter; volledige page loads in de preview (ClientRouter). Documenten gekoppeld aan URL's (`src/lib/sanity/resolve.ts`).
 - CDN-cache: HTML blijft in de Netlify-CDN (tag `sanity`) tot een publicatie; `/api/revalidate` controleert de Sanity-webhook (`SANITY_WEBHOOK_SECRET`) en leegt de cache (`@netlify/cache`). Met preview-cookie `private, no-store`.
@@ -32,6 +33,8 @@ Categorieën: **Toegevoegd**, **Gewijzigd**, **Opgelost**, **Verwijderd**, **Bev
 - De eerste twee Space Dome-avonden in Melkweg (14-07-2023 en 23-12-2023) met line-up; nieuwe dj-pagina's voor Mono/Poly, Kutmah, Cintasoul, Cheyanne Hudson, Odaira en Sunny Saimuns.
 
 ### Gewijzigd
+- Hero-kop breekt niet meer midden in een woord ("RECORDE/D"): de grootte volgt de breedte van de intro-kolom (`cqi`) en het langste woord, in plaats van de schermbreedte.
+- Migratiescript meldt welke documenten nieuw zijn (de teller telde alles mee).
 - Migratiescript maakt standaard alleen ontbrekende documenten aan (`createIfNotExists`), zodat Studio-wijzigingen blijven staan; `--force` overschrijft.
 - Security-headers ook op server-pagina's (middleware); `netlify.toml` start geen build meer bij wijzigingen in het Markdown-archief.
 - Footer: peak gradient met hoger dal (0.76) en een lagere, vlakkere start.

@@ -81,6 +81,7 @@ DESIGN.md       Ontwerpsysteem
 - **DJs:** naam, plaats, resident, foto, links, bio (body).
 - **Genres:** titel, omschrijving.
 - **Pages:** about.
+- **Home** (Sanity, één vast document): titel en intro van de hero. De uitgelichte set kies je met *Uitgelicht* op een set.
 - De content is **dummy** (fictieve dj's), behalve de sets van Drvg Cvltvre en Ono-Sendai Sound en de about-tekst (die gaat nog over de avonden; nieuwe tekst voor FM komt van Space Dome).
 - **Bron is Sanity.** Pagina's lezen alleen via `src/lib/content.ts`, die via `loadQuery()` (`src/lib/sanity/`) GROQ-queries draait (`queries.ts`, types uit TypeGen). Lege velden worden `undefined`; stega (onzichtbare tekens voor de preview) blijft alleen op zichtbare tekst.
 - **Rendering:** elke pagina wordt op verzoek gerenderd en daarna door de Netlify-CDN bewaard (`Netlify-CDN-Cache-Control`, tag `sanity`). Na publiceren roept een Sanity-webhook `/api/revalidate` aan, die de hele cache leegt (header en footer tonen alle genres en tellingen, dus vrijwel elke pagina hangt van alle content af). Geen rebuild nodig.

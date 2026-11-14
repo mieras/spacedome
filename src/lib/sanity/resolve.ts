@@ -5,12 +5,14 @@ const home = { title: 'Home', href: '/' };
 
 export const resolve: PresentationPluginOptions['resolve'] = {
   mainDocuments: defineDocuments([
+    { route: '/', filter: `_type == "home" && _id == "home"` },
     { route: '/sets/:slug', filter: `_type == "set" && slug.current == $slug` },
     { route: '/djs/:slug', filter: `_type == "dj" && slug.current == $slug` },
     { route: '/genres/:slug', filter: `_type == "genre" && slug.current == $slug` },
     { route: '/about', filter: `_type == "page" && slug.current == "about"` },
   ]),
   locations: {
+    home: defineLocations({ locations: [home] }),
     set: defineLocations({
       select: { title: 'title', slug: 'slug.current' },
       resolve: (doc) => ({
