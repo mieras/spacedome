@@ -33,9 +33,9 @@ export type Video = {
   _type: "video";
   src: string;
   duration?: number;
+  thumbnail?: string;
   bunny?: string;
   stack?: number;
-  thumbnail?: string;
 };
 
 export type SiteSettings = {

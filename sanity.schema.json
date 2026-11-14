@@ -100,6 +100,13 @@
           },
           "optional": true
         },
+        "thumbnail": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
         "bunny": {
           "type": "objectAttribute",
           "value": {
@@ -111,13 +118,6 @@
           "type": "objectAttribute",
           "value": {
             "type": "number"
-          },
-          "optional": true
-        },
-        "thumbnail": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string"
           },
           "optional": true
         }

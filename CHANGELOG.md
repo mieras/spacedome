@@ -33,6 +33,7 @@ Categorieën: **Toegevoegd**, **Gewijzigd**, **Opgelost**, **Verwijderd**, **Bev
 - De eerste twee Space Dome-avonden in Melkweg (14-07-2023 en 23-12-2023) met line-up; nieuwe dj-pagina's voor Mono/Poly, Kutmah, Cintasoul, Cheyanne Hudson, Odaira en Sunny Saimuns.
 
 ### Gewijzigd
+- Studio, set → Video en beeld: korte uitleg onder elk veld. Bunny-guid en STACK-id ingeklapt onder *Technisch*; *Moment voor de still* is alleen-lezen (het bepaalde bij het importeren welke still Bunny pakte; aanpassen deed niets).
 - Hero-kop breekt niet meer midden in een woord ("RECORDE/D"): de grootte volgt de breedte van de intro-kolom (`cqi`) en het langste woord, in plaats van de schermbreedte.
 - Migratiescript meldt welke documenten nieuw zijn (de teller telde alles mee).
 - Migratiescript maakt standaard alleen ontbrekende documenten aan (`createIfNotExists`), zodat Studio-wijzigingen blijven staan; `--force` overschrijft.
