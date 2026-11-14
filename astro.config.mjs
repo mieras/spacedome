@@ -30,6 +30,9 @@ export default defineConfig({
     react(),
   ],
   vite: {
+    // Welke Netlify-site dit is (production, branch-deploy, deploy-preview; lokaal 'dev'). Netlify zet CONTEXT
+    // alleen tijdens de build, dus we bakken hem in. Bepaalt welke status-schakelaar uit Sanity geldt.
+    define: { __DEPLOY_CONTEXT__: JSON.stringify(process.env.CONTEXT ?? 'dev') },
     css: {
       preprocessorOptions: {
         // Zodat `@use 'utopia-core-scss/src/utopia'` uit node_modules werkt.

@@ -48,6 +48,7 @@ Zonder `.env` werkt de site (projectgegevens staan als terugval in de config; ge
 | `PUBLIC_SANITY_PROJECT_ID` | Sanity-project (`6fcexd1b`) | sanity.io/manage |
 | `PUBLIC_SANITY_DATASET` | Dataset (`production`) | sanity.io/manage |
 | `SANITY_API_READ_TOKEN` | Drafts in de Presentation tool en ondertekenen van de preview-cookie (rol Viewer), geheim. Op Netlify voor Production, Deploy previews en Branch deploys | sanity.io/manage → API → Tokens |
+| `SITE_STATUS` | Optioneel, noodknop: `live`, `comingSoon` of `maintenance` wint van Sanity. Wordt bij de build ingebakken, dus na wijzigen opnieuw deployen | Zelf zetten op Netlify (per context) |
 | `SANITY_WEBHOOK_SECRET` | Controleert de webhook die na publiceren de CDN leegt (`/api/revalidate`), geheim. Alleen op Netlify | Zelf kiezen; zelfde waarde in de Sanity-webhook |
 | `SANITY_API_WRITE_TOKEN` | Migratiescript (rol Editor/Developer), geheim, alleen lokaal. Intrekken na de migratie | sanity.io/manage → API → Tokens |
 | `BUNNY_STREAM_LIBRARY_ID` | Videobibliotheek | Bunny → Stream → library → API |
@@ -81,6 +82,7 @@ DESIGN.md       Ontwerpsysteem
 - **DJs:** naam, plaats, resident, foto, links, bio (body).
 - **Genres:** titel, omschrijving.
 - **Pages:** about.
+- **Statuspagina** (`/coming-soon`): Site-instellingen → *Status* in Sanity. Live, Coming soon of Onderhoud, met een **aparte schakelaar voor de live site (main) en voor staging/previews** (zelfde dataset, dus anders zou staging de live site raken). Welke geldt, bepaalt de build via Netlify's `CONTEXT` (`production` = main). Niet op Live: elke pagina toont de statuspagina (onderhoud met 503 en `Retry-After`); de Studio, `/api`, `robots.txt`, sitemap en `llms.txt` blijven bereikbaar. Wie in de Studio de *Preview* opent, krijgt een cookie en ziet 12 uur lang de hele site, ook in een gewoon tabblad. Titel, tekst en countdown optioneel; bij nul staat er "Any moment now", live gaan blijft een handmatige stap. Bekijken zonder iets aan te zetten: `/coming-soon` en `/coming-soon?mode=maintenance`. Omschakelen werkt pas direct als de webhook de CDN leegt (zie Deploy).
 - **Home** (Sanity, één vast document): titel en intro van de hero. De uitgelichte set kies je met *Uitgelicht* op een set.
 - De content is **dummy** (fictieve dj's), behalve de sets van Drvg Cvltvre en Ono-Sendai Sound en de about-tekst (die gaat nog over de avonden; nieuwe tekst voor FM komt van Space Dome).
 - **Bron is Sanity.** Pagina's lezen alleen via `src/lib/content.ts`, die via `loadQuery()` (`src/lib/sanity/`) GROQ-queries draait (`queries.ts`, types uit TypeGen). Lege velden worden `undefined`; stega (onzichtbare tekens voor de preview) blijft alleen op zichtbare tekst.

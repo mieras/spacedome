@@ -62,5 +62,10 @@ export const SETTINGS_QUERY = defineQuery(`*[_type == "siteSettings" && _id == "
   "tagline": coalesce(tagline[language == $lang][0].value, tagline[language == "en"][0].value),
   "description": coalesce(description[language == $lang][0].value, description[language == "en"][0].value),
   socials[] { _key, label, handle, url },
-  noindex
+  noindex,
+  status,
+  statusStaging,
+  "statusTitle": coalesce(statusTitle[language == $lang][0].value, statusTitle[language == "en"][0].value),
+  "statusText": coalesce(statusText[language == $lang][0].value, statusText[language == "en"][0].value),
+  countdown
 }`);

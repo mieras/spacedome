@@ -25,9 +25,11 @@ interface Props {
   isHome?: boolean;
   noindex?: boolean;
   jsonLd?: object[];
+  /** Zonder header, footer en player (statuspagina). */
+  bare?: boolean;
 }
 
-const props = Astro.props;
+const { bare = false, ...props } = Astro.props;
 const visualEditing = Astro.locals.visualEditing;
 ---
 
@@ -46,14 +48,22 @@ const visualEditing = Astro.locals.visualEditing;
     <ClientRouter />
   </head>
   <body>
-    <a class="skip-link" href="#main">{t('skip')}</a>
-    <PageProgress />
-    <Header />
-    <main id="main" data-page tabindex="-1">
-      <slot />
-    </main>
-    <Footer />
-    <Player />
+    {
+      bare ? (
+        <slot />
+      ) : (
+        <>
+          <a class="skip-link" href="#main">{t('skip')}</a>
+          <PageProgress />
+          <Header />
+          <main id="main" data-page tabindex="-1">
+            <slot />
+          </main>
+          <Footer />
+          <Player />
+        </>
+      )
+    }
     {visualEditing && <VisualEditing client:only="react" />}
     {
       visualEditing && (

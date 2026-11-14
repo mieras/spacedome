@@ -61,6 +61,16 @@ const en = {
   'player.remove': 'Remove',
   'notFound.title': 'Lost in space',
   'notFound.text': 'This page drifted off. Try the sets instead.',
+  'status.comingSoon': 'Coming soon',
+  'status.maintenance': 'Back soon',
+  'status.maintenanceText': 'We are tuning the dome. Check back in a little while.',
+  'status.launch': 'Launching',
+  'status.backAt': 'Expected back',
+  'status.now': 'Any moment now',
+  'countdown.days': 'Days',
+  'countdown.hours': 'Hours',
+  'countdown.minutes': 'Min',
+  'countdown.seconds': 'Sec',
 } as const;
 
 type Key = keyof typeof en;

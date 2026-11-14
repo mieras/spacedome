@@ -43,4 +43,5 @@ Lees eerst `README.md` voor context, `CHANGELOG.md` voor recente wijzigingen en 
 - Mux-teststreams in de dummy-sets zijn placeholders.
 - Content is grotendeels dummy (fictieve dj's). Niet publiceren zonder echte content.
 - `src/settings.ts`: `noindex: true` tot livegang.
+- Statuspagina (`/coming-soon`, middleware): main en staging hebben elk een eigen status in Site-instellingen (`status` / `statusStaging`), gekozen via `__DEPLOY_CONTEXT__` (Netlify `CONTEXT` bij de build). Main staat op Coming soon tot livegang.
 - `/brand` (`src/pages/brand.astro`) is de stijlgids: nieuwe componenten, tokens of effecten daar ook tonen. Geen underline als hover-feedback op kaarten. Knoppen: `.button` krijgt de position-aware vulling vanzelf (`src/scripts/button-flair.ts`).

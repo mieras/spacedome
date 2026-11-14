@@ -239,6 +239,19 @@ const toc = [
       }
     </section>
 
+    <!-- Statuspagina -->
+    <section class="brand__section" aria-labelledby="status">
+      <h2 id="status" class="brand__title">Status page</h2>
+      <p class="brand__note">
+        Shown on every URL when the site is not live (Sanity → Site-instellingen → Status, separate for main and staging). Logo, peak gradient
+        (end state), optional countdown. Maintenance returns 503 with <code>Retry-After</code>. Anyone with a preview cookie (Studio → Preview) sees the full site.
+      </p>
+      <p class="brand__links">
+        <a class="button" href="/coming-soon">Coming soon</a>
+        <a class="button" href="/coming-soon?mode=maintenance">Maintenance</a>
+      </p>
+    </section>
+
     <!-- Effecten -->
     <section class="brand__section" aria-labelledby="effects">
       <h2 id="effects" class="brand__title">Effects</h2>
@@ -425,6 +438,7 @@ const toc = [
 </script>
 
 <style>
+  .brand__links { display: flex; flex-wrap: wrap; gap: var(--space-2xs); }
   .brand { display: grid; gap: var(--space-3xl); padding-block-end: var(--space-2xl); }
   /* Sticky direct onder de header, zonder kier: zelfde glasachtergrond als de header, over de
      volle breedte (border-image-truc), zodat er niets tussendoor schijnt. */

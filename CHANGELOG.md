@@ -8,6 +8,7 @@ Categorieën: **Toegevoegd**, **Gewijzigd**, **Opgelost**, **Verwijderd**, **Bev
 ## [Unreleased]
 
 ### Toegevoegd
+- Statuspagina `/coming-soon` (logo, peak gradient, optionele countdown) voor coming soon en onderhoud. Aan en uit in Site-instellingen → Status, apart voor de live site (main) en staging/previews; elke URL toont dan de statuspagina (onderhoud: 503 + `Retry-After`). Beheerders met preview-cookie zien de hele site. Noodknop `SITE_STATUS` (env). Main staat in Sanity op Coming soon, staging op Live. Ook op `/brand`.
 - Home in Sanity (vast document `home`, NL/EN): titel en intro van de hero zijn bewerkbaar, ook via de preview. Bovenaan in de Studio; teksten uit de code als terugval.
 - Content live uit Sanity: alle pagina's lezen via `loadQuery()` met GROQ-queries en TypeGen-types (`src/lib/sanity/`). De site draait server-rendered op Netlify (`output: 'server'`, `@astrojs/netlify`); `getStaticPaths` en content collections zijn weg, onbekende slugs geven de 404.
 - Presentation tool in de Studio (*Preview*): drafts met klikbare overlays, volgens `_standards/SANITY.md` §3. Ondertekende preview-cookie via `/api/preview`, alleen actief in de iframe van de Studio; eigen `VisualEditing` met history-adapter; volledige page loads in de preview (ClientRouter). Documenten gekoppeld aan URL's (`src/lib/sanity/resolve.ts`).

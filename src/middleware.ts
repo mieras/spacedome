@@ -4,9 +4,13 @@
  * Bezoekers krijgen HTML uit de Netlify-CDN. De cache blijft staan tot een publicatie in
  * Sanity hem leegt via /api/revalidate (tag `sanity`). Alles in één tag: header en footer
  * tonen genres en tellingen, dus vrijwel elke pagina hangt van alle content af.
+ *
+ * Staat de site niet op Live (Site-instellingen → Status, apart voor main en staging), dan krijgt elke
+ * pagina de statuspagina. Wie een geldige preview-cookie heeft (Studio → Preview) ziet de hele site.
  */
 import type { APIContext, MiddlewareNext } from 'astro';
 import { defineMiddleware } from 'astro:middleware';
+import { getSettings } from './lib/content';
 import { CACHE_TAG } from './lib/sanity/cache';
 import { PREVIEW_COOKIE, isValidPreviewCookie, runWithVisualEditing } from './lib/sanity/visual-editing';
 
@@ -16,6 +20,8 @@ const SECURITY_HEADERS = {
   'Referrer-Policy': 'strict-origin-when-cross-origin',
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
 };
+
+const STATUS_PATH = '/coming-soon';
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const response = await handle(context, next);
@@ -38,7 +44,14 @@ const handle = async (context: APIContext, next: MiddlewareNext): Promise<Respon
   const visualEditing = hasPreviewCookie && inIframe;
   context.locals.visualEditing = visualEditing;
 
-  const response = await runWithVisualEditing(visualEditing, next);
+  const response = await runWithVisualEditing(visualEditing, async () => {
+    // Statuspagina: niet voor beheerders, niet voor de pagina zelf en niet voor bestanden (sitemap, llms.txt).
+    if (!hasPreviewCookie && pathname !== STATUS_PATH && !pathname.includes('.')) {
+      const { status } = await getSettings();
+      if (status.mode !== 'live') return next(STATUS_PATH);
+    }
+    return next();
+  });
 
   // Met preview-cookie nooit cachen: de inhoud verschilt per iframe/tab.
   if (hasPreviewCookie) {

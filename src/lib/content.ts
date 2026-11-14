@@ -21,7 +21,7 @@ import { standaardTaal } from './talen';
  * Strings die op het scherm komen houden hun stega-tekens (klikbare overlays in de Presentation tool).
  * Al het andere (slugs, URL's, datums, getallen, keuzes) wordt schoongemaakt, anders breken links en logica.
  */
-const SHOWN = new Set(['title', 'name', 'location', 'description', 'text', 'label', 'artist', 'siteName', 'tagline', 'intro', 'alt']);
+const SHOWN = new Set(['title', 'name', 'location', 'description', 'text', 'label', 'artist', 'siteName', 'tagline', 'intro', 'statusTitle', 'statusText', 'alt']);
 
 /** Type na normalize(): `null` wordt `undefined`. */
 type Clean<T> = T extends null ? undefined : T extends (infer U)[] ? Clean<U>[] : T extends object ? { [K in keyof T]: Clean<T[K]> } : T;
@@ -176,7 +176,15 @@ export async function getPageSlugs() {
   return (data ?? []).map((p) => normalize(p));
 }
 
-export type SiteSettings = typeof defaults;
+export type SiteMode = 'live' | 'comingSoon' | 'maintenance';
+const MODES = new Set<SiteMode>(['live', 'comingSoon', 'maintenance']);
+const asMode = (v?: string | null): SiteMode | undefined => (v && MODES.has(v as SiteMode) ? (v as SiteMode) : undefined);
+
+/** Production (main) heeft een eigen schakelaar; staging, previews en lokaal de andere. */
+export const isProductionSite = __DEPLOY_CONTEXT__ === 'production';
+
+export type SiteStatus = { mode: SiteMode; title?: string; text?: string; countdown?: Date };
+export type SiteSettings = typeof defaults & { status: SiteStatus };
 
 /** Site-instellingen uit Sanity, met de vaste waarden uit src/settings.ts als terugval. */
 export async function getSettings(): Promise<SiteSettings> {
@@ -190,6 +198,13 @@ export async function getSettings(): Promise<SiteSettings> {
     titleTemplate: `%s · ${stegaClean(s.siteName ?? defaults.siteName)}`,
     socials: s.socials?.length ? s.socials.map((x) => ({ label: x.label, handle: x.handle ?? '', url: x.url })) : defaults.socials,
     noindex: s.noindex ?? defaults.noindex,
+    status: {
+      // SITE_STATUS (env) wint: noodknop als Sanity niet bereikbaar is, en om lokaal te testen.
+      mode: asMode(import.meta.env.SITE_STATUS) ?? asMode(isProductionSite ? s.status : s.statusStaging) ?? 'live',
+      title: s.statusTitle ?? undefined,
+      text: s.statusText ?? undefined,
+      countdown: s.countdown ? new Date(s.countdown) : undefined,
+    },
   };
 }
 
