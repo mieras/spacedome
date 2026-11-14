@@ -6,11 +6,11 @@
 |---|---|
 | **Klant** | Space Dome (vriendendienst) |
 | **Bedrijf** | MIERAS |
-| **Status** | WIP · eerste versie op Markdown-content, Sanity volgt |
+| **Status** | WIP · site leest nog Markdown; Sanity staat klaar met de content erin (Studio op `/admin`) |
 | **SLA** | Nee |
 | **Live** | TODO (domein nog niet gekozen, spacedome.xyz is niet beschikbaar; zie `docs/mail-intake.md`) |
 | **Netlify** | team MIERAS, site `spacedome` (later naar het account van Space Dome) |
-| **CMS** | Nog geen: Markdown in `src/content/`. Later Sanity (eerst MIERAS-account, daarna overdragen) |
+| **CMS** | Sanity, project `6fcexd1b` (Space Dome), dataset `production`, op het MIERAS-account (later overdragen). Studio: `/admin`. De site leest nog uit `src/content/` tot de datalaag over is |
 | **Repo** | [github.com/mieras/spacedome](https://github.com/mieras/spacedome) |
 | **Notion** | Repo-overzicht (privé) |
 
@@ -31,7 +31,9 @@ npm install
 npm run dev        # http://localhost:4321
 ```
 
-Overige scripts: `npm run build`, `npm run preview`, `npm run check`.
+Overige scripts: `npm run build`, `npm run preview`, `npm run check`, `npm run typegen` (types uit schema en queries, na elke schemawijziging), `npm run sanity:migrate` (Markdown → Sanity, `-- --dry-run` eerst).
+
+Studio: http://localhost:4321/admin (inloggen met je Sanity-account).
 
 ### Testvideo
 
@@ -39,13 +41,14 @@ De set `stack-test` speelt `public/media/stack-test.mp4` (8,6 MB): een korte opn
 
 ### Environment-variabelen
 
-Nog geen nodig. De namen voor later staan in `.env.example`.
+Zonder `.env` werkt de site (projectgegevens staan als terugval in de config). Tokens alleen voor preview en scripts; namen in `.env.example`.
 
 | Naam | Waarvoor | Waar te vinden |
 |---|---|---|
-| `PUBLIC_SANITY_PROJECT_ID` | Sanity-project (later) | sanity.io/manage |
-| `PUBLIC_SANITY_DATASET` | Dataset (later) | sanity.io/manage |
-| `SANITY_API_READ_TOKEN` | Drafts / visual editing, geheim (later) | sanity.io/manage → API → Tokens |
+| `PUBLIC_SANITY_PROJECT_ID` | Sanity-project (`6fcexd1b`) | sanity.io/manage |
+| `PUBLIC_SANITY_DATASET` | Dataset (`production`) | sanity.io/manage |
+| `SANITY_API_READ_TOKEN` | Drafts / visual editing (rol Viewer), geheim | sanity.io/manage → API → Tokens |
+| `SANITY_API_WRITE_TOKEN` | Migratiescript (rol Editor/Developer), geheim, alleen lokaal. Intrekken na de migratie | sanity.io/manage → API → Tokens |
 | `BUNNY_STREAM_LIBRARY_ID` | Videobibliotheek | Bunny → Stream → library → API |
 | `BUNNY_STREAM_CDN_HOSTNAME` | Hostnaam voor de HLS-URL's (`vz-….b-cdn.net`) | Bunny → Stream → library → API |
 | `BUNNY_STREAM_API_KEY` | Importscript (STACK → Bunny), geheim, alleen lokaal | Bunny → Stream → library → API |
@@ -78,6 +81,8 @@ DESIGN.md       Ontwerpsysteem
 - **Pages:** about.
 - Schema: `src/content.config.ts`. De Markdown-content is **dummy** (fictieve dj's), behalve de sets van Drvg Cvltvre en Ono-Sendai Sound en de about-tekst (die gaat nog over de avonden; nieuwe tekst voor FM komt van Space Dome).
 - Overstap naar Sanity volgens `~/Code/_standards/SANITY-MIGRATIE.md`; alle pagina's lezen via `src/lib/content.ts`.
+- **Sanity:** schema's in `schema/` (set, dj, genre, page, siteSettings), Studio-indeling in `schema/structure.ts`, config in `sanity.config.ts`. Vertaalbare tekst per veld met `sanity-plugin-internationalized-array` (v5: taal in `language`); Engels is verplicht, Nederlands optioneel. Talen in `src/lib/talen.ts`. Gegenereerde types: `sanity.types.ts` en `sanity.schema.json` (committen).
+- Content staat in Sanity via `scripts/migrate-to-sanity.ts` (vaste ID's `set-<slug>`, `dj-<slug>`, `genre-<slug>`, `page-<slug>`, `siteSettings`; herhaalbaar). Tot de datalaag over is blijft Markdown de bron: wijzig je Markdown, draai dan de migratie opnieuw.
 
 ### Set toevoegen (tot Sanity er is)
 

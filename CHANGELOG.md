@@ -8,6 +8,7 @@ Categorieën: **Toegevoegd**, **Gewijzigd**, **Opgelost**, **Verwijderd**, **Bev
 ## [Unreleased]
 
 ### Toegevoegd
+- Sanity (project `6fcexd1b`, dataset `production`): Studio ingebouwd op `/admin` (`@sanity/astro`, hash-router, geen adapter nodig), schema's voor set, dj, genre, page en site-instellingen, Studio-indeling Sets · DJ's · Genres · Pagina's · Site-instellingen. NL/EN per veld met `sanity-plugin-internationalized-array` (Engels verplicht). TypeGen (`npm run typegen`) en een herhaalbaar migratiescript (`npm run sanity:migrate`) dat alle Markdown-content overzet: 26 documenten, alle geldig.
 - `docs/plan.md`: projectplan met scope, contentmodel, fases en de rendering-aanpak (SSR op Netlify, CDN-cache met cache-tags, purge via Sanity-webhook). Briefingmail aan Space Dome in `docs/mail-briefing.md`. `docs/` staat voortaan in `.gitignore` (de repo is publiek); de map blijft lokaal.
 - Gegenereerde covers bewegen: de lichtbollen drijven, de kleur schuift mee en de ring (dome) zweeft en ademt; tempo en startpunt per seed, ring zet aan bij hover. Alleen CSS (`@property`), niet bij echte stills of `prefers-reduced-motion`.
 - Knoppen: position-aware hover (GSAP), een cirkel vult de knop vanaf de muis en rolt eruit waar je weggaat. Naar CodePen OJYywaJ. Niet op touch of bij reduced motion.

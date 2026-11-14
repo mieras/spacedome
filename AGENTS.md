@@ -24,7 +24,8 @@ Lees eerst `README.md` voor context, `CHANGELOG.md` voor recente wijzigingen en 
 - Klassen die je aan een child-component doorgeeft (`class="…"`) stijl je in de parent met `:global(.klasse)`, anders pakt Astro's scoping ze niet.
 - Toegankelijkheid: WCAG 2.2 AA. Semantische HTML, focus-states, `prefers-reduced-motion` respecteren.
 - AVG: geen cookies of tracking zonder toestemming; embeds pas na een klik (`~/Code/_standards/CONSENT.md`). Statistiek: TODO.
-- Content alleen via `src/lib/content.ts` (straks Sanity `loadQuery()`).
+- Content alleen via `src/lib/content.ts`. Die leest nu nog Markdown; Sanity (schema's in `schema/`, Studio op `/admin`) staat klaar en wordt de bron zodra de datalaag over is (`loadQuery()`, SSR, zie `docs/plan.md`). Tot dan: Markdown wijzigen = `npm run sanity:migrate` opnieuw draaien.
+- Sanity-schema gewijzigd of query toegevoegd? `npm run typegen`. Vertaalbare velden: `internationalizedArray*`, query op `language` (plugin v5), met terugval op `en`.
 - Afbeeldingen: profiel Website volgens `~/Code/_standards/IMAGES.md`.
 - Transities: laag 1-2 (ClientRouter + PageProgress) volgens `~/Code/_standards/TRANSITIONS.md`.
 - SEO en AI readiness volgens `~/Code/_standards/SEO.md`.
