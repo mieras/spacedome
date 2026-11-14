@@ -7,6 +7,8 @@ Categorieën: **Toegevoegd**, **Gewijzigd**, **Opgelost**, **Verwijderd**, **Bev
 
 ## [Unreleased]
 
+- Instagram heet nu @spacedome.fm: fallback in `src/settings.ts` bijgewerkt (Sanity-instellingen al aangepast).
+
 ## [2026-11-14]
 
 ### Toegevoegd

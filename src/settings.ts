@@ -14,7 +14,7 @@ export const settings = {
   /** TODO: op false zetten bij livegang. */
   noindex: true,
   allowAiTraining: true,
-  socials: [{ label: 'Instagram', handle: '@spacedome.xyz', url: 'https://www.instagram.com/spacedome.xyz/' }],
+  socials: [{ label: 'Instagram', handle: '@spacedome.fm', url: 'https://www.instagram.com/spacedome.fm/' }],
 };
 
 export type Settings = typeof settings;
