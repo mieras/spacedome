@@ -399,3 +399,176 @@ export type AllSanitySchemaTypes =
   | SanityAssetSourceData
   | SanityImageAsset
   | Geopoint;
+
+// Source: src/lib/sanity/queries.ts
+// Variable: SETS_QUERY
+// Query: *[_type == "set" && defined(slug.current)] | order(date desc) {  _id,  "id": slug.current,  title,  date,  featured,  filmedBy,  posterTime,  "djs": djs[]->slug.current,  "genres": genres[]->slug.current,  video { src, duration, bunny, stack, thumbnail },  poster { asset, crop, hotspot, alt },  tracklist[] { _key, artist, title, label, time },  "content": coalesce(description[language == $lang][0].value, description[language == "en"][0].value),  "text": pt::text(coalesce(description[language == $lang][0].value, description[language == "en"][0].value))}
+export type SETS_QUERY_RESULT = Array<{
+  _id: string;
+  id: string;
+  title: string;
+  date: string;
+  featured: boolean | null;
+  filmedBy: string | null;
+  posterTime: number | null;
+  djs: Array<string>;
+  genres: Array<string> | null;
+  video: {
+    src: string;
+    duration: number | null;
+    bunny: string | null;
+    stack: number | null;
+    thumbnail: string | null;
+  };
+  poster: {
+    asset: SanityImageAssetReference | null;
+    crop: SanityImageCrop | null;
+    hotspot: SanityImageHotspot | null;
+    alt: string | null;
+  } | null;
+  tracklist: Array<{
+    _key: string;
+    artist: string;
+    title: string;
+    label: string | null;
+    time: string | null;
+  }> | null;
+  content: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal";
+    listItem?: never;
+    markDefs?: Array<{
+      href: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }> | null;
+  text: string;
+}>;
+
+// Source: src/lib/sanity/queries.ts
+// Variable: DJS_QUERY
+// Query: *[_type == "dj" && defined(slug.current)] | order(name asc) {  _id,  "id": slug.current,  name,  location,  resident,  photo { asset, crop, hotspot, alt },  links[] { _key, label, url },  "content": coalesce(bio[language == $lang][0].value, bio[language == "en"][0].value),  "text": pt::text(coalesce(bio[language == $lang][0].value, bio[language == "en"][0].value))}
+export type DJS_QUERY_RESULT = Array<{
+  _id: string;
+  id: string;
+  name: string;
+  location: string | null;
+  resident: boolean | null;
+  photo: {
+    asset: SanityImageAssetReference | null;
+    crop: SanityImageCrop | null;
+    hotspot: SanityImageHotspot | null;
+    alt: string | null;
+  } | null;
+  links: Array<{
+    _key: string;
+    label: string;
+    url: string;
+  }> | null;
+  content: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal";
+    listItem?: never;
+    markDefs?: Array<{
+      href: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }> | null;
+  text: string;
+}>;
+
+// Source: src/lib/sanity/queries.ts
+// Variable: GENRES_QUERY
+// Query: *[_type == "genre" && defined(slug.current)] | order(title asc) {  _id,  "id": slug.current,  title,  "description": coalesce(description[language == $lang][0].value, description[language == "en"][0].value)}
+export type GENRES_QUERY_RESULT = Array<{
+  _id: string;
+  id: string;
+  title: string;
+  description: string | null;
+}>;
+
+// Source: src/lib/sanity/queries.ts
+// Variable: PAGE_QUERY
+// Query: *[_type == "page" && slug.current == $slug][0] {  _id,  "id": slug.current,  "title": coalesce(title[language == $lang][0].value, title[language == "en"][0].value),  "description": coalesce(description[language == $lang][0].value, description[language == "en"][0].value),  "content": coalesce(body[language == $lang][0].value, body[language == "en"][0].value)}
+export type PAGE_QUERY_RESULT = {
+  _id: string;
+  id: string;
+  title: string | null;
+  description: string | null;
+  content: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "h2" | "h3" | "normal";
+    listItem?: "bullet" | "number";
+    markDefs?: Array<{
+      href: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }> | null;
+} | null;
+
+// Source: src/lib/sanity/queries.ts
+// Variable: PAGES_QUERY
+// Query: *[_type == "page" && defined(slug.current)] { "id": slug.current, _updatedAt }
+export type PAGES_QUERY_RESULT = Array<{
+  id: string;
+  _updatedAt: string;
+}>;
+
+// Source: src/lib/sanity/queries.ts
+// Variable: SETTINGS_QUERY
+// Query: *[_type == "siteSettings" && _id == "siteSettings"][0] {  siteName,  "tagline": coalesce(tagline[language == $lang][0].value, tagline[language == "en"][0].value),  "description": coalesce(description[language == $lang][0].value, description[language == "en"][0].value),  socials[] { _key, label, handle, url },  noindex}
+export type SETTINGS_QUERY_RESULT = {
+  siteName: string;
+  tagline: string | null;
+  description: string | null;
+  socials: Array<{
+    _key: string;
+    label: string;
+    handle: string | null;
+    url: string;
+  }> | null;
+  noindex: boolean | null;
+} | null;
+
+// Query TypeMap
+declare global {
+  interface SanityQueries {
+    '*[_type == "set" && defined(slug.current)] | order(date desc) {\n  _id,\n  "id": slug.current,\n  title,\n  date,\n  featured,\n  filmedBy,\n  posterTime,\n  "djs": djs[]->slug.current,\n  "genres": genres[]->slug.current,\n  video { src, duration, bunny, stack, thumbnail },\n  poster { asset, crop, hotspot, alt },\n  tracklist[] { _key, artist, title, label, time },\n  "content": coalesce(description[language == $lang][0].value, description[language == "en"][0].value),\n  "text": pt::text(coalesce(description[language == $lang][0].value, description[language == "en"][0].value))\n}': SETS_QUERY_RESULT;
+    '*[_type == "dj" && defined(slug.current)] | order(name asc) {\n  _id,\n  "id": slug.current,\n  name,\n  location,\n  resident,\n  photo { asset, crop, hotspot, alt },\n  links[] { _key, label, url },\n  "content": coalesce(bio[language == $lang][0].value, bio[language == "en"][0].value),\n  "text": pt::text(coalesce(bio[language == $lang][0].value, bio[language == "en"][0].value))\n}': DJS_QUERY_RESULT;
+    '*[_type == "genre" && defined(slug.current)] | order(title asc) {\n  _id,\n  "id": slug.current,\n  title,\n  "description": coalesce(description[language == $lang][0].value, description[language == "en"][0].value)\n}': GENRES_QUERY_RESULT;
+    '*[_type == "page" && slug.current == $slug][0] {\n  _id,\n  "id": slug.current,\n  "title": coalesce(title[language == $lang][0].value, title[language == "en"][0].value),\n  "description": coalesce(description[language == $lang][0].value, description[language == "en"][0].value),\n  "content": coalesce(body[language == $lang][0].value, body[language == "en"][0].value)\n}': PAGE_QUERY_RESULT;
+    '*[_type == "page" && defined(slug.current)] { "id": slug.current, _updatedAt }': PAGES_QUERY_RESULT;
+    '*[_type == "siteSettings" && _id == "siteSettings"][0] {\n  siteName,\n  "tagline": coalesce(tagline[language == $lang][0].value, tagline[language == "en"][0].value),\n  "description": coalesce(description[language == $lang][0].value, description[language == "en"][0].value),\n  socials[] { _key, label, handle, url },\n  noindex\n}': SETTINGS_QUERY_RESULT;
+  }
+}
+// Lets @sanity/client releases that predate the global registry read it too
+declare module "@sanity/client" {
+  interface SanityQueries extends globalThis.SanityQueries {}
+}

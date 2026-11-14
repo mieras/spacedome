@@ -2,6 +2,9 @@
 import type { APIRoute } from 'astro';
 import { settings } from '../settings';
 
+// Geen content: mag vast in de build.
+export const prerender = true;
+
 const TRAINING_BOTS = ['GPTBot', 'ClaudeBot', 'Google-Extended', 'Applebot-Extended', 'CCBot', 'meta-externalagent'];
 
 export const GET: APIRoute = ({ site }) => {

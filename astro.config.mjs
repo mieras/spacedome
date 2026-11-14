@@ -1,6 +1,6 @@
 // @ts-check
+import netlify from '@astrojs/netlify';
 import react from '@astrojs/react';
-import sitemap from '@astrojs/sitemap';
 import sanity from '@sanity/astro';
 import { defineConfig } from 'astro/config';
 import { loadEnv } from 'vite';
@@ -12,19 +12,20 @@ export default defineConfig({
   // TODO: live-domein zodra dat gekozen is (spacedome.xyz is niet van ons, zie docs/mail-intake.md).
   site: 'https://spacedome.netlify.app',
   trailingSlash: 'never',
-  build: { format: 'file' },
+  // Server-rendering op Netlify: content komt live uit Sanity, de CDN bewaart de pagina's (src/middleware.ts).
+  output: 'server',
+  adapter: netlify(),
   prefetch: { prefetchAll: false, defaultStrategy: 'hover' },
-  // /brand is een interne stijlgids: niet in de sitemap (en noindex).
   integrations: [
-    sitemap({ filter: (page) => !page.endsWith('/brand') && !page.includes('/admin') }),
     sanity({
       projectId: env.PUBLIC_SANITY_PROJECT_ID || '6fcexd1b',
       dataset: env.PUBLIC_SANITY_DATASET || 'production',
       apiVersion: '2025-01-01',
-      // Gepubliceerde content via de CDN. Drafts (preview) komen later met een token, zie docs/plan.md.
-      useCdn: true,
-      // Studio op /admin. Statische build: hash-router (/admin#/…), geen adapter nodig.
+      // Altijd de API, niet de Sanity-CDN: na een purge moet de eerste render de nieuwe versie zien.
+      // Bezoekers krijgen de pagina uit de Netlify-CDN, dus de API ziet weinig verzoeken.
+      useCdn: false,
       studioBasePath: '/admin',
+      stega: { studioUrl: '/admin' },
     }),
     react(),
   ],

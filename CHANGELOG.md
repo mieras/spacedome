@@ -8,6 +8,11 @@ Categorieën: **Toegevoegd**, **Gewijzigd**, **Opgelost**, **Verwijderd**, **Bev
 ## [Unreleased]
 
 ### Toegevoegd
+- Content live uit Sanity: alle pagina's lezen via `loadQuery()` met GROQ-queries en TypeGen-types (`src/lib/sanity/`). De site draait server-rendered op Netlify (`output: 'server'`, `@astrojs/netlify`); `getStaticPaths` en content collections zijn weg, onbekende slugs geven de 404.
+- Presentation tool in de Studio (*Preview*): drafts met klikbare overlays, volgens `_standards/SANITY.md` §3. Ondertekende preview-cookie via `/api/preview`, alleen actief in de iframe van de Studio; eigen `VisualEditing` met history-adapter; volledige page loads in de preview (ClientRouter). Documenten gekoppeld aan URL's (`src/lib/sanity/resolve.ts`).
+- CDN-cache: HTML blijft in de Netlify-CDN (tag `sanity`) tot een publicatie; `/api/revalidate` controleert de Sanity-webhook (`SANITY_WEBHOOK_SECRET`) en leegt de cache (`@netlify/cache`). Met preview-cookie `private, no-store`.
+- Eigen `sitemap-index.xml` uit Sanity (leeg zolang `noindex` aan staat); `@astrojs/sitemap` eruit.
+- Site-instellingen (naam, tagline, omschrijving, socials, noindex) uit Sanity, met `src/settings.ts` als terugval.
 - Sanity (project `6fcexd1b`, dataset `production`): Studio ingebouwd op `/admin` (`@sanity/astro`, hash-router, geen adapter nodig), schema's voor set, dj, genre, page en site-instellingen, Studio-indeling Sets · DJ's · Genres · Pagina's · Site-instellingen. NL/EN per veld met `sanity-plugin-internationalized-array` (Engels verplicht). TypeGen (`npm run typegen`) en een herhaalbaar migratiescript (`npm run sanity:migrate`) dat alle Markdown-content overzet: 26 documenten, alle geldig.
 - `docs/plan.md`: projectplan met scope, contentmodel, fases en de rendering-aanpak (SSR op Netlify, CDN-cache met cache-tags, purge via Sanity-webhook). Briefingmail aan Space Dome in `docs/mail-briefing.md`. `docs/` staat voortaan in `.gitignore` (de repo is publiek); de map blijft lokaal.
 - Gegenereerde covers bewegen: de lichtbollen drijven, de kleur schuift mee en de ring (dome) zweeft en ademt; tempo en startpunt per seed, ring zet aan bij hover. Alleen CSS (`@property`), niet bij echte stills of `prefers-reduced-motion`.
@@ -27,6 +32,9 @@ Categorieën: **Toegevoegd**, **Gewijzigd**, **Opgelost**, **Verwijderd**, **Bev
 - De eerste twee Space Dome-avonden in Melkweg (14-07-2023 en 23-12-2023) met line-up; nieuwe dj-pagina's voor Mono/Poly, Kutmah, Cintasoul, Cheyanne Hudson, Odaira en Sunny Saimuns.
 
 ### Gewijzigd
+- Migratiescript maakt standaard alleen ontbrekende documenten aan (`createIfNotExists`), zodat Studio-wijzigingen blijven staan; `--force` overschrijft.
+- Security-headers ook op server-pagina's (middleware); `netlify.toml` start geen build meer bij wijzigingen in het Markdown-archief.
+- Footer: peak gradient met hoger dal (0.76) en een lagere, vlakkere start.
 - Scope: de site is alleen voor Space Dome FM. Tagline, omschrijving en home-intro spreken van radioshows en sets in plaats van avonden. README, DESIGN en AGENTS bijgewerkt.
 - Setkaarten: datum/locatie (`--step--2`) en dj's (`--step--1`) een stuk kleiner, zodat de titel de kaart draagt.
 - Fonts: Stack Sans-familie, self-hosted via Fontsource 5.3.0. Notch voor de grote titels (`--font-display`), Headline voor koppen (`--font-heading`), Text voor tekst. Unbounded blijft alleen voor het logo (`--font-logo`); Hanken Grotesk eruit.

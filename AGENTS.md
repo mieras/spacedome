@@ -5,7 +5,7 @@ Lees eerst `README.md` voor context, `CHANGELOG.md` voor recente wijzigingen en 
 
 ## Project
 - Klant: Space Dome (vriendendienst) · Bedrijf: MIERAS · SLA: nee
-- Stack: Astro 7.4, Markdown-content (Sanity later), Node 22.23.5 (zie `.nvmrc`)
+- Stack: Astro 7.4 server-rendered op Netlify, content uit Sanity, Node 22.23.5 (zie `.nvmrc`)
 - Maarten maakt geen kosten voor dit project: betaalde diensten (video, domein) komen op naam van Space Dome.
 
 ## Werkwijze
@@ -24,7 +24,10 @@ Lees eerst `README.md` voor context, `CHANGELOG.md` voor recente wijzigingen en 
 - Klassen die je aan een child-component doorgeeft (`class="…"`) stijl je in de parent met `:global(.klasse)`, anders pakt Astro's scoping ze niet.
 - Toegankelijkheid: WCAG 2.2 AA. Semantische HTML, focus-states, `prefers-reduced-motion` respecteren.
 - AVG: geen cookies of tracking zonder toestemming; embeds pas na een klik (`~/Code/_standards/CONSENT.md`). Statistiek: TODO.
-- Content alleen via `src/lib/content.ts`. Die leest nu nog Markdown; Sanity (schema's in `schema/`, Studio op `/admin`) staat klaar en wordt de bron zodra de datalaag over is (`loadQuery()`, SSR, zie `docs/plan.md`). Tot dan: Markdown wijzigen = `npm run sanity:migrate` opnieuw draaien.
+- Content alleen via `src/lib/content.ts`; die haalt alles op via `loadQuery()` (`src/lib/sanity/load-query.ts`), nooit direct `sanityClient.fetch`. Visual Editing en cache volgens `~/Code/_standards/SANITY.md` §3 en §6. Modelwijziging: `schema/` → query in `src/lib/sanity/queries.ts` → `npm run typegen` → `content.ts` → component.
+- Stega: zichtbare tekst houdt de onzichtbare tekens (overlays in de preview). Alles wat je vergelijkt, in een URL, `class`, `data-item` of de `<head>` zet: `stegaClean()` of `stripStega()` (dat laatste ook midden in samengestelde tekst). Symptoom als je het vergeet: links of logica breken alleen in de preview.
+- Geen `getStaticPaths` of `prerender` op pagina's met content (dan geen drafts in de preview en geen purge). Onbekende slug: `return Astro.rewrite('/404')`.
+- `src/content/` is een archief (bron voor `sanity:migrate` en `set:add`), niet meer voor de site.
 - Sanity-schema gewijzigd of query toegevoegd? `npm run typegen`. Vertaalbare velden: `internationalizedArray*`, query op `language` (plugin v5), met terugval op `en`.
 - Afbeeldingen: profiel Website volgens `~/Code/_standards/IMAGES.md`.
 - Transities: laag 1-2 (ClientRouter + PageProgress) volgens `~/Code/_standards/TRANSITIONS.md`.

@@ -1,6 +1,7 @@
 ---
 // <head>: titel, beschrijving, canonical, Open Graph, JSON-LD. Zie ~/Code/_standards/SEO.md.
-import { settings } from '../settings';
+import { getSettings } from '../lib/content';
+import { stripStega } from '../lib/sanity/visual-editing';
 import { entityJsonLd, pageDescription, pageTitle, websiteJsonLd } from '../lib/seo';
 
 interface Props {
@@ -15,12 +16,15 @@ interface Props {
 
 const { type = 'website', isHome = false, jsonLd = [] } = Astro.props;
 const site = Astro.site!;
-const title = pageTitle(Astro.props.title, isHome);
-const description = pageDescription(Astro.props.description);
+// Alles in de <head> zonder stega-tekens (_standards/SANITY.md §3).
+const raw = await getSettings();
+const settings = stripStega(raw);
+const title = stripStega(pageTitle(Astro.props.title, isHome, settings));
+const description = stripStega(pageDescription(Astro.props.description, settings));
 const noindex = settings.noindex || Astro.props.noindex;
 const canonical = new URL(Astro.url.pathname, site).href;
 const ogImage = new URL(Astro.props.image ?? '/og-default.png', site).href;
-const structuredData = [entityJsonLd(site), websiteJsonLd(site), ...jsonLd];
+const structuredData = stripStega([entityJsonLd(site, settings), websiteJsonLd(site, settings), ...jsonLd]);
 ---
 
 <title>{title}</title>

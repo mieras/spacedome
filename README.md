@@ -6,17 +6,17 @@
 |---|---|
 | **Klant** | Space Dome (vriendendienst) |
 | **Bedrijf** | MIERAS |
-| **Status** | WIP · site leest nog Markdown; Sanity staat klaar met de content erin (Studio op `/admin`) |
+| **Status** | WIP · content live uit Sanity (SSR op Netlify, CDN-cache), Studio met preview op `/admin` |
 | **SLA** | Nee |
 | **Live** | TODO (domein nog niet gekozen, spacedome.xyz is niet beschikbaar; zie `docs/mail-intake.md`) |
 | **Netlify** | team MIERAS, site `spacedome` (later naar het account van Space Dome) |
-| **CMS** | Sanity, project `6fcexd1b` (Space Dome), dataset `production`, op het MIERAS-account (later overdragen). Studio: `/admin`. De site leest nog uit `src/content/` tot de datalaag over is |
+| **CMS** | Sanity, project `6fcexd1b` (Space Dome), dataset `production`, op het MIERAS-account (later overdragen). Studio met Presentation (live preview van drafts): `/admin` |
 | **Repo** | [github.com/mieras/spacedome](https://github.com/mieras/spacedome) |
 | **Notion** | Repo-overzicht (privé) |
 
 ## Stack
 
-- Astro 7.4 · Node 22.23.5 (`.nvmrc`) · statisch
+- Astro 7.4 · Node 22.23.5 (`.nvmrc`) · server-rendered op Netlify (`@astrojs/netlify`), pagina's in de Netlify-CDN
 - Styling: SCSS met `utopia-core-scss` (fluid type en space), OKLCH-tokens met `light-dark()`, cascade layers
 - Fonts: Stack Sans Notch (grote titels), Stack Sans Headline (koppen), Stack Sans Text (tekst), Unbounded alleen voor het logo; self-hosted via Fontsource
 - Video: HLS via hls.js (Safari native). Nu teststreams van Mux; straks Bunny Stream
@@ -41,13 +41,14 @@ De set `stack-test` speelt `public/media/stack-test.mp4` (8,6 MB): een korte opn
 
 ### Environment-variabelen
 
-Zonder `.env` werkt de site (projectgegevens staan als terugval in de config). Tokens alleen voor preview en scripts; namen in `.env.example`.
+Zonder `.env` werkt de site (projectgegevens staan als terugval in de config; gepubliceerde content is openbaar leesbaar). Tokens alleen voor preview, cache legen en scripts; namen in `.env.example`.
 
 | Naam | Waarvoor | Waar te vinden |
 |---|---|---|
 | `PUBLIC_SANITY_PROJECT_ID` | Sanity-project (`6fcexd1b`) | sanity.io/manage |
 | `PUBLIC_SANITY_DATASET` | Dataset (`production`) | sanity.io/manage |
-| `SANITY_API_READ_TOKEN` | Drafts / visual editing (rol Viewer), geheim | sanity.io/manage → API → Tokens |
+| `SANITY_API_READ_TOKEN` | Drafts in de Presentation tool en ondertekenen van de preview-cookie (rol Viewer), geheim. Op Netlify voor Production, Deploy previews en Branch deploys | sanity.io/manage → API → Tokens |
+| `SANITY_WEBHOOK_SECRET` | Controleert de webhook die na publiceren de CDN leegt (`/api/revalidate`), geheim. Alleen op Netlify | Zelf kiezen; zelfde waarde in de Sanity-webhook |
 | `SANITY_API_WRITE_TOKEN` | Migratiescript (rol Editor/Developer), geheim, alleen lokaal. Intrekken na de migratie | sanity.io/manage → API → Tokens |
 | `BUNNY_STREAM_LIBRARY_ID` | Videobibliotheek | Bunny → Stream → library → API |
 | `BUNNY_STREAM_CDN_HOSTNAME` | Hostnaam voor de HLS-URL's (`vz-….b-cdn.net`) | Bunny → Stream → library → API |
@@ -62,10 +63,11 @@ Waarden staan nooit in git.
 ```
 src/
   components/   UI (SetCard, PlayButton, Player, CoverArt, …)
-  content/      Markdown: sets, djs, genres, pages
+  content/      Markdown-archief: bron voor sanity:migrate en set:add, niet meer voor de site
   i18n/         Interfaceteksten (EN, NL in voorbereiding)
   layouts/      BaseLayout (head, header, footer, player)
-  lib/          Datalaag (content.ts), art, format, seo
+  lib/          Datalaag (content.ts), sanity/ (queries, loadQuery, preview, Presentation-resolve), art, format, seo
+  middleware.ts Preview aan/uit per verzoek, CDN-cache-headers
   pages/        Routes
   scripts/      player.ts (site-brede player), share.ts
   styles/       tokens.scss (Utopia + kleur), layout, base, player
@@ -79,12 +81,14 @@ DESIGN.md       Ontwerpsysteem
 - **DJs:** naam, plaats, resident, foto, links, bio (body).
 - **Genres:** titel, omschrijving.
 - **Pages:** about.
-- Schema: `src/content.config.ts`. De Markdown-content is **dummy** (fictieve dj's), behalve de sets van Drvg Cvltvre en Ono-Sendai Sound en de about-tekst (die gaat nog over de avonden; nieuwe tekst voor FM komt van Space Dome).
-- Overstap naar Sanity volgens `~/Code/_standards/SANITY-MIGRATIE.md`; alle pagina's lezen via `src/lib/content.ts`.
+- De content is **dummy** (fictieve dj's), behalve de sets van Drvg Cvltvre en Ono-Sendai Sound en de about-tekst (die gaat nog over de avonden; nieuwe tekst voor FM komt van Space Dome).
+- **Bron is Sanity.** Pagina's lezen alleen via `src/lib/content.ts`, die via `loadQuery()` (`src/lib/sanity/`) GROQ-queries draait (`queries.ts`, types uit TypeGen). Lege velden worden `undefined`; stega (onzichtbare tekens voor de preview) blijft alleen op zichtbare tekst.
+- **Rendering:** elke pagina wordt op verzoek gerenderd en daarna door de Netlify-CDN bewaard (`Netlify-CDN-Cache-Control`, tag `sanity`). Na publiceren roept een Sanity-webhook `/api/revalidate` aan, die de hele cache leegt (header en footer tonen alle genres en tellingen, dus vrijwel elke pagina hangt van alle content af). Geen rebuild nodig.
+- **Preview:** Studio → *Preview* (Presentation tool) toont drafts met klikbare overlays, volgens `~/Code/_standards/SANITY.md` §3. `/api/preview` zet een ondertekende cookie; de middleware zet preview alleen aan met die cookie én in de iframe van de Studio. Met de cookie wordt niets gecachet.
 - **Sanity:** schema's in `schema/` (set, dj, genre, page, siteSettings), Studio-indeling in `schema/structure.ts`, config in `sanity.config.ts`. Vertaalbare tekst per veld met `sanity-plugin-internationalized-array` (v5: taal in `language`); Engels is verplicht, Nederlands optioneel. Talen in `src/lib/talen.ts`. Gegenereerde types: `sanity.types.ts` en `sanity.schema.json` (committen).
-- Content staat in Sanity via `scripts/migrate-to-sanity.ts` (vaste ID's `set-<slug>`, `dj-<slug>`, `genre-<slug>`, `page-<slug>`, `siteSettings`; herhaalbaar). Tot de datalaag over is blijft Markdown de bron: wijzig je Markdown, draai dan de migratie opnieuw.
+- `scripts/migrate-to-sanity.ts` zette de Markdown over (vaste ID's `set-<slug>`, `dj-<slug>`, `genre-<slug>`, `page-<slug>`, `siteSettings`). Het maakt standaard alleen ontbrekende documenten aan; bestaande (ook wat in de Studio is aangepast) blijven staan. `-- --force` overschrijft alles met Markdown.
 
-### Set toevoegen (tot Sanity er is)
+### Set toevoegen
 
 Sander zet de afgemonteerde opname in STACK, map **READY**, en stuurt de gegevens (titel, dj's, genres, tracklist). Dan:
 
@@ -93,7 +97,7 @@ npm run set:add            # kies een video uit STACK/READY en beantwoord de vra
 npm run set:add -- --list  # alleen kijken wat er staat (✓ = al op de site)
 ```
 
-Het script (`scripts/set-add.mjs`) laat Bunny Stream de video zelf uit STACK ophalen (server naar server), maakt `src/content/sets/<slug>.md` aan (plus nieuwe dj's/genres) en wacht tot Bunny klaar is met coderen. Daarna: tracklist en beschrijving aanvullen, checken met `npm run dev`, branch → PR naar `staging`.
+Het script (`scripts/set-add.mjs`) laat Bunny Stream de video zelf uit STACK ophalen (server naar server), maakt `src/content/sets/<slug>.md` aan (plus nieuwe dj's/genres) en wacht tot Bunny klaar is met coderen. Daarna `npm run sanity:migrate` (zet alleen de nieuwe documenten in Sanity) en tracklist en beschrijving aanvullen in de Studio. Het script schrijft nog Markdown; rechtstreeks naar Sanity is een open punt.
 
 - Nodig in `.env`: `STACK_SHARE_URL`, `BUNNY_STREAM_LIBRARY_ID`, `BUNNY_STREAM_CDN_HOSTNAME`, `BUNNY_STREAM_API_KEY`.
 - Bij STACK doet het script alleen lees-verzoeken.
@@ -111,6 +115,8 @@ Het script (`scripts/set-add.mjs`) laat Bunny Stream de video zelf uit STACK oph
 
 - Netlify-site `spacedome` op het MIERAS-team: https://spacedome.netlify.app (admin: app.netlify.com/projects/spacedome). Later over naar Space Dome.
 - Gekoppeld aan GitHub: `main` → productie (spacedome.netlify.app), `staging` → branch deploy (staging--spacedome.netlify.app), PR's → deploy preview. Werkwijze volgens `~/Code/_standards/DEPLOY.md`.
+- Content staat los van deploys: publiceren in Sanity leegt de CDN via de webhook. Wijzigingen in `src/content/` of docs starten geen build (`netlify.toml` → `ignore`).
+- **Sanity-webhook** (sanity.io/manage → API → Webhooks): GROQ, create/update/delete, filter `_type in ["set", "dj", "genre", "page", "siteSettings"] && !(_id in path("drafts.**"))`, projectie `{ _type, _id }`, POST naar `https://<site>/api/revalidate`, secret = `SANITY_WEBHOOK_SECRET`. Voor productie en staging een eigen webhook.
 - Branch protection op `staging` en `main`: alleen via PR (0 reviews nodig), geen force-push, niet verwijderen. De repo is publiek: nooit geheimen committen.
 
 ## Bekende issues en afspraken

@@ -2,7 +2,8 @@
  * Markdown (src/content) → Sanity. Volgens _standards/SANITY-MIGRATIE.md §3.
  *
  *   npm run sanity:migrate -- --dry-run   # valideren en tellen, niets schrijven
- *   npm run sanity:migrate                # schrijven (createOrReplace, herhaalbaar)
+ *   npm run sanity:migrate                # alleen nieuwe documenten aanmaken (bestaande blijven staan)
+ *   npm run sanity:migrate -- --force     # alles overschrijven met Markdown (wist wijzigingen uit de Studio!)
  *
  * Nodig in .env: SANITY_API_WRITE_TOKEN (Editor of hoger). Trek die token in als de migratie definitief is.
  * Vaste ID's (`set-<slug>`, `dj-<slug>`, …) en vaste _key's, zodat een tweede run niets verandert.
@@ -16,6 +17,7 @@ import { parse } from 'yaml';
 import { settings } from '../src/settings.ts';
 
 const DRY = process.argv.includes('--dry-run');
+const FORCE = process.argv.includes('--force');
 const ROOT = path.resolve(import.meta.dirname, '..');
 const CONTENT = path.join(ROOT, 'src/content');
 const TAAL = 'en'; // alle bestaande content is Engels
@@ -194,7 +196,9 @@ if (DRY) {
 } else {
   const client = createClient({ projectId, dataset, token, apiVersion: '2025-01-01', useCdn: false });
   const tx = client.transaction();
-  for (const doc of docs) tx.createOrReplace(doc);
+  // Sanity is nu de bron: standaard alleen ontbrekende documenten aanmaken.
+  for (const doc of docs) (FORCE ? tx.createOrReplace(doc) : tx.createIfNotExists(doc));
   const res = await tx.commit({ visibility: 'sync' });
-  console.log(`Klaar: ${res.results.length} documenten geschreven naar ${projectId}/${dataset}.`);
+  const written = res.results.filter((r) => r.operation !== 'none').length;
+  console.log(`Klaar (${FORCE ? 'overschreven' : 'alleen nieuw'}): ${written} van ${docs.length} documenten geschreven naar ${projectId}/${dataset}.`);
 }

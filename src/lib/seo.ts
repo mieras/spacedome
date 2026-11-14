@@ -1,5 +1,6 @@
 // Titel, beschrijving en JSON-LD. Zie ~/Code/_standards/SEO.md.
 import { settings, type Settings } from '../settings';
+// Settings uit Sanity (getSettings) hebben dezelfde vorm; de standaard is de vaste terugval.
 
 export function pageTitle(title: string, isHome = false, s: Settings = settings) {
   if (isHome) return `${s.siteName} — ${s.tagline}`;

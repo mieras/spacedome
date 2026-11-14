@@ -6,11 +6,10 @@ import QueueButton from '../components/QueueButton.astro';
 import SetGrid from '../components/SetGrid.astro';
 import { t } from '../i18n/ui';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { djHref, genreHref, getLibrary, setHref, setsByDj, setStill, toPlayerItem } from '../lib/content';
+import { djHref, genreHref, getLibrary, getSettings, setHref, setsByDj, setStill, toPlayerItem } from '../lib/content';
 import { formatDate, formatDuration, joinNames } from '../lib/format';
-import { settings } from '../settings';
 
-const lib = await getLibrary();
+const [lib, settings] = await Promise.all([getLibrary(), getSettings()]);
 const featured = lib.sets.find((s) => s.data.featured) ?? lib.sets[0];
 const featuredItem = featured && (await toPlayerItem(featured, lib));
 const latest = lib.sets.filter((s) => s.id !== featured?.id).slice(0, 8);

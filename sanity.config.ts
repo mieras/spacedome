@@ -4,16 +4,21 @@
 import { visionTool } from '@sanity/vision';
 import { defineConfig } from 'sanity';
 import { internationalizedArray } from 'sanity-plugin-internationalized-array';
+import { presentationTool } from 'sanity/presentation';
 import { structureTool } from 'sanity/structure';
 import { schemaTypes, singletonIds, singletonTypes } from './schema/index';
 import { blockContent, simpleBlockContent } from './schema/objects/blockContent';
 import { structure } from './schema/structure';
+import { resolve } from './src/lib/sanity/resolve';
 import { standaardTaal, talen } from './src/lib/talen';
 
 // Vite (Studio in Astro) kent import.meta.env; de Sanity CLI (typegen) niet: daarom de vaste terugval.
 const env = (import.meta as { env?: Record<string, string | undefined> }).env ?? {};
 export const projectId = env.PUBLIC_SANITY_PROJECT_ID || '6fcexd1b';
 export const dataset = env.PUBLIC_SANITY_DATASET || 'production';
+
+// De Studio draait op dezelfde site (/admin), dus de preview ook.
+const previewOrigin = typeof location !== 'undefined' ? location.origin : 'http://localhost:4321';
 
 export default defineConfig({
   name: 'spacedome',
@@ -22,6 +27,11 @@ export default defineConfig({
   dataset,
   plugins: [
     structureTool({ structure }),
+    presentationTool({
+      title: 'Preview',
+      resolve,
+      previewUrl: { initial: previewOrigin, previewMode: { enable: '/api/preview', disable: '/api/preview/disable' } },
+    }),
     internationalizedArray({
       languages: talen,
       defaultLanguages: [standaardTaal],
