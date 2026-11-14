@@ -7,6 +7,8 @@ Categorieën: **Toegevoegd**, **Gewijzigd**, **Opgelost**, **Verwijderd**, **Bev
 
 ## [Unreleased]
 
+## [2026-11-14]
+
 ### Toegevoegd
 - Statuspagina `/coming-soon` (logo, peak gradient, optionele countdown) voor coming soon en onderhoud. Aan en uit in Site-instellingen → Status, apart voor de live site (main) en staging/previews; elke URL toont dan de statuspagina (onderhoud: 503 + `Retry-After`). Beheerders met preview-cookie zien de hele site. Noodknop `SITE_STATUS` (env). Main staat in Sanity op Coming soon, staging op Live. Ook op `/brand`.
 - Home in Sanity (vast document `home`, NL/EN): titel en intro van de hero zijn bewerkbaar, ook via de preview. Bovenaan in de Studio; teksten uit de code als terugval.
