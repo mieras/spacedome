@@ -3,7 +3,9 @@
   publish = "dist"
   # Alleen docs, README/CHANGELOG of het Markdown-archief (src/content, bron voor sanity:migrate) gewijzigd? Dan geen build.
   # Content komt live uit Sanity; een publicatie start geen build.
-  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- . ':(exclude)docs' ':(exclude)src/content' ':(exclude,glob)*.md'"
+  # Vergelijk met HEAD^ (bij een merge: alles uit de PR), niet met $CACHED_COMMIT_REF: dat is de vorige build
+  # van de hele site, meestal de deploy preview van dezelfde code, waardoor merges naar staging/main werden overgeslagen.
+  ignore = "git diff --quiet HEAD^ HEAD -- . ':(exclude)docs' ':(exclude)src/content' ':(exclude,glob)*.md'"
 
 [build.environment]
   NODE_VERSION = "22.23.5"
