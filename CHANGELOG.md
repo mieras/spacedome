@@ -8,6 +8,7 @@ Categorieën: **Toegevoegd**, **Gewijzigd**, **Opgelost**, **Verwijderd**, **Bev
 ## [Unreleased]
 
 - Instagram heet nu @spacedome.fm: fallback in `src/settings.ts` bijgewerkt (Sanity-instellingen al aangepast).
+- Netlify slaat merges naar `staging` en `main` niet meer over: de `ignore`-regel in `netlify.toml` vergelijkt met `HEAD^` in plaats van `$CACHED_COMMIT_REF` (de vorige build, meestal de deploy preview van dezelfde code). Volgens `_standards/DEPLOY.md`.
 
 ## [2026-11-14]
 
